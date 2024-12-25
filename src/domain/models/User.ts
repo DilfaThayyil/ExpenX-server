@@ -1,0 +1,1 @@
+//define the user model in this domain layer to rpsnt the user data structure (email, password)
