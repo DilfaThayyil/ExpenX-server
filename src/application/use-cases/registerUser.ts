@@ -1,1 +1,2 @@
-//create use-case for register . contain the busicess logic for this functionality
+//create use-case for register . contain the business logic for this functionality
+
