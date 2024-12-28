@@ -1,35 +1,15 @@
-//repository Architecture
+import express, { Application } from "express";
+import authRoutes from "./routes/userRouter";
+const PORT = 3000
+import { connectDB } from "./config/connectDB";
 
-// src 
-//  |
-//  |----config
-//  |----controllers
-//  |----entities
-//  |----middlewares
-//  |----models 
-//  |----repositories
-//  |----routes 
-//  |----services
-//  |----socket
-//  |----uploads
-//  |----utils
-//  |----validator
-//  |----server.ts   
+const app: Application = express();
+app.use(express.json());
+app.use("/api/auth", authRoutes);
 
-// ------------------------------------------
 
-//config - cloudinaryConfig.ts , firebaseConfig.ts , connectDB.ts
-//controllers - chatController.ts , adminController.ts
-//entities - adminEntity.ts , otpEntity.ts
-//middlewares - authMiddleware.ts
-//models - userModel.ts , otpSchema.ts
-//repositories - implementations -
-//              , interface
-//routes - userRouter.ts , adminRouter.ts
-//services - implementation -
-//              , interface
-//socket - socketHandler.ts
-//uploads 
-//utils - sendOtp.ts , generateOtp.ts , bcrypt.ts , jwt.ts , multer.ts , notificationService.ts
-//validator - otpValidator.ts , registerValidator.ts , loginValidator.ts
-//server.ts
+connectDB().then(()=>{
+    app.listen(PORT, () => {
+      console.log(`Server is running on http://localhost:${PORT}`);
+    });
+  })
