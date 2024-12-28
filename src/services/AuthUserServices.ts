@@ -1,10 +1,10 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = 'http://localhost:3000/api/auth';
 
-export const createUser = async (data: { email: string; password: string }) => {
+export const createUser = async (data: {username:string, email: string; password: string }) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/auth/register`, data);
+    const response = await axios.post(`${API_BASE_URL}/register`, data);
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -16,7 +16,7 @@ export const createUser = async (data: { email: string; password: string }) => {
 
 export const otpGenerate = async (email: string) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/auth/otp-generate`, { email });
+    const response = await axios.post(`${API_BASE_URL}/sendOtp`, { email });
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
