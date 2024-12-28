@@ -5,6 +5,9 @@ import { connectDB } from "./config/connectDB";
 
 const app: Application = express();
 app.use(express.json());
+app.get('/',(req,res)=>{
+  res.send('Hello world')
+})
 app.use("/api/auth", authRoutes);
 
 
