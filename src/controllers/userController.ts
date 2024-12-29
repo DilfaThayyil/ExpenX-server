@@ -43,7 +43,7 @@ export const sendOtp = async (req: Request, res: Response):Promise<void> => {
   try {
     const { email } = req.body;
 
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otp = Math.floor(1000 + Math.random() * 9000).toString();
 
     const expirationTime = new Date(Date.now() + 60 * 1000); // 1 minute
     await OtpModel.create({ email, otp, expiresAt: expirationTime });
