@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
-import UserRepository from '../repositories/userRepository';
+import UserRepository from '../../repositories/userRepository';
 import nodemailer from 'nodemailer';
 import crypto from 'crypto';
-import OtpModel from '../models/otpSchema'; 
-
+import OtpModel from '../../models/otpSchema'; 
+import {verifyOtp} from '../../services/AuthUserServices'
 
 
 
@@ -15,7 +15,7 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
   const { username, email, password } = req.body;
 
   try {
-    const existingUser = await userRepository.findByEmail(email);
+    const existingUser = await userRepository.findUserByEmail(email);
     if (existingUser) {
         res.status(400).json({ message: 'User already exists' });
     }
@@ -45,7 +45,7 @@ export const sendOtp = async (req: Request, res: Response):Promise<void> => {
 
     const otp = Math.floor(1000 + Math.random() * 9000).toString();
 
-    const expirationTime = new Date(Date.now() + 60 * 1000); // 1 minute
+    const expirationTime = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
     await OtpModel.create({ email, otp, expiresAt: expirationTime });
 
     const transporter = nodemailer.createTransport({
@@ -72,3 +72,28 @@ export const sendOtp = async (req: Request, res: Response):Promise<void> => {
     res.status(500).json({ message: 'Failed to send OTP' });
   }
 };
+
+
+
+export const verifyOTP = async(req:Request,res:Response):Promise<void>=>{
+  const {otp,email} = req.body
+
+  if(!otp|| !email){
+    res.status(400).json({message:'OTP and email are required'})
+  }
+
+  try{
+    const token = await verifyOtp(email,otp)
+    if(token){
+      res.status(200).json({
+        message:'OTP verified successfully',
+        token
+      })
+    }else{
+      res.status(400).json({message:'Invalid OTP of OTP expired'})
+    }
+  }catch(error){
+    console.error('Error verifying OTP:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+}
