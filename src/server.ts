@@ -3,6 +3,8 @@ import authRoutes from "./routes/userRouter";
 const PORT = 3000
 import { connectDB } from "./config/connectDB";
 import cors from 'cors'
+import dotenv from 'dotenv'
+dotenv.config()
 
 
 const app: Application = express();

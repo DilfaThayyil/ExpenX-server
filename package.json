@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon --watch src --exec ts-node src/server.ts"
   },
   "keywords": [],
   "author": "",
@@ -18,8 +19,7 @@
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.9.2",
-    "nodemailer": "^6.9.16",
-    "ts-node": "^10.9.2"
+    "nodemailer": "^6.9.16"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
@@ -30,6 +30,8 @@
     "@types/mongoose": "^5.11.97",
     "@types/node": "^22.10.2",
     "@types/nodemailer": "^6.4.17",
+    "nodemon": "^3.1.9",
+    "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.7.2"
   }
