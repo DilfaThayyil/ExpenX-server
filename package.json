@@ -33,6 +33,7 @@
     "nodemon": "^3.1.9",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "vite-plugin-node-polyfills": "^0.22.0"
   }
 }

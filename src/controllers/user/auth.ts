@@ -4,7 +4,7 @@ import UserRepository from '../../repositories/userRepository';
 import nodemailer from 'nodemailer';
 import crypto from 'crypto';
 import OtpModel from '../../models/otpSchema'; 
-import {verifyOtp} from '../../services/AuthUserServices'
+// import {verifyOtp} from '../../services/AuthUserServices'
 
 
 
@@ -19,15 +19,6 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
     if (existingUser) {
         res.status(400).json({ message: 'User already exists' });
     }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = await userRepository.createUser({
-      username,
-      email,
-      password: hashedPassword,
-    });
-
-    res.status(201).json({ message: 'User registered successfully', user: newUser });
   } catch (error) {
     if(error instanceof Error){
         res.status(500).json({ message: 'Internal server error', error: error.message });
@@ -77,23 +68,39 @@ export const sendOtp = async (req: Request, res: Response):Promise<void> => {
 
 export const verifyOTP = async(req:Request,res:Response):Promise<void>=>{
   const {otp,email} = req.body
-
   if(!otp|| !email){
     res.status(400).json({message:'OTP and email are required'})
   }
-
-  try{
-    const token = await verifyOtp(email,otp)
-    if(token){
-      res.status(200).json({
-        message:'OTP verified successfully',
-        token
-      })
-    }else{
-      res.status(400).json({message:'Invalid OTP of OTP expired'})
+  const otpUser = await userRepository.findUserByEmail(email)
+  console.log('otpUser : ',otpUser)
+  if(!otpUser){
+    res.json({error:'User not found of OTP expired'})
+  }
+  if (otp !== otpUser.otp) {
+    res.json({ error: 'Incorrect OTP' }); 
+  }
+  if (otpUser.expiresAt < new Date()) {
+    res.json({ error: 'OTP is expired' });    
+  }
+    if (emailExists) {
+      throw new Error('Email is already in use');
     }
-  }catch(error){
-    console.error('Error verifying OTP:', error);
-    res.status(500).json({ message: 'Internal server error' });
+
+   
+    if (!isValidateEmail(user.email)) {
+      throw new Error('Invalid email format');
+    }
+
+    if (!isValidatePassword(user.password)) {
+      throw new Error('Weak password');
+    }
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = await userRepository.createUser({
+      username,
+      email,
+      password: hashedPassword,
+    });
+
+    res.status(201).json({ message: 'User registered successfully', user: newUser });
   }
 }

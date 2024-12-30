@@ -1,9 +1,10 @@
 import axios from 'axios';
 import {findOtpByEmail,deleteOtp} from '../repositories/otpRepository'
 import UserRepository from '../repositories/userRepository';
-import { generateJwt } from '../utils/jwt';
+// import { generateJwt } from '../utils/jwt';
 import { Types } from 'mongoose';
 const API_BASE_URL = 'http://localhost:3000/api/auth';
+
 const userRepository = new UserRepository()
 
 
@@ -48,5 +49,5 @@ export const verifyOtp = async(email:string,otp:string)=>{
     id:(user._id as Types.ObjectId).toString(),
     email:user.email
   }
-  return generateJwt(tokenPayload)
+
 }
