@@ -19,7 +19,9 @@
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.9.2",
-    "nodemailer": "^6.9.16"
+    "nodemailer": "^6.9.16",
+    "redis": "^4.7.0",
+    "sweetalert2": "^11.15.3"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
