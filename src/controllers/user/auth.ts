@@ -6,7 +6,6 @@ import { sendOtpEmail } from '../../utils/sendOtp';
 import redisClient from '../../utils/redisClient';
 import { HttpStatusCode } from '../../utils/httpStatusCode';
 import UserService from '../../services/userServices';
-import { error } from 'console';
 require('dotenv').config()
 // import bcrypt from 'bcrypt'
 // import {validate,validateEmail } from '../../use-cases/auth/validation';
