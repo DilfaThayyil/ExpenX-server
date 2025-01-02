@@ -1,9 +1,9 @@
 import express, { Application } from "express";
-import authRoutes from "./routes/userRouter";
-const PORT = 3000
+import authRoutes from "./routes/user/userRouter";
 import { connectDB } from "./config/connectDB";
 import cors from 'cors'
 import dotenv from 'dotenv'
+import { CLIENTURL,PORT } from "./config/env";
 dotenv.config()
 
 
@@ -12,9 +12,10 @@ app.get('/',(req,res)=>{
   res.send('Hello world')
 })
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: CLIENTURL,
   methods: ['GET', 'POST', 'PATCH', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
 }));
 app.use(express.json());
 app.use("/api/auth", authRoutes);
