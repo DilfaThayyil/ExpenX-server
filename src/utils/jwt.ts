@@ -1,31 +1,31 @@
-// import jwt from 'jsonwebtoken';
-// import dotenv from 'dotenv'
-// dotenv.config()
+import jwt,{JwtPayload}  from "jsonwebtoken";
 
-// const JWT_SECRET = process.env.JWT_SECRET;
-// const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN;
 
-// if (!JWT_SECRET) {
-//   throw new Error('JWT_SECRET is not defined in the environment variables');
-// }
+const accessTokenSecret='access_secret'
+const refreshTokenSecret ='refresh_secret'
 
-// interface JwtPayload {
-//   id: string;
-//   email: string;
-// }
+export const generateAccessToken=(user:any)=>{
+    return jwt.sign({id:user._id,email:user.email,role:user.isAdmin},accessTokenSecret,{ expiresIn: '50m' })
+}
 
-// export const generateJwt = (user: JwtPayload): string => {
-//   return jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, {
-//     expiresIn: JWT_EXPIRES_IN,
-//   });
-// };
+export const generateRefreshToken=(user:any)=>{
+    return jwt.sign({id:user._id,email:user.email,role:user.isAdmin},refreshTokenSecret,{ expiresIn: '7d' })
+}
 
-// export const verifyJwt = (token: string): JwtPayload | null => {
-//   try {
-//     const decoded = jwt.verify(token,JWT_SECRET)
-//     return decoded as JwtPayload
-//   } catch (error) {
-//     console.error('JWT verification failed:', error);
-//     return null;
-//   }
-// };
+export const verifyAccessToken = (token: string): JwtPayload | undefined => {
+    try {
+      return jwt.verify(token, accessTokenSecret) as JwtPayload;
+    } catch (err) {
+      return undefined;
+    }
+  };
+
+
+export const verifyRefreshToken = (token: string): JwtPayload => {
+    try {
+      const decoded = jwt.verify(token, refreshTokenSecret) as JwtPayload;
+      return decoded;
+    } catch (err) {
+      throw new Error('Invalid refresh token');
+    }
+  };

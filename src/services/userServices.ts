@@ -37,7 +37,7 @@ export default class RegisterUser {
     if (!isValidatePassword(userInput.password)) {
       throw new Error('Weak password');
     }
-    userInput.password = await bcrypt.hash(userInput.password, 10);
-    await this.userRepository.createUser(userInput);
+    userInput.password = await bcrypt.hash(userInput.password, 10)
+    await this.userRepository.createUser(userInput)
   }
 }
