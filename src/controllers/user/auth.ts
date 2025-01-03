@@ -7,28 +7,27 @@ import redisClient from '../../utils/redisClient';
 import { HttpStatusCode } from '../../utils/httpStatusCode';
 import UserService from '../../services/userServices';
 require('dotenv').config()
-// import bcrypt from 'bcrypt'
-// import {validate,validateEmail } from '../../use-cases/auth/validation';
-// import { generateAccessToken,generateRefreshToken, verifyRefreshToken } from '../../interface/security/jwt';
-// import CreateOtp from '../../use-cases/auth/forgetPasswordUsecase';
-// import forgetPasswordUsecase from '../../use-cases/auth/forgetPasswordUsecase';
-// import GoogleAuthUseCase from '../../use-cases/auth/googleAuth';
+import bcrypt from 'bcrypt'
+import {validate,validateEmail } from '../../services/validator';
+import { generateAccessToken,generateRefreshToken, verifyRefreshToken } from '../../utils/jwt';
+// import CreateOtp from '../../';
+// import forgetPasswordUsecase from '../../';
+// import GoogleAuthUseCase from '../../';
 
 
 
 const userRepository= new UserRepository()
 const registerUser = new RegisterUser(userRepository);
-// const createotp=new CreateOtp(userRepository)
+const createotp=new CreateOtp(userRepository)
 // const forgetPasswordusecase=new forgetPasswordUsecase(userRepository)
-
 // const googleuseCase= new GoogleAuthUseCase(userRepository)
 
-// let COOKIESECURE='production'
-// const cookieOptions = {
-//   httpOnly: true,
-//   secure: COOKIESECURE === 'production', 
-//   sameSite:  'none' as const , 
-// };
+let COOKIESECURE='production'
+const cookieOptions = {
+  httpOnly: true,
+  secure: COOKIESECURE === 'production', 
+  sameSite:  'none' as const , 
+};
 
 // USER REGISTRATION
 
@@ -115,7 +114,13 @@ export const verifyOTP = async(req:Request,res:Response)=>{
         res.json({error:'OTP is expired'})
       }
     }
-    await registerUser.registr(userData)
+    const user = {
+      ...userData,
+      isBlocked:false,
+      isAdmin:false,
+      refreshToken: ""
+    }
+    await registerUser.registr(user)
     res.status(HttpStatusCode.OK).json({message:"User registered successfully"})
   }catch(error){
     console.error('Error in verify OTP : ',error)
@@ -150,53 +155,46 @@ export const verifyOTP = async(req:Request,res:Response)=>{
 //   }
 // }
 
+// USER LOGIN
 
-// export const loginUser= async(req:Request,res:Response)=>{
-//   try{
-//     let {email,password}=req.body
-//     const checkUserData=validate(email,password)    
-//     if(checkUserData && checkUserData.isValid){
-//       const user=await userRepository.findByEmail(email)
-//       if(user){
-//         const bcryptPassword=await bcrypt.compare(password,user.password)
-//        if(!bcryptPassword){
-//         return res.json({error:"Incorrect password"})
-//       }
-//       if(user.isBlock){
-//         return res.json({error:"User is Blocked by Admin"})
-//        }
-//         const accessToken= generateAccessToken(user)
-//         const refreshToken= generateRefreshToken(user)
-//         let userObject=mapUserProfile(user)
+export const loginUser= async(req:Request,res:Response):Promise<void>=>{
+  try{
+    let {email,password}=req.body
+    const checkUserData=validate(email,password)    
+    if(checkUserData && checkUserData.isValid){
+      const user=await userRepository.findUserByEmail(email)
+      if(user){
+        const bcryptPassword=await bcrypt.compare(password,user.password)
+       if(!bcryptPassword){
+         res.json({error:"Incorrect password"})
+      }
+      if(user.isBlocked){
+         res.json({error:"User is Blocked by Admin"})
+       }
+        const accessToken= generateAccessToken(user)
+        const refreshToken= generateRefreshToken(user)
+        // let userObject=mapUserProfile(user)
+        user.refreshToken = refreshToken
+        userRepository.updateUser(user,user.email)
+        res.cookie('accessToken', accessToken, {
+          ...cookieOptions,
+        });
+        res.cookie('refreshToken', refreshToken, {
+          ...cookieOptions,
+        });
+         res.status(HttpStatusCode.OK).json({message:"Login successfully",user})
+      }else{
+         res.json({error:"User not found"})
+      }
+    }else{
+       res.json({error:checkUserData.messages[0]})
+    }
+  }catch(err){
+    console.log(err);
+     res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({error:"Error in login",err})  
+  }
+}
 
-//         user.refreshToken =refreshToken
-//         userRepository.updateUser(user,user.email)
-
-
-//         res.cookie('accessToken', accessToken, {
-//           ...cookieOptions,
-//         });
-
-
-//         res.cookie('refreshToken', refreshToken, {
-//           ...cookieOptions,
-//         });
-
-
-//         return res.status(HttpStatusCode.OK).json({message:"Login successfully",userObject})
-//       }else{
-//         return res.json({error:"User not found"})
-//       }
-//     }else{
-//       return res.json({error:checkUserData.messages[0]})
-//     }
-   
-//   }catch(err){
-//     console.log(err);
-//     return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({error:"Error in login",err})  
-//   }
-
-// }
 // export const refreshAccessTokenController = async (req: Request, res: Response) => {
 //   try {
 //       const refreshToken=req.cookies.refreshToken?req.cookies.refreshToken:req.cookies.adminrefreshToken
@@ -245,20 +243,20 @@ export const verifyOTP = async(req:Request,res:Response)=>{
 // };
 
 
-// export const forgetPassword=async(req:Request,res:Response)=>{
-//   try{
-//     const {email}=req.body
-//     const checkmail=validateEmail(email.toLowerCase())
-//     if(!checkmail.isValid)return res.status(HttpStatusCode.BAD_REQUEST).json({error:checkmail.message})
-//     const otp= await createotp.createOtp(email)
-//     if(otp){
-//       return res.status(HttpStatusCode.OK).json({message:"OTP sent successfully"})
-//     }  
-//     return res.status(HttpStatusCode.BAD_REQUEST).json({error:'User not found'})
-//   }catch(err){
-//     return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: 'Internal server error' });
-//   }
-// }
+export const forgetPassword=async(req:Request,res:Response)=>{
+  try{
+    const {email}=req.body
+    const checkmail=validateEmail(email.toLowerCase())
+    if(!checkmail.isValid)return res.status(HttpStatusCode.BAD_REQUEST).json({error:checkmail.message})
+    const otp= await createotp.createOtp(email)
+    if(otp){
+      return res.status(HttpStatusCode.OK).json({message:"OTP sent successfully"})
+    }  
+    return res.status(HttpStatusCode.BAD_REQUEST).json({error:'User not found'})
+  }catch(err){
+    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: 'Internal server error' });
+  }
+}
 
 
 // export const verifyforgetpasswordOtp=async(req:Request,res:Response)=>{
