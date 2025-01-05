@@ -1,9 +1,12 @@
+import 'reflect-metadata';
+import './config/DiContainer'
 import express, { Application } from "express";
-import router from "./routes/Router";
+import routes from './routes/user/authRouter'
 import { connectDB } from "./config/connectDB";
 import cors from 'cors'
 import dotenv from 'dotenv'
 import { CLIENTURL,PORT } from "./config/env";
+import { IUserService } from "./services/Interface/IUserService";
 dotenv.config()
 
 
@@ -18,7 +21,7 @@ app.use(cors({
   credentials: true
 }));
 app.use(express.json());
-app.use("/api", router);
+app.use("/user/auth", routes);
 
 
 connectDB().then(()=>{
