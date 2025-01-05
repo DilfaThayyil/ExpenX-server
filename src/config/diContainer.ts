@@ -1,8 +1,11 @@
-import { Container } from 'inversify';
+import { container } from 'tsyringe';
+import { IUserRepository } from '../repositories/Interface/IUserRepository';
+import UserRepository from '../repositories/Implementation/userRepository';
 import { IUserService } from '../services/Interface/IUserService';
-import { UserService } from '../services/Implementation/userService';
+import UserService from '../services/Implementation/userService';
+import { IUserController } from '../controllers/Interface/IUserController';
+import UserController from '../controllers/Implementation/userController';
 
-const container = new Container();
-container.bind<IUserService>('IUserService').to(UserService);
-
-export { container };
+container.register<IUserController>("IUserController", { useClass: UserController });
+container.register<IUserRepository>('IUserRepository', {useClass:UserRepository});
+container.register<IUserService>('IUserService', {useClass:UserService});
