@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/sweetalert": "^2.0.4",
     "axios": "^1.7.9",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
@@ -18,14 +19,15 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "google-auth-library": "^9.15.0",
-    "inversify": "^6.2.1",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.9.2",
     "nodemailer": "^6.9.16",
     "react-loader-spinner": "^6.1.6",
     "react-spinners": "^0.15.0",
     "redis": "^4.7.0",
-    "sweetalert2": "^11.15.3"
+    "reflect-metadata": "^0.2.2",
+    "sweetalert2": "^11.15.10",
+    "tsyringe": "^4.8.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
