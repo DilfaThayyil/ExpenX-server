@@ -7,6 +7,6 @@ export interface IUserService {
     forgotPassword(email: string): Promise<void>;
     verifyForgotPasswordOtp(email: string, otp: string): Promise<void>;
     resetPassword(email: string, newPassword: string): Promise<void>;
-    googleAuth(token: string): Promise<any>;
+    googleAuth(username:string,email: string,profilePic:string): Promise<any>;
   }
   

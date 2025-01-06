@@ -5,9 +5,10 @@ import { generateAccessToken, generateRefreshToken } from '../../utils/jwt';
 import Otp from '../../models/otpSchema';
 import { sendOtpEmail } from '../../utils/sendOtp';
 import { validateEmail } from '../../services/validator';
-import { googleVerify } from '../../utils/googleOAuth';
+// import { googleVerify } from '../../utils/googleOAuth';
 import { injectable,inject } from 'tsyringe';
 import redisClient from '../../utils/redisClient';
+import { JwtPayload } from 'jsonwebtoken';
 
 
 
@@ -121,15 +122,33 @@ export default class UserService implements IUserService {
     await this.userRepository.updateUser({ password: hashedPassword }, email);
   }
 
-  async googleAuth(token: string): Promise<any> {
-    const googleUser = await googleVerify(token);
-    if(!googleUser?.email){
-        throw new Error('Invalid Google credentials');
+  async googleAuth(username:string,email: string,profilePic:string): Promise<any> {
+    const userCredentials = {
+      username,
+      email,
+      profilePic
     }
-    const existingUser = await this.userRepository.findUserByEmail(googleUser?.email);
+    console.log("usercredentials in services ; ",userCredentials)
+    // const googleUser = await googleVerify(userCredentials);
+    // if(!googleUser?.email){
+    //     throw new Error('Invalid Google credentials');
+    // }
+    let existingUser
+     existingUser = await this.userRepository.findUserByEmail(userCredentials?.email);
     if (!existingUser) {
-      await this.userRepository.createUser(googleUser);
+      console.log('moidu')
+      existingUser = await this.userRepository.createUser(userCredentials);
+      console.log(existingUser,"userrrrrrrrrrrrr");
+      
+      if(existingUser){
+        console.log("moidd difaa");
+        
+      }else{
+        console.log("dfghnjm");
+        
+      }
     }
+    console.log("existingUser : ",existingUser)
     return existingUser;
   }
 }
