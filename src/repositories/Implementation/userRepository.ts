@@ -7,6 +7,9 @@ export default class UserRepository implements IUserRepository {
     }
 
     async createUser(userData: any): Promise<any> {
+        console.log("vanuuuu");
+        console.log(userData,'dfghjngvvhh');
+        
         return await userSchema.create(userData);
     }
 

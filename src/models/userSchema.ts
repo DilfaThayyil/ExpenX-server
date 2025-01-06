@@ -4,12 +4,13 @@ import IUser from "../entities/userEntities";
 
 const UserSchema: Schema = new Schema(
     {
-      username: { type: String, required: true },
-      email: { type: String, required: true, unique: true },
-      password: { type: String, required: true },
+      username: { type: String,},
+      email: { type: String, unique: true },
+      password: { type: String},
       isBlocked: {type: Boolean, default: false},
       isAdmin: {type: Boolean, default: false},
-      refreshToken: {type: String}
+      refreshToken: {type: String},
+      profilePic: {type:String},
     },
     { timestamps: true }
   );

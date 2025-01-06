@@ -112,8 +112,12 @@ export default class UserController implements IUserController {
   //////////////////////////////////////// GOOGLE AUTHENTICATION //////////////////////////////////////////////
     async googleAuth(req: Request, res: Response): Promise<void> {
     try {
-      const { token } = req.body;
-      const user = await this.userService.googleAuth(token);
+      console.log('recieved body : ',req.body)
+      const { userCredential } = req.body;
+      const username = userCredential.name;
+      const email = userCredential.email;
+      const profilePic = userCredential.picture
+      const user = await this.userService.googleAuth(username,email,profilePic);
       res.status(HttpStatusCode.OK).json({ message: 'User authenticated via Google', user });
     } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
