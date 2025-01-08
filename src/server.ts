@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import './config/DiContainer'
 import express, { Application } from "express";
+import morgan from 'morgan';
 import routes from './routes/user/authRouter'
 import advisorRoutes from './routes/user/advisorRouter'
 import { connectDB } from "./config/connectDB";
@@ -20,6 +21,7 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 }));
+app.use(morgan('dev'))
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
 app.use("/user/auth", routes);
