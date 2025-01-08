@@ -2,11 +2,11 @@ import 'reflect-metadata';
 import './config/DiContainer'
 import express, { Application } from "express";
 import routes from './routes/user/authRouter'
+import advisorRoutes from './routes/user/advisorRouter'
 import { connectDB } from "./config/connectDB";
 import cors from 'cors'
 import dotenv from 'dotenv'
 import { CLIENTURL,PORT } from "./config/env";
-import { IUserService } from "./services/Interface/IUserService";
 dotenv.config()
 
 
@@ -23,6 +23,7 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
 app.use("/user/auth", routes);
+app.use("/advisor/auth",advisorRoutes)
 
 
 connectDB().then(()=>{
