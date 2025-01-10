@@ -25,14 +25,14 @@ export default class UserService implements IUserService {
     if (existingUser) throw new Error('Email is already in use')
     await redisClient.setEx(`email:${email}`, 3600, JSON.stringify({ username, email, password }))    
   }
-  
+
 
   async generateOTP(email: string): Promise<void> {
     const user = await this.userRepository.findUserByEmail(email);
     if (user) throw new Error('Email already verified');
 
     const otp = (Math.floor(Math.random() * 10000)).toString().padStart(4, '0');
-    const expiresAt = new Date(Date.now() + 2 * 60 * 1000);
+    const expiresAt = new Date(Date.now() + 1 * 60 * 1000);
 
     await Otp.findOneAndUpdate(
       { email },
@@ -42,6 +42,24 @@ export default class UserService implements IUserService {
 
     await sendOtpEmail(email, otp);
   }
+
+
+  async resendOTP(email: string): Promise<void> {
+    console.log('resendOTP service...')
+    console.log('diluuuuuuuuuuuuu')
+    const otp = (Math.floor(Math.random() * 10000)).toString().padStart(4, '0');
+    const expiresAt = new Date(Date.now() + 1 * 60 * 1000);
+  console.log("otp in service : ",otp)
+  console.log('dilllllffffaaaa')
+    await Otp.findOneAndUpdate(
+      { email },
+      { otp, expiresAt },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
+  
+    await sendOtpEmail(email, otp);
+  }
+  
 
   async verifyOTP(email: string, otp: string): Promise<void> {
     const otpRecord = await Otp.findOne({ email });
@@ -65,10 +83,11 @@ export default class UserService implements IUserService {
     console.log('loginUser : ',user)
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) throw new Error('Invalid credentials');
-    console.log("validPassword : ",validPassword)
+    console.log("isValidPassword : ",validPassword)
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
-    console.log("access,refresh : ",accessToken,refreshToken)
+    console.log("access : ",accessToken)
+    console.log("refresh : ",refreshToken)
     return { accessToken, refreshToken };
   }
 
@@ -136,12 +155,12 @@ export default class UserService implements IUserService {
     let existingUser
      existingUser = await this.userRepository.findUserByEmail(userCredentials?.email);
     if (!existingUser) {
-      console.log('moidu')
+      console.log('yes')
       existingUser = await this.userRepository.createUser(userCredentials);
       console.log(existingUser,"userrrrrrrrrrrrr");
       
       if(existingUser){
-        console.log("moidd difaa");
+        console.log("dilu difaa");
         
       }else{
         console.log("dfghnjm");
