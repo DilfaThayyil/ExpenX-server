@@ -33,6 +33,17 @@ export default class AdvisorController implements IAdvisorController {
     }
   }
 
+  async resendOTP(req:Request,res:Response):Promise<Response>{
+    try{
+      const {email} = req.body
+      await this.advisorService.resendOTP(email)
+      return res.json({message: 'OTP resent successfullt'})
+    }catch(err){
+      const errorMessage = err instanceof Error?err.message:'An unexpected error occurred'
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error:errorMessage });
+    }
+  }
+
     async verifyOTP(req: Request, res: Response): Promise<void> {
     try {
       const { email, otp } = req.body;

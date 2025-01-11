@@ -43,6 +43,19 @@ export default class AdvisorService implements IAdvisorService {
     await sendOtpEmail(email, otp);
   }
 
+
+  async resendOTP(email:string):Promise<void>{
+    const otp = (Math.floor(Math.random()*10000)).toString().padStart(4,'0')
+    const expiresAt = new Date(Date.now()+1*60*1000)
+    await Otp.findOneAndUpdate(
+      {email},
+      {otp,expiresAt},
+      {upsert: true, new:true, setDefaultsOnInsert: true}
+    )
+    await sendOtpEmail(email,otp)
+  }
+  
+
   async verifyOTP(email: string, otp: string): Promise<void> {
     const otpRecord = await Otp.findOne({ email });
     if (!otpRecord) throw new Error('OTP not found');
