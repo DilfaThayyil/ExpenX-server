@@ -3,6 +3,9 @@ import { IUserService } from '../../services/Interface/IUserService';
 import { HttpStatusCode } from '../../utils/httpStatusCode';
 import { IUserController } from '../Interface/IUserController';
 import { inject, injectable } from 'tsyringe';
+import { ValidationError,NotFoundError,ExpiredError } from '../../utils/errors';
+
+
 
 @injectable()
 export default class UserController implements IUserController {
@@ -53,15 +56,22 @@ export default class UserController implements IUserController {
   
 
   //////////////////////////////////////////// OTP VERIFICATION //////////////////////////////////////////////
-    async verifyOTP(req: Request, res: Response): Promise<Response> {
+  async verifyOTP(req: Request, res: Response): Promise<Response> {
     try {
-      console.log('req body in verifyOTP : ',req.body)
       const { email, otp } = req.body;
       await this.userService.verifyOTP(email, otp);
-      return res.status(HttpStatusCode.OK).json({ message: 'User registered successfully' });
+      return res.status(HttpStatusCode.OK).json({ success: true, message: 'User registered successfully' });
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
-      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: errorMessage });
+      if (err instanceof NotFoundError) {
+        return res.status(HttpStatusCode.NOT_FOUND).json({ success: false, message: 'OTP not found.' });
+      } else if (err instanceof ValidationError) {
+        return res.status(HttpStatusCode.BAD_REQUEST).json({ success: false, message: 'Invalid OTP.' });
+      } else if (err instanceof ExpiredError) {
+        return res.status(410).json({ success: false, message: 'OTP expired.' });
+      } else {
+        const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
+        return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: errorMessage });
+      }
     }
   }
 
@@ -103,14 +113,22 @@ export default class UserController implements IUserController {
   }
 
   //////////////////////////////////////// VERIFY FORGOT PASSWORD OTP /////////////////////////////////////////
-    async verifyForgotPasswordOtp(req: Request, res: Response): Promise<void> {
+  async verifyForgotPasswordOtp(req: Request, res: Response): Promise<void> {
     try {
       const { email, otp } = req.body;
       await this.userService.verifyForgotPasswordOtp(email, otp);
-      res.status(HttpStatusCode.OK).json({ success:true, message: 'OTP verified successfully' });
+      res.status(HttpStatusCode.OK).json({ success: true, message: 'OTP verified successfully' });
     } catch (err) {
+      if (err instanceof NotFoundError) {
+        res.status(HttpStatusCode.NOT_FOUND).json({ success: false, message: 'No OTP record found for this email.' });
+      } else if (err instanceof ValidationError) {
+        res.status(HttpStatusCode.BAD_REQUEST).json({ success: false, message: 'The OTP you entered is incorrect.' });
+      } else if (err instanceof ExpiredError) {
+        res.status(410).json({ success: false, message: 'The OTP has expired. Please request a new one.' });
+      } else {
         const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
-      res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: errorMessage });
+        res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: errorMessage });
+      }
     }
   }
 
