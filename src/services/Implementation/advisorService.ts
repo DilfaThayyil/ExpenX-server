@@ -9,6 +9,7 @@ import redisClient from '../../utils/redisClient';
 import { JwtPayload } from 'jsonwebtoken';
 import { IAdvisorService } from '../Interface/IAdvisorService';
 import { IAdvisorRepository } from '../../repositories/Interface/IAdvisorRepository';
+import { NotFoundError, ValidationError, ExpiredError } from '../../utils/errors';
 
 
 
@@ -32,7 +33,7 @@ export default class AdvisorService implements IAdvisorService {
     if (user) throw new Error('Email already verified');
 
     const otp = (Math.floor(Math.random() * 10000)).toString().padStart(4, '0');
-    const expiresAt = new Date(Date.now() + 2 * 60 * 1000);
+    const expiresAt = new Date(Date.now() + 1 * 60 * 1000);
 
     await Otp.findOneAndUpdate(
       { email },
@@ -54,22 +55,26 @@ export default class AdvisorService implements IAdvisorService {
     )
     await sendOtpEmail(email,otp)
   }
-  
 
+ 
   async verifyOTP(email: string, otp: string): Promise<void> {
     const otpRecord = await Otp.findOne({ email });
-    if (!otpRecord) throw new Error('OTP not found');
-
-    if (otpRecord.otp !== otp) throw new Error('Invalid OTP');
-    if (new Date() > otpRecord.expiresAt) throw new Error('OTP expired');
-    const userDataString = await redisClient.get(`email:${email}`)
-    console.log("after taking the userdata from redis....",userDataString)
-    if(!userDataString) throw new Error('user is not in the session')
-    const userData = JSON.parse(userDataString) as {username:string,email:string,password:string}
-    console.log("userData : ",userData)
+    if (!otpRecord) {
+      throw new NotFoundError('OTP not found.');
+    }
+    if (otpRecord.otp !== otp) {
+      throw new ValidationError('Invalid OTP.');
+    }
+    if (otpRecord.expiresAt.getTime() < Date.now()) {
+      throw new ExpiredError('OTP expired.');
+    }
+    const userDataString = await redisClient.get(`email:${email}`);
+    if (!userDataString) {
+      throw new ValidationError('User is not in the session.');
+    }
+    const userData = JSON.parse(userDataString) as { username: string; email: string; password: string };
     userData.password = await bcrypt.hash(userData.password, 10);
-    const uusser = await this.advisorRepository.createUser(userData);
-    console.log(uusser,"moiduuuuuu")
+    await this.advisorRepository.createUser(userData);
   }
   
 
@@ -99,7 +104,7 @@ export default class AdvisorService implements IAdvisorService {
     if (!user) throw new Error('Email not found');
     console.log("user in forgotPass : ",user)
     const otp = (Math.floor(Math.random() * 10000)).toString().padStart(4, '0');
-    const expiresAt = new Date(Date.now() + 2 * 60 * 1000);
+    const expiresAt = new Date(Date.now() + 1 * 60 * 1000);
     console.log("otp : ",otp)
     await Otp.findOneAndUpdate(
       { email },
@@ -110,18 +115,17 @@ export default class AdvisorService implements IAdvisorService {
     await sendOtpEmail(email, otp);
   }
 
-  async verifyForgotPasswordOtp(email: string, otp: string): Promise<any> {
+  async verifyForgotPasswordOtp(email: string, otp: string): Promise<void> {
     const otpRecord = await Otp.findOne({ email });
     if(!otpRecord){
-      throw new Error("User Not Found")
+      throw new Error("No OTP record found for this email")
      }
      if(otpRecord.otp!==otp){
-      throw new Error("incorrect otp")
+      throw new Error("The OTP you entered is incorrect")
      }
      if(otpRecord.expiresAt.getTime()<Date.now()){
-      throw new Error("otp has expired")
+      throw new Error("The OTP has expired. Please request a new one")
      }
-     return { success: true, message: 'OTP verified successfully' }
   }
 
   async resetPassword(email: string, newPassword: string): Promise<void> {

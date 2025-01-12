@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 export interface IAdvisorController {
   register(req: Request, res: Response): Promise<void>;
   generateOTP(req: Request, res: Response): Promise<void>;
-  verifyOTP(req: Request, res: Response): Promise<void>;
+  verifyOTP(req: Request, res: Response): Promise<Response>;
   resendOTP(req:Request,res:Response):Promise<Response>
   loginUser(req: Request, res: Response): Promise<void>;
   refreshAccessTokenController(req: Request, res: Response): Promise<void>;

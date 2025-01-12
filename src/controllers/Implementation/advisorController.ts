@@ -1,8 +1,9 @@
 import { Request, Response } from 'express';
-import { HttpStatusCode } from '../../utils/httpStatusCode';
+import { HttpStatusCode } from '../../utils/httpStatusCode' 
 import { inject, injectable } from 'tsyringe';
 import { IAdvisorController } from '../Interface/IAdvisorController';
 import { IAdvisorService } from '../../services/Interface/IAdvisorService';
+import { NotFoundError, ValidationError, ExpiredError } from '../../utils/errors';
 
 @injectable()
 export default class AdvisorController implements IAdvisorController {
@@ -44,14 +45,23 @@ export default class AdvisorController implements IAdvisorController {
     }
   }
 
-    async verifyOTP(req: Request, res: Response): Promise<void> {
+    async verifyOTP(req: Request, res: Response): Promise<Response> {
     try {
+      console.log('req body in controllr : ',req.body)
       const { email, otp } = req.body;
       await this.advisorService.verifyOTP(email, otp);
-      res.status(HttpStatusCode.OK).json({ message: 'User registered successfully' });
+      return res.status(HttpStatusCode.OK).json({success:true, message: 'User registered successfully' });
     } catch (err) {
+      if (err instanceof NotFoundError) {
+        return res.status(HttpStatusCode.NOT_FOUND).json({ success: false, message: 'OTP not found.' });
+      } else if (err instanceof ValidationError) {
+        return res.status(HttpStatusCode.BAD_REQUEST).json({ success: false, message: 'Invalid OTP.' });
+      } else if (err instanceof ExpiredError) {
+        return res.status(410).json({ success: false, message: 'OTP expired.' });
+      } else {
         const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
-      res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: errorMessage });
+        return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: errorMessage });
+      }
     }
   }
 
@@ -95,8 +105,16 @@ export default class AdvisorController implements IAdvisorController {
       await this.advisorService.verifyForgotPasswordOtp(email, otp);
       res.status(HttpStatusCode.OK).json({ success:true, message: 'OTP verified successfully' });
     } catch (err) {
+      if (err instanceof NotFoundError) {
+        res.status(HttpStatusCode.NOT_FOUND).json({ success: false, message: 'No OTP record found for this email.' });
+      } else if (err instanceof ValidationError) {
+        res.status(HttpStatusCode.BAD_REQUEST).json({ success: false, message: 'The OTP you entered is incorrect.' });
+      } else if (err instanceof ExpiredError) {
+        res.status(410).json({ success: false, message: 'The OTP has expired. Please request a new one.' });
+      } else {
         const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
-      res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: errorMessage });
+        res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: errorMessage });
+      }
     }
   }
 
