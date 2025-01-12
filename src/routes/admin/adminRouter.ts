@@ -1,7 +1,9 @@
 import { Router } from "express";
+import { adminLogin } from "../../controllers/Implementation/adminController";
 
-const router = Router()
+const router = Router();
 
-router.post('/login')
+router.post("/login", adminLogin);
+// router.post("/refreshToken",adminRefreshToken)
 
-export default router
+export default router;

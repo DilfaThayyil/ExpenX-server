@@ -4,6 +4,7 @@ import express, { Application } from "express";
 import morgan from 'morgan';
 import routes from './routes/user/authRouter'
 import advisorRoutes from './routes/user/advisorRouter'
+import adminRoutes from './routes/admin/adminRouter'
 import { connectDB } from "./config/connectDB";
 import cors from 'cors'
 import dotenv from 'dotenv'
@@ -26,6 +27,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
 app.use("/user/auth", routes);
 app.use("/advisor/auth",advisorRoutes)
+app.use("/admin",adminRoutes)
 
 
 connectDB().then(()=>{
