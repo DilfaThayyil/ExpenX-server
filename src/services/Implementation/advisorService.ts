@@ -154,12 +154,11 @@ export default class AdvisorService implements IAdvisorService {
     let existingUser
      existingUser = await this.advisorRepository.findUserByEmail(userCredentials?.email);
     if (!existingUser) {
-      console.log('moidu')
       existingUser = await this.advisorRepository.createUser(userCredentials);
       console.log(existingUser,"userrrrrrrrrrrrr");
       
       if(existingUser){
-        console.log("moidd difaa");
+        console.log("difaa");
         
       }else{
         console.log("dfghnjm");

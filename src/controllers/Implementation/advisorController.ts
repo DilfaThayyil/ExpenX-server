@@ -138,7 +138,7 @@ export default class AdvisorController implements IAdvisorController {
       const email = userCredential.email;
       const profilePic = userCredential.picture
       const user = await this.advisorService.googleAuth(username,email,profilePic);
-      res.status(HttpStatusCode.OK).json({ message: 'User authenticated via Google', user });
+      res.status(HttpStatusCode.OK).json({ message: 'You authenticated via Google', user });
     } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
       res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: errorMessage });
