@@ -1,7 +1,7 @@
 import { IUserRepository } from '../../repositories/Interface/IUserRepository';
 import { IUserService } from '../Interface/IUserService';
 import bcrypt from 'bcrypt';
-import { generateAccessToken, generateRefreshToken } from '../../utils/jwt';
+import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../../utils/jwt';
 import Otp from '../../models/otpSchema';
 import { sendOtpEmail } from '../../utils/sendOtp';
 import { validateEmail } from '../../services/validator';
@@ -97,13 +97,26 @@ export default class UserService implements IUserService {
     return { accessToken, refreshToken };
   }
 
-  async refreshAccessToken(refreshToken: string): Promise<any> {
-    const user = await this.userRepository.findUserByRefreshToken(refreshToken);
-    if (!user) throw new Error('User not found');
-    const accessToken = generateAccessToken(user);
-    const newRefreshToken = generateRefreshToken(user);
-    return { accessToken, refreshToken: newRefreshToken };
-  }
+
+  async  setNewAccessToken(refreshToken:string):Promise<any> {
+    try {
+      const decoded = verifyRefreshToken(refreshToken);
+      const employeeData = decoded?.employeeData
+      if (!decoded || !employeeData) {
+        throw new Error("Invalid or expired refresh token");
+      }
+      const accessToken = generateAccessToken({ employeeData });
+      return {
+        accessToken,
+        message: "Access token set successfully from service ",
+        success: true,
+        businessOwnerId: employeeData.businessOwnerId
+      }
+    } catch (error:any) {
+      throw new Error("Error generating new access token: " + error.message);
+    }
+  } 
+
 
   async forgotPassword(email: string): Promise<void> {
     const user = await this.userRepository.findUserByEmail(email);
@@ -147,31 +160,19 @@ export default class UserService implements IUserService {
     await this.userRepository.updateUser({ password: hashedPassword }, email);
   }
 
-  async googleAuth(username:string,email: string,profilePic:string): Promise<any> {
+  async googleAuth(username:string,email: string,password: string,profilePic:string): Promise<any> {
     const userCredentials = {
       username,
       email,
+      password,
       profilePic
     }
     console.log("usercredentials in services ; ",userCredentials)
-    // const googleUser = await googleVerify(userCredentials);
-    // if(!googleUser?.email){
-    //     throw new Error('Invalid Google credentials');
-    // }
     let existingUser
      existingUser = await this.userRepository.findUserByEmail(userCredentials?.email);
     if (!existingUser) {
-      console.log('yes')
       existingUser = await this.userRepository.createUser(userCredentials);
       console.log(existingUser,"userrrrrrrrrrrrr");
-      
-      if(existingUser){
-        console.log("dilu difaa");
-        
-      }else{
-        console.log("dfghnjm");
-        
-      }
     }
     console.log("existingUser : ",existingUser)
     return existingUser;

@@ -15,7 +15,6 @@ export default class UserController implements IUserController {
     this.userService = userService;
   }
 
-  /////////////////////////////////////////// USER REGISTRATION ///////////////////////////////////////////
 
     async register(req: Request, res: Response): Promise<void> {
     try {
@@ -28,7 +27,6 @@ export default class UserController implements IUserController {
     }
   }
 
-  /////////////////////////////////////////// OTP GENERATION ///////////////////////////////////////////////
 
     async generateOTP(req: Request, res: Response): Promise<void> {
     try {
@@ -41,7 +39,6 @@ export default class UserController implements IUserController {
     }
   }
 
-  //////////////////////////////////////////// RESEND OTP ////////////////////////////////////////////////////
   async resendOTP(req: Request, res: Response): Promise<Response> {
     try {
       const { email } = req.body;
@@ -55,7 +52,6 @@ export default class UserController implements IUserController {
   }
   
 
-  //////////////////////////////////////////// OTP VERIFICATION //////////////////////////////////////////////
   async verifyOTP(req: Request, res: Response): Promise<Response> {
     try {
       const { email, otp } = req.body;
@@ -76,31 +72,62 @@ export default class UserController implements IUserController {
   }
 
   //////////////////////////////////////////// USER LOGIN /////////////////////////////////////////////////
-    async loginUser(req: Request, res: Response): Promise<void> {
+  //   async loginUser(req: Request, res: Response): Promise<void> {
+  //   try {
+  //     const { email, password } = req.body;
+  //     const user = await this.userService.loginUser(email, password);
+  //     console.log("user-controllr : ",user)
+  //     res.cookie('accessToken',user.accessToken)
+  //     res.status(HttpStatusCode.OK).json({ message: 'Login successfull', user });
+  //   } catch (err) {
+  //       const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
+  //     res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: errorMessage });
+  //   }
+  // }
+  async loginUser(req: Request, res: Response): Promise<void> {
     try {
       const { email, password } = req.body;
       const user = await this.userService.loginUser(email, password);
-      res.status(HttpStatusCode.OK).json({ message: 'Login successfull', user });
+      console.log("user-controller : ", user);
+      // Set access token and refresh token in cookies
+      res.cookie('accessToken', user.accessToken, {
+        httpOnly: true, 
+        secure: process.env.NODE_ENV === 'production', 
+        maxAge: 15 * 60 * 1000, 
+        sameSite: 'lax', 
+      })
+      res.cookie('refreshToken', user.refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 30 * 24 * 60 * 60 * 1000, 
+        sameSite: 'lax',
+      })
+      res.status(HttpStatusCode.OK).json({ message: 'Login successful', user });
     } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
+      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
       res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: errorMessage });
     }
   }
+  
 
-  ////////////////////////////////////////// REFRESH TOKEN /////////////////////////////////////////////////
-    async refreshAccessTokenController(req: Request, res: Response): Promise<void> {
+
+  async setNewAccessToken(req: Request, res: Response): Promise<Response> {
     try {
-      const newTokens = await this.userService.refreshAccessToken(req.cookies.refreshToken);
-      res.cookie('accessToken', newTokens.accessToken);
-      res.cookie('refreshToken', newTokens.refreshToken);
-      res.status(HttpStatusCode.OK).json({ message: 'Access token updated' });
-    } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
-      res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: errorMessage });
+        const refreshToken = req.cookies?.refreshToken;
+        if (!refreshToken) return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: "No token provided" });
+        const result = await this.userService.setNewAccessToken(refreshToken);
+        console.log("-----result--- : ",result)
+        if (!result.accessToken) return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: 'Failed to generate token' });
+        res.cookie('accessToken', result.accessToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production', maxAge: 3600000, sameSite: 'strict' });
+        // await connectDB(result.businessOwnerId);
+        return res.status(HttpStatusCode.OK).json({ message: "Token set successfully", success: result.success });
+    } catch (error) {
+        console.error(error);
+        return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: "Internal server error" });
     }
-  }
+}
 
-  ///////////////////////////////////////// FORGOT PASSWORD /////////////////////////////////////////////////
+
     async forgotPassword(req: Request, res: Response): Promise<void> {
     try {
       const { email } = req.body;
@@ -112,7 +139,7 @@ export default class UserController implements IUserController {
     }
   }
 
-  //////////////////////////////////////// VERIFY FORGOT PASSWORD OTP /////////////////////////////////////////
+
   async verifyForgotPasswordOtp(req: Request, res: Response): Promise<void> {
     try {
       const { email, otp } = req.body;
@@ -132,8 +159,9 @@ export default class UserController implements IUserController {
     }
   }
 
-  /////////////////////////////////////// CHANGE PASSWORD /////////////////////////////////////////////////
-    async resetPassword(req: Request, res: Response): Promise<void> {
+
+
+  async resetPassword(req: Request, res: Response): Promise<void> {
     try {
       const { email, password } = req.body;
       await this.userService.resetPassword(email, password);
@@ -145,19 +173,36 @@ export default class UserController implements IUserController {
     }
   }
 
-  //////////////////////////////////////// GOOGLE AUTHENTICATION //////////////////////////////////////////////
-    async googleAuth(req: Request, res: Response): Promise<void> {
+
+
+  async googleAuth(req: Request, res: Response): Promise<void> {
     try {
       console.log('recieved body : ',req.body)
       const { userCredential } = req.body
       const username = userCredential.name
-      const email = userCredential.email
+      const email = userCredential.email 
+      const password = userCredential.sub
       const profilePic = userCredential.picture
-      const user = await this.userService.googleAuth(username,email,profilePic)
+      const user = await this.userService.googleAuth(username,email,password,profilePic)
+      console.log("user in controllr: ",user)
+      
       res.status(HttpStatusCode.OK).json({ message: 'You authenticated via Google', user })
     } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred'
       res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: errorMessage })
     }
   }
+
+
+
+  // async logout(req: Request, res: Response): Promise<Response> {
+  //   try {
+  //       res.clearCookie('refreshToken').clearCookie('accessToken');
+  //       return res.status(HttpStatusCode.OK).json({ message: 'Logged out successfully' });
+  //   } catch (error) {
+  //       return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: 'Failed to logout' });
+  //   }
+  // }
 }
+
+

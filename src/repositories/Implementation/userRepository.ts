@@ -17,7 +17,7 @@ export default class UserRepository implements IUserRepository {
         return await userSchema.findOneAndUpdate({ email }, userData, { new: true });
     }
 
-    async findUserByRefreshToken(refreshToken: string): Promise<any> {
+    async findUserByRefreshToken(refreshToken: string): Promise<any> { 
         return await userSchema.findOne({ refreshToken });
     }
 
