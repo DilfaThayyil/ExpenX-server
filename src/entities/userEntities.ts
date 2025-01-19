@@ -1,4 +1,5 @@
 export default interface IUser{
+    id: string;
     username: string
     email: string
     password: string;
@@ -7,4 +8,8 @@ export default interface IUser{
     isAdmin: boolean;
     profilePic:string;
     refreshToken: string;
-  }  
+    phone: string;
+    description: string;
+    country: string;
+
+  }

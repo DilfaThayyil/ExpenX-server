@@ -9,6 +9,6 @@ const UserSchema: Schema = new Schema({
     isBlocked: {type: Boolean, default: false},
     isAdmin: {type: Boolean, default: false},
     profilePic: {type:String},
-    refreshToken: {type: String},
+    refreshToken: {type: String}
 })  
   export default model<IUser>('User', UserSchema);
