@@ -4,6 +4,7 @@ import { HttpStatusCode } from '../../utils/httpStatusCode';
 import { IUserController } from '../Interface/IUserController';
 import { inject, injectable } from 'tsyringe';
 import { ValidationError,NotFoundError,ExpiredError } from '../../utils/errors';
+import { mapUserProfile } from '../Interface/mappers/userMapper';
 
 
 
@@ -89,9 +90,10 @@ export default class UserController implements IUserController {
       const { email, password } = req.body;
       const user = await this.userService.loginUser(email, password);
       console.log("user-controller : ", user);
+      const user2 = mapUserProfile(user)
       // Set access token and refresh token in cookies
       res.cookie('accessToken', user.accessToken, {
-        httpOnly: true, 
+        httpOnly: true,  
         secure: process.env.NODE_ENV === 'production', 
         maxAge: 15 * 60 * 1000, 
         sameSite: 'lax', 
@@ -102,7 +104,7 @@ export default class UserController implements IUserController {
         maxAge: 30 * 24 * 60 * 60 * 1000, 
         sameSite: 'lax',
       })
-      res.status(HttpStatusCode.OK).json({ message: 'Login successful', user });
+      res.status(HttpStatusCode.OK).json({ message: 'Login successful', user2 });
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
       res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: errorMessage });

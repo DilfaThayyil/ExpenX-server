@@ -94,7 +94,9 @@ export default class UserService implements IUserService {
     const refreshToken = generateRefreshToken(user);
     console.log("access : ",accessToken)
     console.log("refresh : ",refreshToken)
-    return { accessToken, refreshToken };
+    user.accessToken = accessToken
+    user.refreshToken = refreshToken
+    return user
   }
 
 
