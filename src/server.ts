@@ -3,6 +3,7 @@ import './config/DiContainer'
 import express, { Application } from "express";
 import morgan from 'morgan';
 import routes from './routes/user/authRouter'
+import userRoutes from './routes/user/userRouter'
 import advisorRoutes from './routes/user/advisorRouter'
 import adminRoutes from './routes/admin/adminRouter'
 import { connectDB } from "./config/connectDB";
@@ -26,6 +27,7 @@ app.use(morgan('dev'))
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
 app.use("/user/auth", routes);
+app.use("/user",userRoutes)
 app.use("/advisor/auth",advisorRoutes)
 app.use("/admin",adminRoutes)
 
