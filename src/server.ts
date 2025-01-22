@@ -1,10 +1,10 @@
 import 'reflect-metadata';
-import './config/DiContainer'
+import './config/diContainer'
 import express, { Application } from "express";
 import morgan from 'morgan';
-import routes from './routes/user/authRouter'
+import routes from './routes/user/userAuthRouter'
 import userRoutes from './routes/user/userRouter'
-import advisorRoutes from './routes/user/advisorRouter'
+import advisorRoutes from './routes/advisor/advisorRouter'
 import adminRoutes from './routes/admin/adminRouter'
 import { connectDB } from "./config/connectDB";
 import cors from 'cors'
