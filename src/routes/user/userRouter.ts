@@ -6,7 +6,7 @@ import { IUserController } from '../../controllers/Interface/user/IUserControlle
 const userController = container.resolve<IUserController>('IUserController');
 const router = Router();
 
-router.post('/upload', upload.single('profilePicture'), (req, res) =>{
+router.post('/upload', upload.single('profilePic'), (req, res) =>{
   console.log("req file : ",req.file)
   console.log("req body : ",req.body)
   userController.uploadProfileImage(req, res)
@@ -16,4 +16,4 @@ router.patch('/editProfile', (req, res) =>
   userController.updateUser(req, res)
 );
 
-export default router;
+export default router
