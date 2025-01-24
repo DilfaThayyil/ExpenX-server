@@ -1,5 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { IUserRepository } from '../Interface/IUserRepository';
 import userSchema from '../../models/userSchema';
+import { IExpense } from '../../entities/expenseEntities';
+import expenseSchema from '../../models/expenseSchema';
 
 export default class UserRepository implements IUserRepository {
     async findUserByEmail(email: string): Promise<any> {
@@ -33,4 +36,15 @@ export default class UserRepository implements IUserRepository {
     async removeRefreshToken(email: string): Promise<any> {
         return await userSchema.findOneAndUpdate({ email }, { refreshToken: null }, { new: true });
     }
+
+    async findExpensesByUserId(userId: string): Promise<IExpense[]> {
+        console.log("userId from repository: ",userId)
+        const expense = await expenseSchema.find({ userId });
+        console.log("expense from repo : ",expense)
+        return expense
+      }
+    
+      async createExpense(expenseData: IExpense): Promise<IExpense> {
+        return expenseSchema.create(expenseData);
+      }
 }
