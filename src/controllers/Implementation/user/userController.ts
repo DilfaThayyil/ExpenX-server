@@ -34,7 +34,6 @@ export default class UserController implements IUserController {
   }
 
 
-
   async updateUser(req: Request, res: Response): Promise<void> {
     try {
       const { profilePic, username, email, phone, country, language } = req.body;
@@ -56,4 +55,42 @@ export default class UserController implements IUserController {
       res.status(500).json({ error: 'Error updating user' });
     }
   }
+
+
+  async getExpenses(req: Request, res: Response): Promise<void> {
+    try {
+      const { userId } = req.params; 
+      const expenses = await this.userService.getExpensesByUserId(userId);
+      res.status(200).json(expenses);
+    } catch (error) {
+      console.error('Error fetching expenses:', error);
+      res.status(500).json({ error: 'Error fetching expenses' });
+    }
+  }
+
+  async createExpense(req: Request, res: Response): Promise<void> {
+    try {
+      console.log('dillll')
+      const {userId} = req.params
+      const { date, amount, category, description } = req.body;
+      if (!date || !amount || !category || !description) {
+        res.status(400).json({ error: 'All fields are required' });
+        return;
+      }
+      const newExpense = await this.userService.createExpense({
+        userId: userId,
+        date,
+        amount,
+        category,
+        description,
+      });
+      console.log("new expense: ",newExpense)
+      res.status(201).json(newExpense);
+    } catch (error) {
+      console.error('Error creating expense:', error);
+      res.status(500).json({ error: 'Error creating expense' });
+    }
+  }
+
+
 }
