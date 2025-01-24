@@ -11,4 +11,4 @@ const ExpenseSchema: Schema = new Schema(
       },
       { timestamps: true }
 )  
-  export default model<IExpense>('Expense', ExpenseSchema);
+  export default model<IExpense>('Expense', ExpenseSchema)
