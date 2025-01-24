@@ -1,6 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 import { IUserRepository } from '../../../repositories/Interface/IUserRepository';
 import { IUserService } from '../../Interface/user/IUserService';
+import { IExpense } from '../../../entities/expenseEntities';
 
 @injectable()
 export default class UserService implements IUserService {
@@ -16,8 +17,18 @@ export default class UserService implements IUserService {
       const updatedUser = await this.userRepository.updateUser(userData, userData.email);
       console.log("updated user ; ",updatedUser)
       return updatedUser;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       throw new Error('Error updating user in service');
     }
+  }
+
+  async getExpensesByUserId(userId: string): Promise<IExpense[]> {
+    console.log("userId from service : ",userId)
+    return this.userRepository.findExpensesByUserId(userId);
+  }
+
+  async createExpense(expenseData: IExpense): Promise<IExpense> {
+    return this.userRepository.createExpense(expenseData);
   }
 }
