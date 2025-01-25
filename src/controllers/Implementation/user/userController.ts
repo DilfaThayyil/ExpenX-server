@@ -92,5 +92,25 @@ export default class UserController implements IUserController {
     }
   }
 
+  async createGroup(req: Request, res: Response): Promise<void> {
+    try {
+      console.log('req.body : ',req.body)
+      const { name, members, splitMethod } = req.body;
+      if (!name || !Array.isArray(members) || members.length === 0 || !splitMethod) {
+        res.status(400).json({ error: 'All fields are required (name, members, splitMethod).' });
+        return;
+      }
+      const newGroup = await this.userService.createGroup({
+        name,
+        members,
+        splitMethod,
+      });
+      console.log("newGroup in contrllr : ",newGroup)
+      res.status(201).json(newGroup);
+    } catch (error) {
+      console.error('Error creating group:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
 
 }
