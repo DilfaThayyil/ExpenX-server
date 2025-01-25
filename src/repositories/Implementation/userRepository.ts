@@ -3,6 +3,11 @@ import { IUserRepository } from '../Interface/IUserRepository';
 import userSchema from '../../models/userSchema';
 import { IExpense } from '../../entities/expenseEntities';
 import expenseSchema from '../../models/expenseSchema';
+import IGroup from '../../entities/groupEntities';
+import groupSchema from '../../models/groupSchema';
+
+
+
 
 export default class UserRepository implements IUserRepository {
     async findUserByEmail(email: string): Promise<any> {
@@ -12,8 +17,8 @@ export default class UserRepository implements IUserRepository {
 
     async createUser(userData: any): Promise<any> {
         console.log("vanuuuu");
-        console.log(userData,'dfghjngvvhh');
-        
+        console.log(userData, 'dfghjngvvhh');
+
         return await userSchema.create(userData);
     }
 
@@ -21,7 +26,7 @@ export default class UserRepository implements IUserRepository {
         return await userSchema.findOneAndUpdate({ email }, userData, { new: true });
     }
 
-    async findUserByRefreshToken(refreshToken: string): Promise<any> { 
+    async findUserByRefreshToken(refreshToken: string): Promise<any> {
         return await userSchema.findOne({ refreshToken });
     }
 
@@ -38,13 +43,27 @@ export default class UserRepository implements IUserRepository {
     }
 
     async findExpensesByUserId(userId: string): Promise<IExpense[]> {
-        console.log("userId from repository: ",userId)
+        console.log("userId from repository: ", userId)
         const expense = await expenseSchema.find({ userId });
-        console.log("expense from repo : ",expense)
+        console.log("expense from repo : ", expense)
         return expense
-      }
-    
-      async createExpense(expenseData: IExpense): Promise<IExpense> {
+    }
+
+    async createExpense(expenseData: IExpense): Promise<IExpense> {
         return expenseSchema.create(expenseData);
-      }
+    }
+
+    async createGroup(groupData: IGroup): Promise<IGroup> {
+        console.log("repo calling...")
+        console.log("groupData in repo : ",groupData)
+        return groupSchema.create(groupData)
+    }
+
+    // async getGroupById = async (id: string) => {
+    //     return Group.findById(id);
+    // };
+
+    // async updateGroup = async (id: string, updates: Partial<GroupType>) => {
+    //     return Group.findByIdAndUpdate(id, updates, { new: true });
+    // };
 }
