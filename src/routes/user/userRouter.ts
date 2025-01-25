@@ -11,6 +11,7 @@ router.post('/upload', upload.single('profilePic'), (req, res) =>{userController
 router.patch('/editProfile', (req, res) =>userController.updateUser(req, res))
 router.get('/getExpenses/:userId', (req,res)=>userController.getExpenses(req,res))
 router.post('/createExpense/:userId',(req,res)=>userController.createExpense(req,res))
+router.post('/createGroup',(req,res)=>userController.createGroup(req,res))
 
 
 export default router
