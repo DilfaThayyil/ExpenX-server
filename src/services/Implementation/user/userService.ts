@@ -2,6 +2,7 @@ import { inject, injectable } from 'tsyringe';
 import { IUserRepository } from '../../../repositories/Interface/IUserRepository';
 import { IUserService } from '../../Interface/user/IUserService';
 import { IExpense } from '../../../entities/expenseEntities';
+import IGroup from '../../../entities/groupEntities';
 
 @injectable()
 export default class UserService implements IUserService {
@@ -11,7 +12,6 @@ export default class UserService implements IUserService {
     this.userRepository = userRepository;
   }
 
-  
   async updateUserProfile(userData: { profilePic: string; username: string; email: string; phone: string; country: string; language: string }) {
     try {
       const updatedUser = await this.userRepository.updateUser(userData, userData.email);
@@ -30,5 +30,11 @@ export default class UserService implements IUserService {
 
   async createExpense(expenseData: IExpense): Promise<IExpense> {
     return this.userRepository.createExpense(expenseData);
+  }
+
+  async createGroup(groupData: IGroup):Promise<IGroup>{
+    console.log("service....")
+    console.log("groupData in service: ",groupData)
+    return this.userRepository.createGroup(groupData)
   }
 }
