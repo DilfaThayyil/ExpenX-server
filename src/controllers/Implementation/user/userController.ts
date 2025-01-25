@@ -113,4 +113,26 @@ export default class UserController implements IUserController {
     }
   }
 
+
+  async getUserGroups(req: Request, res: Response): Promise<void> {
+    try {
+      console.log("req.parmas: ",req.params)
+      const { email } = req.params;
+      if (!email) {
+        res.status(400).json({ error: 'Email is required' });
+        return;
+      }
+      const groups = await this.userService.getUserGroups(email);
+      if (groups.length === 0) {
+        res.status(404).json({ message: 'No groups found for this user' });
+        return;
+      }
+      console.log("groups: ",groups)
+      res.status(200).json({ groups });
+    } catch (error) {
+      console.error('Error fetching groups:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+
 }

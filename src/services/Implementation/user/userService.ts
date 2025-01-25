@@ -37,4 +37,12 @@ export default class UserService implements IUserService {
     console.log("groupData in service: ",groupData)
     return this.userRepository.createGroup(groupData)
   }
+
+
+  async getUserGroups(email:string):Promise<IGroup[]>{
+    console.log("service calls....")
+    const groups = await this.userRepository.getUserGroups(email)
+    console.log("groups from service: ",groups)
+    return groups
+  }
 }

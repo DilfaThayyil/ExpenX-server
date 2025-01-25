@@ -59,9 +59,9 @@ export default class UserRepository implements IUserRepository {
         return groupSchema.create(groupData)
     }
 
-    // async getGroupById = async (id: string) => {
-    //     return Group.findById(id);
-    // };
+    async getUserGroups(email: string): Promise<IGroup[]> {
+        return groupSchema.find({ members: email });
+      }
 
     // async updateGroup = async (id: string, updates: Partial<GroupType>) => {
     //     return Group.findByIdAndUpdate(id, updates, { new: true });

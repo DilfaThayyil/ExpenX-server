@@ -12,6 +12,7 @@ router.patch('/editProfile', (req, res) =>userController.updateUser(req, res))
 router.get('/getExpenses/:userId', (req,res)=>userController.getExpenses(req,res))
 router.post('/createExpense/:userId',(req,res)=>userController.createExpense(req,res))
 router.post('/createGroup',(req,res)=>userController.createGroup(req,res))
+router.get('/getUserGroups/:email',(req,res)=>userController.getUserGroups(req,res))
 
 
 export default router

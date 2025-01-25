@@ -6,4 +6,5 @@ export interface IUserController {
   getExpenses(req: Request, res: Response): Promise<void>;
   createExpense(req: Request, res: Response): Promise<void>;
   createGroup(req: Request, res: Response): Promise<void>
+  getUserGroups(req: Request, res:Response): Promise<void>
 }

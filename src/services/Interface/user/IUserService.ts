@@ -7,4 +7,5 @@ export interface IUserService {
     getExpensesByUserId(userId: string): Promise<IExpense[]>;
     createExpense(expenseData: IExpense): Promise<IExpense>;
     createGroup(groupData:IGroup): Promise<IGroup>
+    getUserGroups(email:string): Promise<IGroup[]>;
 }
