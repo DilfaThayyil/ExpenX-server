@@ -1,5 +1,7 @@
 require('dotenv').config()
 
+export const ADMINEMAIL = process.env.ADMIN_EMAIL
+export const ADMINPASSWORD = process.env.ADMIN_PASSWORD
 export const MONGODBURL = process.env.MONGODBURL
 export const REDISURL = process.env.REDISURL
 export const NODEMAILEREMAIL = process.env.NODEMAILEREMAIL

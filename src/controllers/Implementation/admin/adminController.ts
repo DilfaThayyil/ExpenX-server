@@ -2,11 +2,12 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import { HttpStatusCode } from "../../../utils/httpStatusCode";
 import jwt from "jsonwebtoken";
+import { ADMINEMAIL, ADMINPASSWORD } from "../../../config/env";
 
 const accessTokenSecret = "access_secret"
 const refreshTokenSecret = "refresh_secret"
-const adminEmail = process.env.ADMIN_EMAIL;
-const adminPassword = process.env.ADMIN_PASSWORD; 
+const adminEmail = ADMINEMAIL
+const adminPassword = ADMINPASSWORD
 
 
 
@@ -41,6 +42,9 @@ export const adminLogin = async (req: Request, res: Response) => {
     return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: "Internal server error" });
   }
 };
+
+
+
 
 
 

@@ -96,7 +96,7 @@ export default class AuthUserController implements IAuthUserController {
         httpOnly: true,  
         secure: process.env.NODE_ENV === 'production', 
         maxAge: 15 * 60 * 1000, 
-        sameSite: 'lax', 
+        sameSite: 'lax',
       })
       res.cookie('refreshToken', user.refreshToken, {
         httpOnly: true,
