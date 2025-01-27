@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import advisorSchema from '../../models/advisorSchema';
 import { IAdvisorRepository } from '../Interface/IAdvisorRepository';
 

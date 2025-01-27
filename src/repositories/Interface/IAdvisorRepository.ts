@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export interface IAdvisorRepository {
     findUserByEmail(email: string): Promise<any>;
     createUser(userData: any): Promise<any>;

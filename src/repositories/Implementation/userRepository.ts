@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { IUserRepository } from '../Interface/IUserRepository';
 import userSchema from '../../models/userSchema';
 import { IExpense } from '../../entities/expenseEntities';
@@ -63,7 +62,4 @@ export default class UserRepository implements IUserRepository {
         return groupSchema.find({ members: email });
       }
 
-    // async updateGroup = async (id: string, updates: Partial<GroupType>) => {
-    //     return Group.findByIdAndUpdate(id, updates, { new: true });
-    // };
 }

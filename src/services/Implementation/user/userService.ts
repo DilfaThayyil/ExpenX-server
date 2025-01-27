@@ -17,7 +17,6 @@ export default class UserService implements IUserService {
       const updatedUser = await this.userRepository.updateUser(userData, userData.email);
       console.log("updated user ; ",updatedUser)
       return updatedUser;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       throw new Error('Error updating user in service');
     }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { IOtpRepository } from '../Interface/IOtpRepository';
 import otpSchema from '../../models/otpSchema';
 

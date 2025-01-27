@@ -9,7 +9,9 @@ const advisorSchema : Schema = new Schema({
     isBlocked: {type:Boolean, default:false},
     isAdmin: {type:Boolean, default: false},
     profilePic: {type: String},
-    refreshToken: {type:String}
+    refreshToken: {type:String},
+    phone: {type: String},
+    country: {type:String}
 })
     
 export default model<IAdvisor>('Advisor',advisorSchema)

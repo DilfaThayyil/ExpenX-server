@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export interface IOtpRepository {
     createOrUpdateOtp(userId: string, otp: number, expiresAt: Date): Promise<any>;
     findOtpByUserId(userId: string): Promise<any>;

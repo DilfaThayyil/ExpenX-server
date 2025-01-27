@@ -1,4 +1,5 @@
 export default interface IAdvisor{
+    id:string
     username:string
     email:string
     password:string
@@ -7,4 +8,7 @@ export default interface IAdvisor{
     isAdmin:boolean
     profilePic:string
     refreshToken:string
+    phone:string
+    description:string
+    country:string
 }
