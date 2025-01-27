@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-export interface IAdvisorController {
+export interface IAuthAdvisorController {
   register(req: Request, res: Response): Promise<void>;
   generateOTP(req: Request, res: Response): Promise<void>;
   verifyOTP(req: Request, res: Response): Promise<Response>;

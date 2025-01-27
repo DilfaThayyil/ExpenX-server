@@ -2,14 +2,12 @@ import 'reflect-metadata';
 import './config/diContainer'
 import express, { Application } from "express";
 import morgan from 'morgan';
-import routes from './routes/user/userAuthRouter'
-import userRoutes from './routes/user/userRouter'
-import advisorRoutes from './routes/advisor/advisorRouter'
-import adminRoutes from './routes/admin/adminRouter'
+
 import { connectDB } from "./config/connectDB";
 import cors from 'cors'
 import dotenv from 'dotenv'
 import { CLIENTURL,PORT } from "./config/env";
+import router from './routes';
 dotenv.config()
 
 
@@ -26,10 +24,7 @@ app.use(cors({
 app.use(morgan('dev'))
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
-app.use("/user/auth", routes);
-app.use("/user",userRoutes)
-app.use("/advisor/auth",advisorRoutes)
-app.use("/admin",adminRoutes)
+app.use("/",router)
 
 
 connectDB().then(()=>{
