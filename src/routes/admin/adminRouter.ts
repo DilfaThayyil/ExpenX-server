@@ -1,9 +1,14 @@
 import { Router } from "express";
-import { adminLogin } from "../../controllers/Implementation/admin/adminController";
+import { container } from "tsyringe";
+import { IAdminController } from "../../controllers/Interface/admin/IAdminController";
 
-const router = Router();
+const adminController = container.resolve<IAdminController>('IAdminController')
+const router = Router()
 
-router.post("/login", adminLogin);
-// router.post("/refreshToken",adminRefreshToken)
+router.post("/login", (req,res)=>adminController.adminLogin(req,res))
+router.get("/users", (req,res)=>adminController.fetchUsers(req,res))
+router.get("/advisors", (req,res)=>adminController.fetchAdvisors(req,res))
+router.post("/updateAdmin", (req,res)=>adminController.updateAdmin(req,res))
+
 
 export default router;

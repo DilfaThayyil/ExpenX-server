@@ -23,6 +23,14 @@ import { IAdvisorController } from '../controllers/Interface/advisor/IAdvisorCon
 import AdvisorController from '../controllers/Implementation/advisor/advisorController';
 import { IAdvisorService } from '../services/Interface/advisor/IAdvisorService';
 import AdvisorService from '../services/Implementation/advisor/advisorService';
+import { IAdminController } from '../controllers/Interface/admin/IAdminController';
+
+
+//admin
+import AdminController from '../controllers/Implementation/admin/adminController';
+import { IAdminService } from '../services/Interface/admin/IAdminService';
+import AdminService from '../services/Implementation/admin/adminService';
+
 
 
 //user
@@ -38,3 +46,8 @@ container.register<IAuthAdvisorService>('IAuthAdvisorService',{useClass:AuthAdvi
 container.register<IAdvisorRepository>('IAdvisorRepository',{useClass:AdvisorRepository})
 container.register<IAdvisorController>('IAdvisorController',{useClass:AdvisorController})
 container.register<IAdvisorService>('IAdvisorService',{useClass:AdvisorService})
+
+
+//admin
+container.register<IAdminController>('IAdminController',{useClass: AdminController})
+container.register<IAdminService>('IAdminService',{useClass:AdminService})
