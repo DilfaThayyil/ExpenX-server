@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { IExpense } from "../../entities/expenseEntities";
 import IGroup from "../../entities/groupEntities";
+import IUser from "../../entities/userEntities";
 
 export interface IUserRepository {
   findUserByEmail(email: string): Promise<any>;
@@ -14,4 +15,7 @@ export interface IUserRepository {
   createExpense(expenseData: IExpense): Promise<IExpense>;
   createGroup(groupData: IGroup):Promise<IGroup>
   getUserGroups(email:string):Promise<IGroup[]>
+  fetchUsers(page: number, limit: number): Promise<{ users: IUser[]; totalUsers: number }>;
+  findAdmin():Promise<any>
+  updateAdmin(admin:any):Promise<any>
 }

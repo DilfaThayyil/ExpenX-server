@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import IAdvisor from '../../entities/advisorEntities';
 import advisorSchema from '../../models/advisorSchema';
 import { IAdvisorRepository } from '../Interface/IAdvisorRepository';
 
@@ -16,6 +17,17 @@ export default class AdvisorRepository implements IAdvisorRepository {
 
     async updateUser(userData: any, email: string): Promise<any> {
         return await advisorSchema.findOneAndUpdate({ email }, userData, { new: true });
+    }
+
+    async fetchAdvisors(page: number, limit: number): Promise<{ users: IAdvisor[]; totalUsers: number }> {
+        console.log("reppostiry...")
+        const skip = (page - 1) * limit;
+        const [users, totalUsers] = await Promise.all([
+            advisorSchema.find().skip(skip).limit(limit),
+            advisorSchema.countDocuments(),
+        ]);
+        console.log("skip :",skip)
+        return { users, totalUsers };
     }
 
     async findUserByRefreshToken(refreshToken: string): Promise<any> {

@@ -1,17 +1,19 @@
 import { model, Schema } from "mongoose";
 import IAdvisor from "../entities/advisorEntities";
 
-const advisorSchema : Schema = new Schema({
-    username: {type: String},
-    email: {type: String, unique: true},
-    password: {type: String},
-    role: {type:String, default:'advisor'},
-    isBlocked: {type:Boolean, default:false},
-    isAdmin: {type:Boolean, default: false},
-    profilePic: {type: String},
-    refreshToken: {type:String},
-    phone: {type: String},
-    country: {type:String}
+const advisorSchema: Schema = new Schema({
+    username: { type: String },
+    email: { type: String, unique: true },
+    password: { type: String },
+    role: { type: String, default: 'advisor' },
+    isBlocked: { type: Boolean, default: false },
+    isAdmin: { type: Boolean, default: false },
+    profilePic: { type: String },
+    refreshToken: { type: String },
+    phone: { type: String },
+    country: { type: String }
+}, {
+    timestamps: true
 })
-    
-export default model<IAdvisor>('Advisor',advisorSchema)
+
+export default model<IAdvisor>('Advisor', advisorSchema)
