@@ -86,9 +86,29 @@ export default class AdminService implements IAdminService {
     }
 
 
-    // async updateUserStatus(action: string, email: string): Promise<{ message: string; error?: string }> {
-    //     return this.adminRepository.updateUser(action, email);
-    // }
+    async updateUserBlockStatus(action: string, email: string): Promise<{ message: string; error?: string }> {
+        try{
+            const isBlocked = action === 'block'
+            await this.userRepository.updateUserStatus(email, isBlocked)
+            return {message : `User ${action}ed successfully`}
+        }catch(err){
+            const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred";
+            return {message : 'Failed to update user status ',error:errorMessage}
+        }
+    }
+
+
+    async updateAdvisorBlockStatus(action: string, email: string): Promise<{ message: string; error?: string }> {
+        try{
+            const isBlocked = action === 'block'
+            await this.advisorRepository.updateAdvisorStatus(email, isBlocked)
+            return {message : `Advisor ${action}ed successfully`}
+        }catch(err){
+            const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred";
+            return {message : 'Failed to update advisor status ',error:errorMessage}
+        }
+    }
+
 
     // async getDashboardData(): Promise<any> {
     //     return this.adminRepository.getDashboardData();

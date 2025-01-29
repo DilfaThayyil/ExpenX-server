@@ -30,6 +30,10 @@ export default class AdvisorRepository implements IAdvisorRepository {
         return { users, totalUsers };
     }
 
+    async updateAdvisorStatus(email: string, isBlock: boolean): Promise<void> {
+        await advisorSchema.updateOne({email},{$set:{isBlocked:isBlock}})
+    }
+
     async findUserByRefreshToken(refreshToken: string): Promise<any> {
         return await advisorSchema.findOne({ refreshToken });
     }

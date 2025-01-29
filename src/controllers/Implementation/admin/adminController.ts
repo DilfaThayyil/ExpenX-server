@@ -87,18 +87,33 @@ export default class AdminController implements IAdminController{
 
   
 
-  // async updateUserStatus(req: Request, res: Response): Promise<Response> {
-  //   try {
-  //     const { action, email } = req.body;
-  //     const result = await this.adminService.updateUserStatus(action, email);
-  //     if (result.error) {
-  //       return res.status(HttpStatusCode.BAD_REQUEST).json({ error: result.error });
-  //     }
-  //     return res.status(HttpStatusCode.OK).json({ message: result.message });
-  //   } catch (error) {
-  //     return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: "Internal server error" });
-  //   }
-  // }
+  async updateUserBlockStatus(req: Request, res: Response): Promise<Response> {
+    try {
+      const { action, email } = req.body;
+      const result = await this.adminService.updateUserBlockStatus(action, email);
+      if (result.error) {
+        return res.status(HttpStatusCode.BAD_REQUEST).json({ error: result.error });
+      }
+      return res.status(HttpStatusCode.OK).json({ message: result.message });
+    } catch (error) {
+      console.error(error)
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: "Internal server error" });
+    }
+  }
+
+  async updateAdvisorBlockStatus(req:Request, res:Response):Promise<Response>{
+    try{
+      const {action,email} = req.body
+      const result = await this.adminService.updateAdvisorBlockStatus(action,email)
+      if(result.error){
+        return res.status(HttpStatusCode.BAD_REQUEST).json({error: result.error})
+      }
+      return res.status(HttpStatusCode.OK).json({message:result.message})
+    }catch(error){
+      console.error(error)
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({error: "Internal server error"})
+    }
+  }
 
   // async getDashboardData(req: Request, res: Response): Promise<Response> {
   //   try {

@@ -6,4 +6,6 @@ export interface IAdminService {
   fetchUsers(page: number, limit: number): Promise<{ users: IUser[]; totalPages: number }>;
   fetchAdvisors(page: number, limit: number): Promise<{ users: IAdvisor[]; totalPages: number }>;
   updateAdmin(name:string,email:string,password:string): Promise<any>
+  updateUserBlockStatus(action:string,email:string):Promise<{ message: string; error?: string }>
+  updateAdvisorBlockStatus(action:string,email:string):Promise<{ message: string; error?: string }>
 }

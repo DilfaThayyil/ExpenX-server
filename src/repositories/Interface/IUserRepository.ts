@@ -18,4 +18,5 @@ export interface IUserRepository {
   fetchUsers(page: number, limit: number): Promise<{ users: IUser[]; totalUsers: number }>;
   findAdmin():Promise<any>
   updateAdmin(admin:any):Promise<any>
+  updateUserStatus(email:string, isBlock:boolean):Promise<void>
 }

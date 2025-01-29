@@ -5,4 +5,6 @@ export interface IAdminController{
     fetchUsers(req:Request, res:Response):Promise<Response>
     fetchAdvisors(req:Request, res:Response):Promise<Response>
     updateAdmin(req:Request, res:Response):Promise<void>
+    updateUserBlockStatus(req:Request, res:Response):Promise<Response>
+    updateAdvisorBlockStatus(req:Request, res:Response):Promise<Response>
 }

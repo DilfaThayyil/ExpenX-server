@@ -10,5 +10,6 @@ export interface IAdvisorRepository {
     updateRefreshToken(refreshToken: string, email: string): Promise<any>;
     findUserByPhoneNumber(phoneNumber: string): Promise<any>;
     removeRefreshToken(email: string): Promise<any>;
+    updateAdvisorStatus(email:string, isBlock:boolean): Promise<void>
   }
   

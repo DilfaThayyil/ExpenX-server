@@ -69,7 +69,12 @@ export default class UserRepository implements IUserRepository {
         console.log("admin-repo : ",admin)
         return await userSchema.findOneAndUpdate({ isAdmin: true }, admin, { new: true });
     }
-    
+
+    async updateUserStatus(email: string, isBlock: boolean): Promise<void> {
+        await userSchema.updateOne({email}, {$set:{isBlocked:isBlock}})
+    }
+
+
     async findUserByRefreshToken(refreshToken: string): Promise<any> {
         return await userSchema.findOne({ refreshToken });
     }
