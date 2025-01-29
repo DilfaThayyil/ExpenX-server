@@ -46,4 +46,21 @@ export default class UserService implements IUserService {
     console.log("groups from service: ",groups)
     return groups
   }
+
+  async addMember(groupId: string, memberEmail: string): Promise<IGroup> {
+    if (!groupId || !memberEmail) {
+      throw new Error('Group ID and member email are required');
+    }
+
+    const group = await this.userRepository.findById(groupId);
+    if (!group) {
+      throw new Error('Group not found');
+    }
+
+    if (group.members.includes(memberEmail)) {
+      throw new Error('Member already exists in the group');
+    }
+
+    return await this.userRepository.addMember(groupId, memberEmail);
+  }
 }

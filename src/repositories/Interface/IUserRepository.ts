@@ -19,4 +19,6 @@ export interface IUserRepository {
   findAdmin():Promise<any>
   updateAdmin(admin:any):Promise<any>
   updateUserStatus(email:string, isBlock:boolean):Promise<void>
+  findById(groupId:string):Promise<IGroup | null>
+  addMember(groupId:string,memberEmail:string):Promise<IGroup>
 }

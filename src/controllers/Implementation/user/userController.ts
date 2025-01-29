@@ -135,4 +135,24 @@ export default class UserController implements IUserController {
     }
   }
 
+  async addMember(req:Request,res:Response):Promise<void>{
+    try {
+      const { groupId } = req.params;
+      const { memberEmail } = req.body;
+
+      const updatedGroup = await this.userService.addMember(groupId, memberEmail);
+
+      res.status(200).json({
+        success: true,
+        message: 'Member added successfully',
+        data: updatedGroup
+      });
+    } catch (error) {
+      res.status(400).json({
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to add member'
+      });
+    }
+  }
+
 }

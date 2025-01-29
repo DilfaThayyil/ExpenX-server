@@ -74,6 +74,21 @@ export default class UserRepository implements IUserRepository {
         await userSchema.updateOne({email}, {$set:{isBlocked:isBlock}})
     }
 
+    async findById(groupId: string): Promise<IGroup | null> {
+        return await groupSchema.findById(groupId)
+    }
+
+    async addMember(groupId: string, memberEmail: string): Promise<IGroup> {
+        const group = await groupSchema.findByIdAndUpdate(
+            groupId,
+            {$addToSet:{members:memberEmail}},
+            {new:true}
+        )
+        if(!group){
+            throw new Error('group not found')
+        }
+        return group
+    }
 
     async findUserByRefreshToken(refreshToken: string): Promise<any> {
         return await userSchema.findOne({ refreshToken });
