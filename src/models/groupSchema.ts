@@ -1,17 +1,3 @@
-// import { model, Schema } from "mongoose";
-// import IGroup from "../entities/groupEntities";
-
-// const GroupSchema: Schema = new Schema(
-//     {
-//         name: { type: String },
-//         members: [{ type:String}],
-//         expenses: [{ type: String }],
-//         splitMethod: { type: String },
-//         createdBy: {type:String}
-//     },
-//     { timestamps: true }
-// )
-// export default model<IGroup>('Group', GroupSchema)
 
 
 import mongoose, { Schema, Document } from 'mongoose';
@@ -34,3 +20,18 @@ const GroupSchema = new Schema<IGroup>(
 )
 
 export default mongoose.model<IGroup>('Group', GroupSchema);
+
+  // import { model, Schema } from "mongoose";
+  // import IGroup from "../entities/groupEntities";
+  
+  // const GroupSchema: Schema = new Schema(
+  //     {
+  //         name: { type: String },
+  //         members: [{ type:String}],
+  //         expenses: [{ type: String }],
+  //         splitMethod: { type: String },
+  //         createdBy: {type:String}
+  //     },
+  //     { timestamps: true }
+  // )
+  // export default model<IGroup>('Group', GroupSchema)
