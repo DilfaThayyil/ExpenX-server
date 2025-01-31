@@ -3,6 +3,7 @@ import { IUserRepository } from '../../../repositories/Interface/IUserRepository
 import { IUserService } from '../../Interface/user/IUserService';
 import { IExpense } from '../../../entities/expenseEntities';
 import IGroup from '../../../entities/groupEntities';
+import { IGroupExpense } from '../../../models/groupSchema';
 
 
 
@@ -66,5 +67,28 @@ export default class UserService implements IUserService {
   }
 
 
-  
+  async addExpenseInGroup(groupId: string, expenseData: IGroupExpense): Promise<IGroup> {
+    if (!groupId || !expenseData.description || !expenseData.amount || !expenseData.paidBy) {
+      throw new Error('Missing required expense information');
+    }
+
+    const group = await this.userRepository.findById(groupId);
+    if (!group) {
+      throw new Error('Group not found');
+    }
+    console.log("paidBy : ",expenseData.paidBy)
+    if (!group.members.includes(expenseData.paidBy)) {
+      throw new Error('Expense payer must be a group member');
+    }
+
+    const expense: IGroupExpense = {
+      description: expenseData.description,
+      amount: Number(expenseData.amount),
+      paidBy: expenseData.paidBy,
+      splitMethod: expenseData.splitMethod || group.splitMethod,
+      date: new Date()
+    };
+
+    return await this.userRepository.addExpenseInGroup(groupId, expense);
+  }
 }

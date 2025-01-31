@@ -4,6 +4,7 @@ import { IUserService } from '../../../services/Interface/user/IUserService';
 import cloudinary from '../../../config/cloudinaryConfig';
 import { Request, Response } from 'express';
 import { HttpStatusCode } from '../../../utils/httpStatusCode';
+import { IGroupExpense } from '../../../models/groupSchema';
 
 @injectable()
 export default class UserController implements IUserController {
@@ -156,6 +157,25 @@ export default class UserController implements IUserController {
     }
   }
 
+  async addExpenseInGroup(req: Request, res: Response): Promise<void> {
+    try {
+      const { groupId } = req.params;
+      const expenseData: IGroupExpense = req.body;
   
+      if (!expenseData.description || !expenseData.amount || !expenseData.paidBy) {
+         res.status(400).json({ success: false, error: 'Missing required fields' });
+      }
+  
+      const updatedGroup = await this.userService.addExpenseInGroup(groupId, expenseData);
+      res.status(200).json({
+        success: true,
+        message: 'Group updated successfully',
+        data: { group: updatedGroup },
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(400).json({ success: false, error: 'Failed to update group' });
+    }
+  }
   
 }

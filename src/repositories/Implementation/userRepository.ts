@@ -5,6 +5,7 @@ import expenseSchema from '../../models/expenseSchema';
 import IGroup from '../../entities/groupEntities';
 import groupSchema from '../../models/groupSchema';
 import IUser from '../../entities/userEntities';
+import { IGroupExpense } from '../../models/groupSchema';
 
  
 
@@ -90,7 +91,17 @@ export default class UserRepository implements IUserRepository {
         return group
     }
 
-    
+    async addExpenseInGroup(groupId:string,expense:IGroupExpense):Promise<IGroup>{
+        const updatedGroup = await groupSchema.findByIdAndUpdate(
+            groupId,
+            {$push:{expenses:expense}},
+            {new:true}
+        ).exec()
+        if(!updatedGroup){
+            throw new Error('group not found')
+        }
+        return updatedGroup
+    }
 
     async findUserByRefreshToken(refreshToken: string): Promise<any> {
         return await userSchema.findOne({ refreshToken })

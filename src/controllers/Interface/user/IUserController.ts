@@ -8,4 +8,5 @@ export interface IUserController {
   createGroup(req: Request, res: Response): Promise<void>
   getUserGroups(req: Request, res:Response): Promise<void>
   addMember(req: Request, res:Response): Promise<void>
+  addExpenseInGroup(req: Request, res:Response): Promise<void>
 }

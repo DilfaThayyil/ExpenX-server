@@ -22,4 +22,5 @@ export interface IUserRepository {
   updateUserStatus(email:string, isBlock:boolean):Promise<void>
   findById(groupId:string):Promise<IGroup | null>
   addMember(groupId:string,memberEmail:string):Promise<IGroup>
+  addExpenseInGroup(groupId:string,expense:IGroupExpense):Promise<IGroup>
 }
