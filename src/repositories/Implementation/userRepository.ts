@@ -6,7 +6,7 @@ import IGroup from '../../entities/groupEntities';
 import groupSchema from '../../models/groupSchema';
 import IUser from '../../entities/userEntities';
 
-
+ 
 
 export default class UserRepository implements IUserRepository {
 
@@ -90,20 +90,22 @@ export default class UserRepository implements IUserRepository {
         return group
     }
 
+    
+
     async findUserByRefreshToken(refreshToken: string): Promise<any> {
-        return await userSchema.findOne({ refreshToken });
+        return await userSchema.findOne({ refreshToken })
     }
 
     async updateRefreshToken(refreshToken: string, email: string): Promise<any> {
-        return await userSchema.findOneAndUpdate({ email }, { refreshToken }, { new: true });
+        return await userSchema.findOneAndUpdate({ email }, { refreshToken }, { new: true })
     }
 
     async findUserByPhoneNumber(phoneNumber: string): Promise<any> {
-        return await userSchema.findOne({ phoneNumber });
+        return await userSchema.findOne({ phoneNumber })
     }
 
     async removeRefreshToken(email: string): Promise<any> {
-        return await userSchema.findOneAndUpdate({ email }, { refreshToken: null }, { new: true });
+        return await userSchema.findOneAndUpdate({ email }, { refreshToken: null }, { new: true })
     }
 
 

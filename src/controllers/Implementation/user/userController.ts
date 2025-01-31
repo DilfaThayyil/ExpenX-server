@@ -3,6 +3,7 @@ import { IUserController } from '../../Interface/user/IUserController';
 import { IUserService } from '../../../services/Interface/user/IUserService';
 import cloudinary from '../../../config/cloudinaryConfig';
 import { Request, Response } from 'express';
+import { HttpStatusCode } from '../../../utils/httpStatusCode';
 
 @injectable()
 export default class UserController implements IUserController {
@@ -155,4 +156,6 @@ export default class UserController implements IUserController {
     }
   }
 
+  
+  
 }

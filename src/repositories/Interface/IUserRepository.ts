@@ -2,6 +2,7 @@
 import { IExpense } from "../../entities/expenseEntities";
 import IGroup from "../../entities/groupEntities";
 import IUser from "../../entities/userEntities";
+import { IGroupExpense } from "../../models/groupSchema";
 
 export interface IUserRepository {
   findUserByEmail(email: string): Promise<any>;

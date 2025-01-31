@@ -47,6 +47,7 @@ export default class UserService implements IUserService {
     return groups
   }
 
+
   async addMember(groupId: string, memberEmail: string): Promise<IGroup> {
     if (!groupId || !memberEmail) {
       throw new Error('Group ID and member email are required');
@@ -63,4 +64,7 @@ export default class UserService implements IUserService {
 
     return await this.userRepository.addMember(groupId, memberEmail);
   }
+
+
+  
 }
