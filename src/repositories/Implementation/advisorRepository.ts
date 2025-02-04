@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import IAdvisor from '../../entities/advisorEntities';
 import advisorSchema from '../../models/advisorSchema';
+import slotSchema, { Slot } from '../../models/slotSchema';
 import { IAdvisorRepository } from '../Interface/IAdvisorRepository';
 
 export default class AdvisorRepository implements IAdvisorRepository {
@@ -32,6 +33,28 @@ export default class AdvisorRepository implements IAdvisorRepository {
 
     async updateAdvisorStatus(email: string, isBlock: boolean): Promise<void> {
         await advisorSchema.updateOne({email},{$set:{isBlocked:isBlock}})
+    }
+
+    async createSlot(slot:Slot):Promise<Slot>{
+        return await slotSchema.create(slot)
+    }
+
+    async findExistingSlot(date:string,startTime:string):Promise<Slot | null>{
+        console.log("findingSlot....")
+        return await slotSchema.findOne({date,startTime})
+    }
+
+    async fetchSlots():Promise<Slot[] | Slot>{
+        console.log("fetching-repo....")
+        return await slotSchema.find()
+    }
+
+    async findSlotById(slotId:string):Promise<Slot | null>{
+        return await slotSchema.findById(slotId)
+    }
+
+    async updateSlot(slotId:string,slot:Slot):Promise<Slot | null>{
+        return await slotSchema.findByIdAndUpdate(slotId,slot,{new:true})
     }
 
     async findUserByRefreshToken(refreshToken: string): Promise<any> {
