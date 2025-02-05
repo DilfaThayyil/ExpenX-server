@@ -35,7 +35,7 @@ export default class AdvisorRepository implements IAdvisorRepository {
         await advisorSchema.updateOne({email},{$set:{isBlocked:isBlock}})
     }
 
-    async createSlot(slot:Slot):Promise<any>{
+    async createSlot(slot:Slot):Promise<Slot>{
         console.log("creating...")
         const result = await slotSchema.create(slot)
         return result

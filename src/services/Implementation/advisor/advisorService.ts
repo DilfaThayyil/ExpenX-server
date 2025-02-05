@@ -23,26 +23,29 @@ export default class AdvisorService implements IAdvisorService {
     }
   }
 
-  async createSlot(slotData: Slot):Promise<Slot> {
+  async createSlot(id:string,slotData: Slot):Promise<Slot> {
     try{
+      console.log("advisorId-service : ",id)
       console.log("date & time-service : ",slotData.date,"&",slotData.startTime)
       const isExist = await this.advisorRepository.findExistingSlot(slotData.date, slotData.startTime);
       console.log("existingSlot-service : ",isExist)
       if (isExist) {
         throw new Error("A slot already exists for the given date and time.");
       }
-      const creatingSlot = {
+      const creatingSlot: Partial<Slot> = {
+        advisorId : id,
         date : slotData.date,
         startTime : slotData.startTime,
         endTime : slotData.endTime,
         duration : slotData.duration,
         maxBookings : slotData.maxBookings,
         status : slotData.status,
+        bookedBy : '',
         location : slotData.location,
         locationDetails : slotData.locationDetails,
         description : slotData.description
       }
-      const slot = await this.advisorRepository.createSlot(slotData)
+      const slot = await this.advisorRepository.createSlot(creatingSlot as Slot)
       return slot
     }catch(err){
       throw new Error('Error creating slot')

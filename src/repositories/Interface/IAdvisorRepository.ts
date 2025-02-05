@@ -12,7 +12,7 @@ export interface IAdvisorRepository {
     findUserByPhoneNumber(phoneNumber: string): Promise<any>;
     removeRefreshToken(email: string): Promise<any>;
     updateAdvisorStatus(email:string, isBlock:boolean): Promise<void>
-    createSlot(slotData:Slot):Promise<any>
+    createSlot(slotData:Slot):Promise<Slot>
     findExistingSlot(date:string,startTime:string):Promise<boolean>
     fetchSlots():Promise<Slot[] | Slot>
     findSlotById(slotId:string):Promise<Slot | null>

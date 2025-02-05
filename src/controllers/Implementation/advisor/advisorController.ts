@@ -60,12 +60,11 @@ export default class AdvisorController implements IAdvisorController {
   async createSlot(req:Request,res:Response):Promise<void>{
     try{
       console.log("req body-contr :",req.body)
-      // const {date,startTime,endTime,duration,maxBookings,status,location,locationDetails,description} = req.body
-      // const creatingSlot = {date,startTime,endTime,duration,maxBookings,status,location,locationDetails,description}
-      if(req.body._id===''){
-        delete req.body._id
+      if(req.body.slotData._id===''){
+        delete req.body.slotData._id
       }
-      const Slot = await this.advisorService.createSlot(req.body)
+      console.log("after deltg Id-contrll : ",req.body)
+      const Slot = await this.advisorService.createSlot(req.body.id,req.body.slotData)
       console.log("Slot-contr : ",Slot)
       if(!Slot){
         throw new Error('Slot is already exists')
