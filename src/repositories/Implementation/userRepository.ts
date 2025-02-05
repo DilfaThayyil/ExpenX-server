@@ -6,6 +6,7 @@ import IGroup from '../../entities/groupEntities';
 import groupSchema from '../../models/groupSchema';
 import IUser from '../../entities/userEntities';
 import { IGroupExpense } from '../../models/groupSchema';
+import slotSchema, { Slot } from '../../models/slotSchema';
 
  
 
@@ -101,6 +102,18 @@ export default class UserRepository implements IUserRepository {
             throw new Error('group not found')
         }
         return updatedGroup
+    }
+
+    async findSlot(slotId: string): Promise<Slot | null> {
+        return await slotSchema.findById(slotId)
+    }
+
+    async bookSlot(slotId:string,slot:Slot):Promise<Slot | null>{
+        console.log("slotId-repo :",slotId)
+        console.log("slot-repo :",slot)
+        const bookedSlot = await slotSchema.findOneAndUpdate({_id:slotId},slot,{new:true})
+        console.log("bookedslot-repo :",bookedSlot)
+        return bookedSlot
     }
 
     async findUserByRefreshToken(refreshToken: string): Promise<any> {

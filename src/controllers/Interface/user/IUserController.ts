@@ -9,4 +9,5 @@ export interface IUserController {
   getUserGroups(req: Request, res:Response): Promise<void>
   addMember(req: Request, res:Response): Promise<void>
   addExpenseInGroup(req: Request, res:Response): Promise<void>
+  bookslot(req: Request, res: Response): Promise<void>
 }

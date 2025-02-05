@@ -4,6 +4,7 @@ import { IUserService } from '../../Interface/user/IUserService';
 import { IExpense } from '../../../entities/expenseEntities';
 import IGroup from '../../../entities/groupEntities';
 import { IGroupExpense } from '../../../models/groupSchema';
+import { Slot } from '../../../models/slotSchema';
 
 
 
@@ -91,4 +92,27 @@ export default class UserService implements IUserService {
 
     return await this.userRepository.addExpenseInGroup(groupId, expense);
   }
+
+
+  async bookslot(slotId: string, userId: string): Promise<Slot | null> {
+    try {
+      console.log("slotId-service :", slotId);
+      console.log("userId-service :", userId);
+  
+      const slot = await this.userRepository.findSlot(slotId);
+      if (!slot) throw new Error("Slot not found");
+      if (slot.status === "Booked") throw new Error("Slot is already booked");
+  
+      slot.status = "Booked";
+      slot.bookedBy = userId;
+      const bookedSlot = await this.userRepository.bookSlot(slotId, slot);
+      console.log("bookedSlot-service :",bookedSlot)
+      return bookedSlot
+    } catch (err) {
+      console.error(err);
+      return null;
+    }
+  }
+  
+
 }

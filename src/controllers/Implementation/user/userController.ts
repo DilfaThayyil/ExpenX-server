@@ -177,5 +177,19 @@ export default class UserController implements IUserController {
       res.status(400).json({ success: false, error: 'Failed to update group' });
     }
   }
+
+  async bookslot(req:Request,res:Response):Promise<void>{
+    try{
+      const {slotId,userId} = req.body
+      console.log("req.body : ",req.body)
+      const bookedSlot = await this.userService.bookslot(slotId,userId)
+      console.log("bookedSlot-contrll :",bookedSlot)
+      res.status(HttpStatusCode.OK).json({message:"slot booked successfully",slot:bookedSlot})
+    }catch(err){
+      console.error(err)
+      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred' 
+      res.status(HttpStatusCode.NOT_FOUND).json({message:errorMessage})
+    }
+  }
   
 }

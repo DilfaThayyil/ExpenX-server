@@ -3,6 +3,7 @@ import { IExpense } from "../../entities/expenseEntities";
 import IGroup from "../../entities/groupEntities";
 import IUser from "../../entities/userEntities";
 import { IGroupExpense } from "../../models/groupSchema";
+import { Slot } from "../../models/slotSchema";
 
 export interface IUserRepository {
   findUserByEmail(email: string): Promise<any>;
@@ -23,4 +24,6 @@ export interface IUserRepository {
   findById(groupId:string):Promise<IGroup | null>
   addMember(groupId:string,memberEmail:string):Promise<IGroup>
   addExpenseInGroup(groupId:string,expense:IGroupExpense):Promise<IGroup>
+  findSlot(slotId:string):Promise<Slot | null>
+  bookSlot(slotId:string,slot:Slot):Promise<Slot | null>
 }
