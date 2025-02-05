@@ -6,4 +6,5 @@ export interface IAdvisorService {
     createSlot(slot:Slot):Promise<Slot>
     fetchSlots():Promise<Slot[] | Slot>
     updateSlot(slotId:string,slot:Slot):Promise<Slot | null>
+    deleteSlot(slotId:string):Promise<boolean>
 }

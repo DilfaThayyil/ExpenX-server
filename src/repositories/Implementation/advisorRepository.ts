@@ -35,13 +35,16 @@ export default class AdvisorRepository implements IAdvisorRepository {
         await advisorSchema.updateOne({email},{$set:{isBlocked:isBlock}})
     }
 
-    async createSlot(slot:Slot):Promise<Slot>{
-        return await slotSchema.create(slot)
+    async createSlot(slot:Slot):Promise<any>{
+        console.log("creating...")
+        const result = await slotSchema.create(slot)
+        return result
     }
 
-    async findExistingSlot(date:string,startTime:string):Promise<Slot | null>{
+    async findExistingSlot(date:string,startTime:string):Promise<boolean>{
         console.log("findingSlot....")
-        return await slotSchema.findOne({date,startTime})
+        const result = await slotSchema.findOne({date,startTime})
+        return !!result
     }
 
     async fetchSlots():Promise<Slot[] | Slot>{
@@ -56,6 +59,11 @@ export default class AdvisorRepository implements IAdvisorRepository {
     async updateSlot(slotId:string,slot:Slot):Promise<Slot | null>{
         return await slotSchema.findByIdAndUpdate(slotId,slot,{new:true})
     }
+
+    async deleteSlot(slotId: string): Promise<boolean> {
+        const result = await slotSchema.findByIdAndDelete(slotId);
+        return !!result;
+      }
 
     async findUserByRefreshToken(refreshToken: string): Promise<any> {
         return await advisorSchema.findOne({ refreshToken });

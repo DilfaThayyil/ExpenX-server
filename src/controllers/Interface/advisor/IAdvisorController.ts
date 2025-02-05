@@ -6,4 +6,5 @@ export interface IAdvisorController {
   createSlot(req:Request,res:Response): Promise<void>
   fetchSlots(req:Request,res:Response): Promise<void>
   updateSlot(req:Request,res:Response): Promise<void>
+  deleteSlot(req:Request,res:Response): Promise<void>
 }

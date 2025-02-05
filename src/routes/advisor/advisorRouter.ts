@@ -10,9 +10,10 @@ const router = Router()
 
 router.post('/upload', upload.single('profilePic'), (req, res) =>{advisorController.uploadProfileImage(req, res)})
 router.patch('/editProfile', (req, res) =>advisorController.updateUser(req, res))
-router.post('/createSlot',validateSlot,(req,res)=>advisorController.createSlot(req,res))
+router.post('/createSlot',(req,res)=>advisorController.createSlot(req,res))
 router.get('/fetchSlots',(req,res)=>advisorController.fetchSlots(req,res))
 router.patch('/updateSlot/:slotId',(req,res)=>advisorController.updateSlot(req,res))
+router.delete('/deleteSlot/:slotId',(req,res)=>advisorController.deleteSlot(req,res))
 
 
 export default router

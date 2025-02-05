@@ -60,8 +60,16 @@ export default class AdvisorController implements IAdvisorController {
   async createSlot(req:Request,res:Response):Promise<void>{
     try{
       console.log("req body-contr :",req.body)
+      // const {date,startTime,endTime,duration,maxBookings,status,location,locationDetails,description} = req.body
+      // const creatingSlot = {date,startTime,endTime,duration,maxBookings,status,location,locationDetails,description}
+      if(req.body._id===''){
+        delete req.body._id
+      }
       const Slot = await this.advisorService.createSlot(req.body)
       console.log("Slot-contr : ",Slot)
+      if(!Slot){
+        throw new Error('Slot is already exists')
+      }
       res.status(HttpStatusCode.Created).json({message:'Slot created successfully',Slot})
     }catch(err){
       console.error(err)
@@ -89,13 +97,27 @@ export default class AdvisorController implements IAdvisorController {
       const updatedSlot = await this.advisorService.updateSlot(slotId, updatedSlotData);
 
       if (!updatedSlot) {
-         res.status(404).json({ message: "Slot not found" });
+         res.status(HttpStatusCode.NotFound).json({ message: "Slot not found" });
       }
 
-       res.status(200).json({ message: "Slot updated successfully", slot: updatedSlot });
+       res.status(HttpStatusCode.Ok).json({ message: "Slot updated successfully", slot: updatedSlot });
     } catch (error) {
       console.error("Error updating slot:", error);
        res.status(500).json({ message: "Internal server error" });
+    }
+  }
+
+  async deleteSlot(req:Request,res:Response):Promise<void>{
+    try{
+      const {slotId} = req.params
+      const isDeleted = await this.advisorService.deleteSlot(slotId)
+      if(!isDeleted){
+        res.status(HttpStatusCode.NotFound).json({message:"cant found or delete slot"})
+      }
+      res.status(HttpStatusCode.Ok).json({message: "Slot deleted successfully"})
+    }catch(err){
+      console.log("Error deleting slot : ",err)
+      res.status(HttpStatusCode.InternalServerError).json({message:"Internal server error"})
     }
   }
   

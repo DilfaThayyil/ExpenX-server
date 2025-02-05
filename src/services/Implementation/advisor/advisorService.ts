@@ -23,15 +23,27 @@ export default class AdvisorService implements IAdvisorService {
     }
   }
 
-  async createSlot(slotData: Slot) {
+  async createSlot(slotData: Slot):Promise<Slot> {
     try{
       console.log("date & time-service : ",slotData.date,"&",slotData.startTime)
-      const existingSlot = await this.advisorRepository.findExistingSlot(slotData.date, slotData.startTime);
-      if (existingSlot) {
+      const isExist = await this.advisorRepository.findExistingSlot(slotData.date, slotData.startTime);
+      console.log("existingSlot-service : ",isExist)
+      if (isExist) {
         throw new Error("A slot already exists for the given date and time.");
       }
-      console.log("existingSlot-service : ",existingSlot)
-      return this.advisorRepository.createSlot(slotData)
+      const creatingSlot = {
+        date : slotData.date,
+        startTime : slotData.startTime,
+        endTime : slotData.endTime,
+        duration : slotData.duration,
+        maxBookings : slotData.maxBookings,
+        status : slotData.status,
+        location : slotData.location,
+        locationDetails : slotData.locationDetails,
+        description : slotData.description
+      }
+      const slot = await this.advisorRepository.createSlot(slotData)
+      return slot
     }catch(err){
       throw new Error('Error creating slot')
     }
@@ -61,6 +73,20 @@ export default class AdvisorService implements IAdvisorService {
       const updatedSlot = await this.advisorRepository.updateSlot(slotId,slot)
       console.log("updatedSlot-service ; ",updatedSlot)
       return updatedSlot
+    }catch(err){
+      console.error(err)
+      throw err
+    }
+  }
+
+  async deleteSlot(slotId:string):Promise<boolean>{
+    try{
+      console.log("slotId : ",slotId)
+      const isDeleted = await this.advisorRepository.deleteSlot(slotId)
+      if(!isDeleted){
+        throw new Error('Cant found or delete the slot')
+      }
+      return isDeleted
     }catch(err){
       console.error(err)
       throw err
