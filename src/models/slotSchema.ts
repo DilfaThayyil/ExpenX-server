@@ -1,4 +1,4 @@
-import {model, Schema, Document } from "mongoose";
+import {model, Schema, Document, Types } from "mongoose";
 
 export interface Slot extends Document {
   advisorId: string;
@@ -8,7 +8,7 @@ export interface Slot extends Document {
   duration: number;
   maxBookings: number;
   status: 'Available' | 'Booked' | 'Cancelled';
-  bookedBy: string;
+  bookedBy: Types.ObjectId | null;
   location: "Virtual" | "Physical";
   locationDetails: string;
   description: string;
@@ -23,7 +23,7 @@ const SlotSchema: Schema = new Schema(
     duration: { type: Number},
     maxBookings: { type: Number},
     status: { type: String, enum: ['Available' , 'Booked' , 'Cancelled'], default:"Available"},
-    bookedBy: { type: String },
+    bookedBy: { type: Schema.Types.ObjectId, ref:'User' , default:null},
     location: { type: String, enum: ["Virtual", "Physical"]},
     locationDetails: { type: String },
     description: { type: String },

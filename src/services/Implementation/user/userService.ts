@@ -5,6 +5,7 @@ import { IExpense } from '../../../entities/expenseEntities';
 import IGroup from '../../../entities/groupEntities';
 import { IGroupExpense } from '../../../models/groupSchema';
 import { Slot } from '../../../models/slotSchema';
+import { Types } from 'mongoose';
 
 
 
@@ -104,7 +105,7 @@ export default class UserService implements IUserService {
       if (slot.status === "Booked") throw new Error("Slot is already booked");
   
       slot.status = "Booked";
-      slot.bookedBy = userId;
+      slot.bookedBy = new Types.ObjectId(userId)
       const bookedSlot = await this.userRepository.bookSlot(slotId, slot);
       console.log("bookedSlot-service :",bookedSlot)
       return bookedSlot

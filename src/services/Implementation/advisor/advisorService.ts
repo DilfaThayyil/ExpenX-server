@@ -40,7 +40,7 @@ export default class AdvisorService implements IAdvisorService {
         duration : slotData.duration,
         maxBookings : slotData.maxBookings,
         status : slotData.status,
-        bookedBy : '',
+        bookedBy : null,
         location : slotData.location,
         locationDetails : slotData.locationDetails,
         description : slotData.description
