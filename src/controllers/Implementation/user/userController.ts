@@ -191,5 +191,6 @@ export default class UserController implements IUserController {
       res.status(HttpStatusCode.NOT_FOUND).json({message:errorMessage})
     }
   }
-  
+
+
 }

@@ -119,5 +119,19 @@ export default class AdvisorController implements IAdvisorController {
       res.status(HttpStatusCode.InternalServerError).json({message:"Internal server error"})
     }
   }
+
+
+  async getBookedSlotsForAdvisor(req: Request, res: Response):Promise<void>{
+    try {
+      const advisorId = req.params.advisorId
+      console.log("advisorId-contrll : ",advisorId)
+      const bookedSlots = await this.advisorService.getBookedSlotsForAdvisor(advisorId)
+      console.log("bookedSlot-contrll : ",bookedSlots)
+       res.status(HttpStatusCode.Ok).json({ slots: bookedSlots })
+    } catch (error) {
+       res.status(HttpStatusCode.InternalServerError).json({ error: "Error fetching booked slots" });
+    }
+  }
+  
   
 }

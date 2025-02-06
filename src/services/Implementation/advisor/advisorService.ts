@@ -96,4 +96,15 @@ export default class AdvisorService implements IAdvisorService {
     }
   }
 
+  async getBookedSlotsForAdvisor(advisorId:string):Promise<Slot[] | Slot>{
+    try{
+      console.log("advisorId-service :",advisorId)
+      const bookedSlots = await this.advisorRepository.getBookedSlotsForAdvisor(advisorId)
+      console.log("getBookedSlotsForAdvisor :",bookedSlots)
+      return bookedSlots
+    }catch(err){
+      console.error(err)
+      throw err
+    }
+  }
 }

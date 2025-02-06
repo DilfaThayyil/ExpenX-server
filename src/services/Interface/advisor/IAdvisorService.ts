@@ -7,4 +7,5 @@ export interface IAdvisorService {
     fetchSlots():Promise<Slot[] | Slot>
     updateSlot(slotId:string,slot:Slot):Promise<Slot | null>
     deleteSlot(slotId:string):Promise<boolean>
+    getBookedSlotsForAdvisor(advisorId:string):Promise<Slot[] | Slot>
 }

@@ -14,6 +14,7 @@ router.post('/createSlot',(req,res)=>advisorController.createSlot(req,res))
 router.get('/fetchSlots',(req,res)=>advisorController.fetchSlots(req,res))
 router.patch('/updateSlot/:slotId',(req,res)=>advisorController.updateSlot(req,res))
 router.delete('/deleteSlot/:slotId',(req,res)=>advisorController.deleteSlot(req,res))
+router.get('/fetchSlots/:advisorId',(req,res)=>advisorController.getBookedSlotsForAdvisor(req,res))
 
 
 export default router

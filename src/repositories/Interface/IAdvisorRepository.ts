@@ -9,7 +9,6 @@ export interface IAdvisorRepository {
     fetchAdvisors(page: number, limit: number): Promise<{ users: IAdvisor[]; totalUsers: number }>;
     findUserByRefreshToken(refreshToken: string): Promise<any>;
     updateRefreshToken(refreshToken: string, email: string): Promise<any>;
-    findUserByPhoneNumber(phoneNumber: string): Promise<any>;
     removeRefreshToken(email: string): Promise<any>;
     updateAdvisorStatus(email:string, isBlock:boolean): Promise<void>
     createSlot(slotData:Slot):Promise<Slot>
@@ -18,5 +17,6 @@ export interface IAdvisorRepository {
     findSlotById(slotId:string):Promise<Slot | null>
     updateSlot(slotId:string,slot:Slot):Promise<Slot | null>
     deleteSlot(slotId:string):Promise<boolean>
+    getBookedSlotsForAdvisor(advisorid:string):Promise<Slot[] | Slot>
   }
   
