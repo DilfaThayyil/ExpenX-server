@@ -25,9 +25,9 @@ export default class UserController implements IUserController {
       const result = await cloudinary.uploader.upload(file.path, {
         folder: 'profile_pictures',
       });
-      console.log("result : ", result)
+      // console.log("result : ", result)
       const imageUrl = result.secure_url;
-      console.log("imageUrl : ", imageUrl)
+      // console.log("imageUrl : ", imageUrl)
       res.status(200).json({ url: imageUrl });
     } catch (error) {
       console.error('Error uploading image:', error);
@@ -183,7 +183,7 @@ export default class UserController implements IUserController {
       const {slotId,userId} = req.body
       console.log("req.body : ",req.body)
       const bookedSlot = await this.userService.bookslot(slotId,userId)
-      console.log("bookedSlot-contrll :",bookedSlot)
+      // console.log("bookedSlot-contrll :",bookedSlot)
       res.status(HttpStatusCode.OK).json({message:"slot booked successfully",slot:bookedSlot})
     }catch(err){
       console.error(err)
@@ -192,5 +192,5 @@ export default class UserController implements IUserController {
     }
   }
 
-
+  
 }
