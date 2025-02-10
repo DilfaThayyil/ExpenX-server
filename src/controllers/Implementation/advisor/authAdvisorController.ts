@@ -49,7 +49,7 @@ export default class AuthAdvisorController implements IAuthAdvisorController {
 
     async verifyOTP(req: Request, res: Response): Promise<Response> {
     try {
-      console.log('req body in controllr : ',req.body)
+      // console.log('req body in controllr : ',req.body)
       const { email, otp } = req.body;
       await this.authAdvisorService.verifyOTP(email, otp);
       return res.status(HttpStatusCode.OK).json({success:true, message: 'User registered successfully' });
@@ -71,7 +71,7 @@ export default class AuthAdvisorController implements IAuthAdvisorController {
     try {
       const { email, password } = req.body;
       const user = await this.authAdvisorService.loginUser(email, password);
-      console.log("advisor-controller : ",user)
+      // console.log("advisor-controller : ",user)
       const user2 = mapUserProfile(user)
       //set access token and refresh token in cookies
       res.cookie('accessToken', user.accessToken, {
@@ -149,7 +149,7 @@ export default class AuthAdvisorController implements IAuthAdvisorController {
 
     async googleAuth(req: Request, res: Response): Promise<void> {
     try {
-      console.log('recieved body : ',req.body)
+      // console.log('recieved body : ',req.body)
       const { userCredential } = req.body;
       const username = userCredential.name;
       const email = userCredential.email;

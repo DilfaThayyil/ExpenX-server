@@ -31,7 +31,7 @@ export default class AuthUserController implements IAuthUserController {
 
     async generateOTP(req: Request, res: Response): Promise<void> {
     try {
-      console.log('body in generateOTP ; ',req.body)
+      // console.log('body in generateOTP ; ',req.body)
       const { email } = req.body
       await this.authUserService.generateOTP(email);
       res.json({ message: 'OTP sent successfully' });
@@ -43,7 +43,7 @@ export default class AuthUserController implements IAuthUserController {
   async resendOTP(req: Request, res: Response): Promise<Response> {
     try {
       const { email } = req.body;
-      console.log('Resend OTP request for email:', email);
+      // console.log('Resend OTP request for email:', email);
       await this.authUserService.resendOTP(email);
       return res.json({ message: 'OTP resent successfully' });
     } catch (err) {
@@ -89,7 +89,7 @@ export default class AuthUserController implements IAuthUserController {
     try {
       const { email, password } = req.body;
       const user = await this.authUserService.loginUser(email, password);
-      console.log("user-controller : ", user);
+      // console.log("user-controller : ", user);
       const user2 = mapUserProfile(user)
       // Set access token and refresh token in cookies
       res.cookie('accessToken', user.accessToken, {
@@ -179,14 +179,14 @@ export default class AuthUserController implements IAuthUserController {
 
   async googleAuth(req: Request, res: Response): Promise<void> {
     try {
-      console.log('recieved body : ',req.body)
+      // console.log('recieved body : ',req.body)
       const { userCredential } = req.body
       const username = userCredential.name
       const email = userCredential.email 
       const password = userCredential.sub
       const profilePic = userCredential.picture
       const user = await this.authUserService.googleAuth(username,email,password,profilePic)
-      console.log("user in controllr: ",user)
+      // console.log("user in controllr: ",user)
       
       res.status(HttpStatusCode.OK).json({ message: 'You authenticated via Google', user })
     } catch (err) {

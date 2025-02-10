@@ -10,8 +10,8 @@ export default class AdvisorRepository implements IAdvisorRepository {
     }
 
     async createUser(userData: any): Promise<any> {
-        console.log("vanuuuu");
-        console.log(userData, 'dfghjngvvhh');
+        // console.log("vanuuuu");
+        // console.log(userData, 'dfghjngvvhh');
 
         return await advisorSchema.create(userData);
     }
@@ -21,13 +21,13 @@ export default class AdvisorRepository implements IAdvisorRepository {
     }
 
     async fetchAdvisors(page: number, limit: number): Promise<{ users: IAdvisor[]; totalUsers: number }> {
-        console.log("reppostiry...")
+        // console.log("reppostiry...")
         const skip = (page - 1) * limit;
         const [users, totalUsers] = await Promise.all([
             advisorSchema.find().skip(skip).limit(limit),
             advisorSchema.countDocuments(),
         ]);
-        console.log("skip :", skip)
+        // console.log("skip :", skip)
         return { users, totalUsers };
     }
 
@@ -36,25 +36,25 @@ export default class AdvisorRepository implements IAdvisorRepository {
     }
 
     async createSlot(slot: Slot): Promise<Slot> {
-        console.log("creating...")
+        // console.log("creating...")
         const result = await slotSchema.create(slot)
         return result
     }
 
     async findExistingSlot(date: string, startTime: string): Promise<boolean> {
-        console.log("findingSlot....")
+        // console.log("findingSlot....")
         const result = await slotSchema.findOne({ date, startTime })
         return !!result
     }
 
     async fetchSlots(page:number,limit:number): Promise<{slots:Slot[] | Slot; totalSlots:number}> {
         const skip = (page - 1) * limit
-        console.log("skip:", skip);
+        // console.log("skip:", skip);
         const [slots,totalSlots] = await Promise.all([
             slotSchema.find().skip(skip).limit(limit),
             slotSchema.countDocuments()
         ])
-        console.log("fetchSlot-repo :",slots,totalSlots)
+        // console.log("fetchSlot-repo :",slots,totalSlots)
         return {slots,totalSlots}
     }
 

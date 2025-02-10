@@ -9,8 +9,8 @@ import { IGroupExpense } from '../../models/groupSchema';
 import slotSchema, { Slot } from '../../models/slotSchema';
 import { IMessage } from '../../entities/messageEntities';
 import { IFriendsLists } from '../../entities/friendsEntities';
-import Message from '../../models/chatSchema';
-import Conversation from '../../models/conversationSchema';
+import Message from '../../models/messageSchema';
+import Conversation from '../../models/chatSchema';
 import mongoose, { Types } from 'mongoose';
 
 

@@ -50,7 +50,7 @@ export default class UserController implements IUserController {
         country,
         language,
       });
-      console.log("updatedUser : ",updatedUser)
+      // console.log("updatedUser : ",updatedUser)
       res.status(200).json(updatedUser);
     } catch (error) {
       console.error('Error updating user:', error);
@@ -72,7 +72,7 @@ export default class UserController implements IUserController {
 
   async createExpense(req: Request, res: Response): Promise<void> {
     try {
-      console.log('dillll')
+      // console.log('dillll')
       const {userId} = req.params
       const { date, amount, category, description } = req.body;
       if (!date || !amount || !category || !description) {
@@ -86,7 +86,7 @@ export default class UserController implements IUserController {
         category,
         description,
       });
-      console.log("new expense: ",newExpense)
+      // console.log("new expense: ",newExpense)
       res.status(201).json(newExpense);
     } catch (error) {
       console.error('Error creating expense:', error);
@@ -96,7 +96,7 @@ export default class UserController implements IUserController {
 
   async createGroup(req: Request, res: Response): Promise<void> {
     try {
-      console.log('req.body : ',req.body)
+      // console.log('req.body : ',req.body)
       const { name, members, splitMethod } = req.body;
       if (!name || !Array.isArray(members) || members.length === 0 || !splitMethod) {
         res.status(400).json({ error: 'All fields are required (name, members, splitMethod).' });
@@ -107,7 +107,7 @@ export default class UserController implements IUserController {
         members,
         splitMethod,
       });
-      console.log("newGroup in contrllr : ",newGroup)
+      // console.log("newGroup in contrllr : ",newGroup)
       res.status(201).json(newGroup);
     } catch (error) {
       console.error('Error creating group:', error);
@@ -118,7 +118,7 @@ export default class UserController implements IUserController {
 
   async getUserGroups(req: Request, res: Response): Promise<void> {
     try {
-      console.log("req.parmas: ",req.params)
+      // console.log("req.parmas: ",req.params)
       const { email } = req.params;
       if (!email) {
         res.status(400).json({ error: 'Email is required' });
@@ -129,7 +129,7 @@ export default class UserController implements IUserController {
         res.status(404).json({ message: 'No groups found for this user' });
         return;
       }
-      console.log("groups: ",groups)
+      // console.log("groups: ",groups)
       res.status(200).json({ groups });
     } catch (error) {
       console.error('Error fetching groups:', error);
@@ -181,7 +181,7 @@ export default class UserController implements IUserController {
   async bookslot(req:Request,res:Response):Promise<void>{
     try{
       const {slotId,userId} = req.body
-      console.log("req.body : ",req.body)
+      // console.log("req.body : ",req.body)
       const bookedSlot = await this.userService.bookslot(slotId,userId)
       // console.log("bookedSlot-contrll :",bookedSlot)
       res.status(HttpStatusCode.OK).json({message:"slot booked successfully",slot:bookedSlot})

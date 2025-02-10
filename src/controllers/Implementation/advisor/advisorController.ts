@@ -49,7 +49,7 @@ export default class AdvisorController implements IAdvisorController {
         country,
         language,
       });
-      console.log("updatedUser : ",updatedUser)
+      // console.log("updatedUser : ",updatedUser)
       res.status(HttpStatusCode.OK).json(updatedUser);
     } catch (error) {
       console.error('Error updating user:', error);
@@ -59,13 +59,13 @@ export default class AdvisorController implements IAdvisorController {
 
   async createSlot(req:Request,res:Response):Promise<void>{
     try{
-      console.log("req body-contr :",req.body)
+      // console.log("req body-contr :",req.body)
       if(req.body.slotData._id===''){
         delete req.body.slotData._id
       }
-      console.log("after deltg Id-contrll : ",req.body)
+      // console.log("after deltg Id-contrll : ",req.body)
       const Slot = await this.advisorService.createSlot(req.body.id,req.body.slotData)
-      console.log("Slot-contr : ",Slot)
+      // console.log("Slot-contr : ",Slot)
       if(!Slot){
         throw new Error('Slot is already exists')
       }
@@ -79,9 +79,9 @@ export default class AdvisorController implements IAdvisorController {
     try{
       const page = parseInt(req.query.page as string) || 1
       const limit = parseInt(req.query.limit as string) || 10
-      console.log("fetch-page-cotrll :",page)
+      // console.log("fetch-page-cotrll :",page)
       const {slots,totalPages} = await this.advisorService.fetchSlots(page,limit)
-      console.log("slts , totalPages : ",slots," ",totalPages)
+      // console.log("slts , totalPages : ",slots," ",totalPages)
       return res.status(HttpStatusCode.OK).json({success:true,data:{slots,totalPages}})
     }catch(err){
       console.error(err)
@@ -116,7 +116,7 @@ export default class AdvisorController implements IAdvisorController {
       }
       res.status(HttpStatusCode.OK).json({message: "Slot deleted successfully"})
     }catch(err){
-      console.log("Error deleting slot : ",err)
+      // console.log("Error deleting slot : ",err)
       res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({message:"Internal server error"})
     }
   }
@@ -127,10 +127,10 @@ export default class AdvisorController implements IAdvisorController {
       const advisorId = req.params.advisorId
       const page = parseInt(req.query.page as string) || 1
       const limit = parseInt(req.query.limit as string) || 10
-      console.log("booked-page-contrll :",page)
-      console.log("advisorId-contrll : ",advisorId)
+      // console.log("booked-page-contrll :",page)
+      // console.log("advisorId-contrll : ",advisorId)
       const {bookedSlots,totalPages} = await this.advisorService.getBookedSlotsForAdvisor(advisorId,page,limit)
-      console.log("bookedSlot-contrll,totalPages : ",bookedSlots," ",totalPages)
+      // console.log("bookedSlot-contrll,totalPages : ",bookedSlots," ",totalPages)
       return  res.status(HttpStatusCode.OK).json({ success:true,data:{bookedSlots,totalPages} })
     } catch (error) {
       return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: "Error fetching booked slots" });
