@@ -5,6 +5,8 @@ import IUser from "../../../entities/userEntities";
 import { IAdvisorRepository } from "../../../repositories/Interface/IAdvisorRepository";
 import bcrypt from 'bcrypt';
 import { generateAccessToken, generateRefreshToken } from "../../../utils/jwt";
+import { ICategoryRepository } from "../../../repositories/Interface/ICategoryRepository";
+import { ICategory } from "../../../models/categorySchema";
 
 
 
@@ -12,13 +14,16 @@ import { generateAccessToken, generateRefreshToken } from "../../../utils/jwt";
 export default class AdminService implements IAdminService {
     private userRepository: IUserRepository
     private advisorRepository: IAdvisorRepository;
+    private categoryRepository: ICategoryRepository
 
     constructor(
         @inject('IUserRepository') userRepository: IUserRepository,
-        @inject('IAdvisorRepository') advisorRepository: IAdvisorRepository
+        @inject('IAdvisorRepository') advisorRepository: IAdvisorRepository,
+        @inject('ICategoryRepository') categoryRepository: ICategoryRepository
     ) {
         this.userRepository = userRepository
         this.advisorRepository = advisorRepository
+        this.categoryRepository = categoryRepository
     }
 
 
@@ -110,8 +115,29 @@ export default class AdminService implements IAdminService {
     }
 
 
-    // async getDashboardData(): Promise<any> {
-    //     return this.adminRepository.getDashboardData();
-    // }
+    async fetchCategories(page: number, limit: number): Promise<{ categories: ICategory[]; totalPages: number }> {
+        console.log("service-category..")
+        const { categories, totalCategories } = await this.categoryRepository.fetchCategories(page, limit);
+        const totalPages = Math.ceil(totalCategories / limit);
+        return { categories, totalPages };
+    }
+
+    async addCategory(name:string):Promise<ICategory>{
+        const category = await this.categoryRepository.addCategory(name)
+        console.log("category-service :",category)
+        return category
+    }
+
+    async updateCategory(id:string,name:string):Promise<ICategory | null>{
+        const updatedCategory = await this.categoryRepository.updateCategory(id,name)
+        console.log("updtCategry: ",updatedCategory)
+        return updatedCategory
+    }
+
+    async deleteCategory(id:string):Promise<ICategory | null>{
+        const deleteCategory = await this.categoryRepository.deleteCategory(id)
+        console.log("deleteCategory-serv : ",deleteCategory)
+        return deleteCategory
+    }
 
 }

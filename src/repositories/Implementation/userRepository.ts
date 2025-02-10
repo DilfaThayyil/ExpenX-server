@@ -7,7 +7,16 @@ import groupSchema from '../../models/groupSchema';
 import IUser from '../../entities/userEntities';
 import { IGroupExpense } from '../../models/groupSchema';
 import slotSchema, { Slot } from '../../models/slotSchema';
+import { IMessage } from '../../entities/messageEntities';
+import { IFriendsLists } from '../../entities/friendsEntities';
+import Message from '../../models/chatSchema';
+import Conversation from '../../models/conversationSchema';
+import mongoose, { Types } from 'mongoose';
 
+
+const isValidObjectId = (id: string): boolean => {
+    return mongoose.Types.ObjectId.isValid(id);
+  }
  
 
 export default class UserRepository implements IUserRepository {
@@ -108,6 +117,10 @@ export default class UserRepository implements IUserRepository {
         return await slotSchema.findById(slotId)
     }
 
+    async findUserById(userId: string): Promise<IUser | null> {
+        return await userSchema.findById(userId)
+    }
+
     async bookSlot(slotId:string,slot:Slot):Promise<Slot | null>{
         console.log("slotId-repo :",slotId)
         console.log("slot-repo :",slot)
@@ -132,5 +145,6 @@ export default class UserRepository implements IUserRepository {
         return await userSchema.findOneAndUpdate({ email }, { refreshToken: null }, { new: true })
     }
 
+    
 
 }

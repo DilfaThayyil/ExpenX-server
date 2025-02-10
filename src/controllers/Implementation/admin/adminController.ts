@@ -3,15 +3,21 @@ import { inject, injectable } from "tsyringe";
 import { IAdminController } from "../../Interface/admin/IAdminController";
 import { IAdminService } from "../../../services/Interface/admin/IAdminService";
 import { HttpStatusCode } from "../../../utils/httpStatusCode";
+import { IUserService } from "../../../services/Interface/user/IUserService";
 
 
 
 @injectable()
 export default class AdminController implements IAdminController{
   private adminService: IAdminService
+  private userService: IUserService
   
-  constructor(@inject('IAdminService')adminService:IAdminService){
+  constructor(
+    @inject('IAdminService')adminService:IAdminService,
+    @inject('IUserService')userService:IUserService
+  ){
     this.adminService = adminService
+    this.userService = userService
   }
 
   
@@ -94,6 +100,7 @@ export default class AdminController implements IAdminController{
       if (result.error) {
         return res.status(HttpStatusCode.BAD_REQUEST).json({ error: result.error });
       }
+      
       return res.status(HttpStatusCode.OK).json({ message: result.message });
     } catch (error) {
       console.error(error)
@@ -115,12 +122,59 @@ export default class AdminController implements IAdminController{
     }
   }
 
-  // async getDashboardData(req: Request, res: Response): Promise<Response> {
-  //   try {
-  //     const dashboard = await this.adminService.getDashboardData();
-  //     return res.status(HttpStatusCode.OK).json({ dashboard });
-  //   } catch (error) {
-  //     return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: "Internal server error" });
-  //   }
-  // }
+  async fetchCategories(req: Request, res: Response): Promise<Response> {
+    try {
+      console.log("controler-category")
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+      console.log("page: ",page)
+      const { categories, totalPages } = await this.adminService.fetchCategories(page, limit);
+      console.log("categories , totalPages : ", categories," , ",totalPages)
+      return res.status(HttpStatusCode.OK).json({ success: true, data: { categories, totalPages } });
+    } catch (error) {
+      console.error(error)
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: "Internal server error" });
+    }
+  }
+
+  async addCategory(req:Request, res:Response):Promise<Response>{
+    try{
+      const {name} = req.body
+      const category = await this.adminService.addCategory(name)
+      console.log("category-controll : ",category)
+      return res.status(HttpStatusCode.CREATED).json({success:true,data:{category}})
+    }catch(err){
+      console.error(err)
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({error:"Internal server error"})
+      
+    }
+  }
+
+  async updateCategory(req:Request,res:Response):Promise<Response>{
+    try{
+      const {id} = req.params
+      const {name} = req.body
+      console.log("catgry-update (id , name) : ",id," ",name)
+      const updatedCategory = await this.adminService.updateCategory(id,name)
+      console.log("categ-updat-contrll :",updatedCategory)
+      return res.status(HttpStatusCode.OK).json({success:true,data:{updatedCategory}})
+    }catch(err){
+      console.error(err)
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({error: "Internal server error"})
+    }
+  }
+
+  async deleteCategory(req:Request, res:Response):Promise<Response>{
+    try{
+      const {id} = req.params
+      const category = await this.adminService.deleteCategory(id)
+      if(!category){
+        return res.status(HttpStatusCode.NOT_FOUND).json({message:"category not found"})
+      }
+      return res.status(HttpStatusCode.OK).json({message:"category deleted successfully"})
+    }catch(err){
+      console.error(err)
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({error:"Error deleting category"})
+    }
+  }
 }

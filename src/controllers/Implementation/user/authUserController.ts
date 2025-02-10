@@ -118,7 +118,7 @@ export default class AuthUserController implements IAuthUserController {
         const refreshToken = req.cookies?.refreshToken;
         if (!refreshToken) return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: "No token provided" });
         const result = await this.authUserService.setNewAccessToken(refreshToken);
-        console.log("-----result--- : ",result)
+        // console.log("-----result--- : ",result)
         if (!result.accessToken) return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: 'Failed to generate token' });
         res.cookie('accessToken', result.accessToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production', maxAge: 3600000, sameSite: 'strict' });
         // await connectDB(result.businessOwnerId);

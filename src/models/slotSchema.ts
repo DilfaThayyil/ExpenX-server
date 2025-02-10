@@ -8,7 +8,11 @@ export interface Slot extends Document {
   duration: number;
   maxBookings: number;
   status: 'Available' | 'Booked' | 'Cancelled';
-  bookedBy: Types.ObjectId | null;
+  bookedBy: {
+    _id:Types.ObjectId
+    username:string
+    email:string
+  } | {};
   location: "Virtual" | "Physical";
   locationDetails: string;
   description: string;
@@ -22,8 +26,19 @@ const SlotSchema: Schema = new Schema(
     endTime: { type: String},
     duration: { type: Number},
     maxBookings: { type: Number},
-    status: { type: String, enum: ['Available' , 'Booked' , 'Cancelled'], default:"Available"},
-    bookedBy: { type: Schema.Types.ObjectId, ref:'User' , default:null},
+    status: { 
+      type: String, 
+      enum: ['Available' , 'Booked' , 'Cancelled'], 
+      default:"Available"
+    },
+    bookedBy: {
+      type : {
+        _id: {type: Schema.Types.ObjectId, ref:'User'},
+        username: {type: String}, 
+        email:{type: String}
+      },
+      default:{}
+    },
     location: { type: String, enum: ["Virtual", "Physical"]},
     locationDetails: { type: String },
     description: { type: String },

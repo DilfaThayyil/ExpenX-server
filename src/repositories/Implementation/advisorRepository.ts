@@ -47,9 +47,15 @@ export default class AdvisorRepository implements IAdvisorRepository {
         return !!result
     }
 
-    async fetchSlots(): Promise<Slot[] | Slot> {
-        console.log("fetching-repo....")
-        return await slotSchema.find()
+    async fetchSlots(page:number,limit:number): Promise<{slots:Slot[] | Slot; totalSlots:number}> {
+        const skip = (page - 1) * limit
+        console.log("skip:", skip);
+        const [slots,totalSlots] = await Promise.all([
+            slotSchema.find().skip(skip).limit(limit),
+            slotSchema.countDocuments()
+        ])
+        console.log("fetchSlot-repo :",slots,totalSlots)
+        return {slots,totalSlots}
     }
 
     async findSlotById(slotId: string): Promise<Slot | null> {
@@ -65,16 +71,21 @@ export default class AdvisorRepository implements IAdvisorRepository {
         return !!result;
     }
 
-    async getBookedSlotsForAdvisor(advisorId: string): Promise<Slot[] | Slot> {
+    async getBookedSlotsForAdvisor(advisorId: string,page:number,limit:number): Promise<{bookedSlots:Slot[] | Slot; totalSlots:number}> {
         try {
-            const result = await slotSchema.find({ advisorId: advisorId, status: "Booked" })
-                .populate('bookedBy', 'username email') 
-                .exec();
-            console.log("result :", result)
-            if (!result) {
-                throw new Error('slot is not found in the database')
-            }
-            return result
+            const skip = (page-1)*limit
+            const [bookedSlots, totalSlots] = await Promise.all([
+                slotSchema
+                  .find({ advisorId: advisorId, status: "Booked" })
+                  .skip(skip)
+                  .limit(limit)
+                  .populate("bookedBy._id", "username email")
+                  .exec(),
+          
+                slotSchema.countDocuments({ advisorId: advisorId, status: "Booked" })
+              ]);
+          
+              return { bookedSlots, totalSlots };
         } catch (err) {
             throw err
         }

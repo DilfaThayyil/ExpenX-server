@@ -25,12 +25,18 @@ import { IAdvisorService } from '../services/Interface/advisor/IAdvisorService';
 import AdvisorService from '../services/Implementation/advisor/advisorService';
 import { IAdminController } from '../controllers/Interface/admin/IAdminController';
 
-
 //admin
 import AdminController from '../controllers/Implementation/admin/adminController';
 import { IAdminService } from '../services/Interface/admin/IAdminService';
 import AdminService from '../services/Implementation/admin/adminService';
-
+import { IChatRepository } from '../repositories/Interface/IChatRepository';
+import ChatRepository from '../repositories/Implementation/chatRepository';
+import { IChatController } from '../controllers/Interface/chat/IChatController';
+import ChatController from '../controllers/Implementation/chat/chatController';
+import { IChatService } from '../services/Interface/chat/IChatService';
+import ChatService from '../services/Implementation/chat/chatService';
+import { ICategoryRepository } from '../repositories/Interface/ICategoryRepository';
+import { CategoryRepository } from '../repositories/Implementation/categoryRepository';
 
 
 //user
@@ -47,7 +53,14 @@ container.register<IAdvisorRepository>('IAdvisorRepository',{useClass:AdvisorRep
 container.register<IAdvisorController>('IAdvisorController',{useClass:AdvisorController})
 container.register<IAdvisorService>('IAdvisorService',{useClass:AdvisorService})
 
-
 //admin
 container.register<IAdminController>('IAdminController',{useClass: AdminController})
 container.register<IAdminService>('IAdminService',{useClass:AdminService})
+
+//chat
+container.register<IChatController>('IChatController',{useClass:ChatController})
+container.register<IChatService>('IChatService',{useClass:ChatService})
+container.register<IChatRepository>('IChatRepository',{useClass:ChatRepository})
+
+//category
+container.register<ICategoryRepository>('ICategoryRepository',{useClass:CategoryRepository})

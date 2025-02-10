@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { IExpense } from "../../entities/expenseEntities";
+import { IFriendsLists } from "../../entities/friendsEntities";
 import IGroup from "../../entities/groupEntities";
+import { IMessage } from "../../entities/messageEntities";
 import IUser from "../../entities/userEntities";
 import { IGroupExpense } from "../../models/groupSchema";
 import { Slot } from "../../models/slotSchema";
@@ -25,5 +27,7 @@ export interface IUserRepository {
   addMember(groupId:string,memberEmail:string):Promise<IGroup>
   addExpenseInGroup(groupId:string,expense:IGroupExpense):Promise<IGroup>
   findSlot(slotId:string):Promise<Slot | null>
+  findUserById(userId:string):Promise<IUser | null>
   bookSlot(slotId:string,slot:Slot):Promise<Slot | null>
+
 }

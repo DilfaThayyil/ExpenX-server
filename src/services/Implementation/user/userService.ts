@@ -6,6 +6,8 @@ import IGroup from '../../../entities/groupEntities';
 import { IGroupExpense } from '../../../models/groupSchema';
 import { Slot } from '../../../models/slotSchema';
 import { Types } from 'mongoose';
+import { IMessage } from '../../../entities/messageEntities';
+import { IFriendsLists } from '../../../entities/friendsEntities';
 
 
 
@@ -37,16 +39,16 @@ export default class UserService implements IUserService {
   }
 
   async createGroup(groupData: IGroup):Promise<IGroup>{
-    console.log("service....")
-    console.log("groupData in service: ",groupData)
+    // console.log("service....")
+    // console.log("groupData in service: ",groupData)
     return this.userRepository.createGroup(groupData)
   }
 
 
   async getUserGroups(email:string):Promise<IGroup[]>{
-    console.log("service calls....")
+    // console.log("service calls....")
     const groups = await this.userRepository.getUserGroups(email)
-    console.log("groups from service: ",groups)
+    // console.log("groups from service: ",groups)
     return groups
   }
 
@@ -78,7 +80,7 @@ export default class UserService implements IUserService {
     if (!group) {
       throw new Error('Group not found');
     }
-    console.log("paidBy : ",expenseData.paidBy)
+    // console.log("paidBy : ",expenseData.paidBy)
     if (!group.members.includes(expenseData.paidBy)) {
       throw new Error('Expense payer must be a group member');
     }
@@ -97,25 +99,35 @@ export default class UserService implements IUserService {
 
   async bookslot(slotId: string, userId: string): Promise<Slot | null> {
     try {
-      console.log("slotId-service :", slotId);
-      console.log("userId-service :", userId);
-  
       const slot = await this.userRepository.findSlot(slotId);
       if (!slot) throw new Error("Slot not found");
       if (slot.status === "Booked") throw new Error("Slot is already booked");
   
+      // Fetch user details
+      const user = await this.userRepository.findUserById(userId);
+      if (!user) throw new Error("User not found");
+  
+      // Update slot details
       slot.status = "Booked";
-      slot.bookedBy = new Types.ObjectId(userId)
+      slot.bookedBy = {
+        _id: user.id,
+        username: user.username,
+        email: user.email,
+      };
+  
+      // Save the updated slot
       const bookedSlot = await this.userRepository.bookSlot(slotId, slot);
-      console.log("bookedSlot-service :",bookedSlot)
-      return bookedSlot
+      return bookedSlot;
     } catch (err) {
       console.error(err);
       return null;
     }
   }
+  
+  async logout(): Promise<void> {
+    console.log("logoutUser service called...",localStorage)
+    localStorage.removeItem('refreshToken');
+  }
 
-  
-  
 
 }

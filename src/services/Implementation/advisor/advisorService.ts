@@ -40,7 +40,7 @@ export default class AdvisorService implements IAdvisorService {
         duration : slotData.duration,
         maxBookings : slotData.maxBookings,
         status : slotData.status,
-        bookedBy : null,
+        bookedBy : {},
         location : slotData.location,
         locationDetails : slotData.locationDetails,
         description : slotData.description
@@ -52,14 +52,12 @@ export default class AdvisorService implements IAdvisorService {
     }
   }
 
-  async fetchSlots(){
+  async fetchSlots(page:number,limit:number):Promise<{slots:Slot[]|Slot,totalPages:number}>{
     try{
-      const slots = await this.advisorRepository.fetchSlots()
-      console.log("fetchSlots-service : ",slots )
-      if(!slots){
-        throw new Error('Error fetching slots...')
-      }
-      return slots
+      console.log("fetchSlot-serv...")
+      const {slots,totalSlots} = await this.advisorRepository.fetchSlots(page,limit)
+      const totalPages = Math.ceil(totalSlots/limit)      
+      return {slots,totalPages}
     }catch(err){
       throw err
     }
@@ -96,12 +94,16 @@ export default class AdvisorService implements IAdvisorService {
     }
   }
 
-  async getBookedSlotsForAdvisor(advisorId:string):Promise<Slot[] | Slot>{
+  async getBookedSlotsForAdvisor(advisorId:string,page:number,limit:number):Promise<{bookedSlots:Slot[] | Slot; totalPages:number}>{
     try{
       console.log("advisorId-service :",advisorId)
-      const bookedSlots = await this.advisorRepository.getBookedSlotsForAdvisor(advisorId)
+      const {bookedSlots,totalSlots} = await this.advisorRepository.getBookedSlotsForAdvisor(advisorId,page,limit)
+      if(!bookedSlots){
+        throw new Error('No slots found')
+      }
+      const totalPages = Math.ceil(totalSlots/limit)
       console.log("getBookedSlotsForAdvisor :",bookedSlots)
-      return bookedSlots
+      return {bookedSlots,totalPages}
     }catch(err){
       console.error(err)
       throw err

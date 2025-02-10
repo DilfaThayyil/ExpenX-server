@@ -1,5 +1,7 @@
 import { IExpense } from "../../../entities/expenseEntities";
+import { IFriendsLists } from "../../../entities/friendsEntities";
 import IGroup from "../../../entities/groupEntities";
+import { IMessage } from "../../../entities/messageEntities";
 import { IGroupExpense } from "../../../models/groupSchema";
 import { Slot } from "../../../models/slotSchema";
 

@@ -13,10 +13,10 @@ export interface IAdvisorRepository {
     updateAdvisorStatus(email:string, isBlock:boolean): Promise<void>
     createSlot(slotData:Slot):Promise<Slot>
     findExistingSlot(date:string,startTime:string):Promise<boolean>
-    fetchSlots():Promise<Slot[] | Slot>
+    fetchSlots(page:number,limit:number):Promise<{slots:Slot[] | Slot; totalSlots:number}>
     findSlotById(slotId:string):Promise<Slot | null>
     updateSlot(slotId:string,slot:Slot):Promise<Slot | null>
     deleteSlot(slotId:string):Promise<boolean>
-    getBookedSlotsForAdvisor(advisorid:string):Promise<Slot[] | Slot>
+    getBookedSlotsForAdvisor(advisorid:string,page:number,limit:number):Promise<{bookedSlots:Slot[] | Slot; totalSlots:number}>
   }
   
