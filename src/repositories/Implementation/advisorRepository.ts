@@ -79,7 +79,7 @@ export default class AdvisorRepository implements IAdvisorRepository {
                   .find({ advisorId: advisorId, status: "Booked" })
                   .skip(skip)
                   .limit(limit)
-                  .populate("bookedBy._id", "username email")
+                  .populate("bookedBy", "username email")
                   .exec(),
           
                 slotSchema.countDocuments({ advisorId: advisorId, status: "Booked" })
