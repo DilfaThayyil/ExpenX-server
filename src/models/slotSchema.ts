@@ -1,7 +1,12 @@
 import {model, Schema, Document, Types } from "mongoose";
 
 export interface Slot extends Document {
-  advisorId: string;
+  advisorId: {
+    _id:Types.ObjectId
+    username:string
+    email:string
+    profilePic:string
+  } | {};
   date: string;
   startTime: string;
   endTime: string;
@@ -12,6 +17,7 @@ export interface Slot extends Document {
     _id:Types.ObjectId
     username:string
     email:string
+    profilePic:string
   } | {};
   location: "Virtual" | "Physical";
   locationDetails: string;
@@ -20,7 +26,15 @@ export interface Slot extends Document {
 
 const SlotSchema: Schema = new Schema(
   {
-    advisorId: { type: String },
+    advisorId: {
+      type: {
+        _id:{type: Schema.Types.ObjectId,ref:'Advisor'},
+        username:{type:String},
+        email:{type:String},
+        profilePic:{type:String}
+      },
+      default:{}
+    },
     date: { type: String},
     startTime: { type: String},
     endTime: { type: String},
@@ -35,7 +49,8 @@ const SlotSchema: Schema = new Schema(
       type : {
         _id: {type: Schema.Types.ObjectId, ref:'User'},
         username: {type: String}, 
-        email:{type: String}
+        email:{type: String},
+        profilePic:{type: String}
       },
       default:{}
     },
