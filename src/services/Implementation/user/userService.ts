@@ -113,6 +113,7 @@ export default class UserService implements IUserService {
         _id: user.id,
         username: user.username,
         email: user.email,
+        profilePic: user.profilePic
       };
   
       // Save the updated slot

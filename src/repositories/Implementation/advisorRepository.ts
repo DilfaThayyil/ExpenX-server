@@ -71,20 +71,24 @@ export default class AdvisorRepository implements IAdvisorRepository {
         return !!result;
     }
 
+    async findUserById(id: string): Promise<IAdvisor | null> {
+        return await advisorSchema.findById(id)
+    }
+
     async getBookedSlotsForAdvisor(advisorId: string,page:number,limit:number): Promise<{bookedSlots:Slot[] | Slot; totalSlots:number}> {
         try {
             const skip = (page-1)*limit
             const [bookedSlots, totalSlots] = await Promise.all([
                 slotSchema
-                  .find({ advisorId: advisorId, status: "Booked" })
+                  .find({ 'advisorId._id': advisorId, status: "Booked" })
                   .skip(skip)
                   .limit(limit)
                   .populate("bookedBy", "username email")
                   .exec(),
           
-                slotSchema.countDocuments({ advisorId: advisorId, status: "Booked" })
+                slotSchema.countDocuments({ 'advisorId._id': advisorId, status: "Booked" })
               ]);
-          
+            //   console.log("bookedSlots-repo : ",bookedSlots)
               return { bookedSlots, totalSlots };
         } catch (err) {
             throw err

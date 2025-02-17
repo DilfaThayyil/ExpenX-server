@@ -1,8 +1,8 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
-interface IChat extends Document {
-  user1: mongoose.Types.ObjectId; 
-  user2: mongoose.Types.ObjectId; 
+export interface IChat extends Document {
+  user1: string
+  user2: string
   createdAt: Date; 
   updatedAt: Date;  
   lastMessage?: string;
@@ -11,8 +11,8 @@ interface IChat extends Document {
 
 const ChatSchema: Schema = new Schema(
   {
-    user1: { type: Schema.Types.ObjectId, ref: 'Advisor', required: true },
-    user2: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    user1: { type: String, ref: 'Advisor', required: true },
+    user2: { type: String, ref: 'User', required: true },
     lastMessage: { type: String, default: '' },
   },
   { 

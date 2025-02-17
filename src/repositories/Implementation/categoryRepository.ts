@@ -28,4 +28,9 @@ export class CategoryRepository implements ICategoryRepository{
         console.log("deleteCategory-repo...")
         return await categorySchema.findByIdAndDelete(id)
     }
+
+    async findCategory(name:string):Promise<ICategory | null>{
+        console.log("findingCateg...")
+        return await categorySchema.findOne({name:name})
+    }
 }

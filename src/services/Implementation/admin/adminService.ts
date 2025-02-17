@@ -123,6 +123,10 @@ export default class AdminService implements IAdminService {
     }
 
     async addCategory(name:string):Promise<ICategory>{
+        const existingCategory = await this.categoryRepository.findCategory(name)
+        if(existingCategory){
+            throw new Error('Category already exist')
+        }
         const category = await this.categoryRepository.addCategory(name)
         console.log("category-service :",category)
         return category

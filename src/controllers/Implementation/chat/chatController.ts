@@ -32,6 +32,7 @@ export default class ChatController implements IChatController{
 
     async fetchMessages(req: Request, res: Response): Promise<Response> {
       try {
+        console.log("fetchMesg-controll : +++++++++++++ ",req.params)
         const { senderId, receiverId } = req.params;
   
         if (!senderId || !receiverId) {
@@ -39,9 +40,61 @@ export default class ChatController implements IChatController{
         }
   
         const messages = await this.chatService.fetchMessages(senderId, receiverId);
+        console.log("messages-contrll : ",messages)
         return res.status(HttpStatusCode.OK).json(messages);
       } catch (error) {
         return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
+      }
+    }
+
+    async fetchUsers(req: Request, res: Response): Promise<Response> {
+      try{
+        const {id} = req.params
+        const users = await this.chatService.fetchUsers(id)
+        console.log("users :",users)
+        return res.status(HttpStatusCode.OK).json({users})
+      }catch(err){
+        return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
+      }
+    }
+
+    async fetchAdvisors(req: Request, res: Response): Promise<Response> {
+      try{
+        const {id} = req.params
+        const users = await this.chatService.fetchAdvisors(id)
+        console.log("Advisors :",users)
+        return res.status(HttpStatusCode.OK).json({users})
+      }catch(err){
+        return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
+      }
+    }
+
+
+    async createChat(req: Request, res: Response):Promise<Response> {
+      try {
+        const chat = await this.chatService.createChat(req.body);
+        return res.status(201).json({ success: true, result: chat });
+      } catch (error) {
+        return res.status(500).json({ success: false, message: "Error creating chat", error });
+      }
+    }
+  
+    async fetchChats(req: Request, res: Response):Promise<Response> {
+      try {
+        const userId = req.params.userId;
+        const chats = await this.chatService.getUserChats(userId);
+        return res.status(200).json({ success: true, result: chats });
+      } catch (error) {
+        return res.status(500).json({ success: false, message: "Error fetching chats", error });
+      }
+    }
+  
+    async fetchAllChats(req: Request, res: Response):Promise<Response> {
+      try {
+        const chats = await this.chatService.getAllChats();
+        return res.status(200).json({ success: true, result: chats });
+      } catch (error) {
+        return res.status(500).json({ success: false, message: "Error fetching all chats", error });
       }
     }
 

@@ -1,20 +1,22 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IMessage extends Document {
-  sender: string;
-  receiver: string;
+  senderId: string;
+  receiverId: string;
+  roomId: string;
   text: string;
   status: 'sent' | 'delivered' | 'read'; 
-  timestamp: Date;
+  // time: Date;
 }
 
 const MessageSchema = new Schema<IMessage>(
   {
-    sender: { type: String},
-    receiver: { type: String},
+    senderId: { type: String},
+    receiverId: { type: String},
+    roomId: {type: String},
     text: { type: String},
     status: { type: String, enum: ['sent', 'delivered', 'read'], default: 'sent' }, 
-    timestamp: { type: Date, default: Date.now },
+    // time: { type: Date, default: Date.now },
   },
   { timestamps: true }
 );

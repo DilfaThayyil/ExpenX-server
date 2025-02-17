@@ -18,5 +18,6 @@ export interface IAdvisorRepository {
     updateSlot(slotId:string,slot:Slot):Promise<Slot | null>
     deleteSlot(slotId:string):Promise<boolean>
     getBookedSlotsForAdvisor(advisorid:string,page:number,limit:number):Promise<{bookedSlots:Slot[] | Slot; totalSlots:number}>
+    findUserById(id:string):Promise<IAdvisor | null>
   }
   

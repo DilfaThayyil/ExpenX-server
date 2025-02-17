@@ -2,6 +2,7 @@ import { inject, injectable } from 'tsyringe';
 import { IAdvisorRepository } from '../../../repositories/Interface/IAdvisorRepository';
 import { IAdvisorService } from '../../Interface/advisor/IAdvisorService';
 import { Slot } from '../../../models/slotSchema';
+import { Types } from 'mongoose';
 
 
 @injectable()
@@ -23,34 +24,47 @@ export default class AdvisorService implements IAdvisorService {
     }
   }
 
-  async createSlot(id:string,slotData: Slot):Promise<Slot> {
-    try{
-      console.log("advisorId-service : ",id)
-      console.log("date & time-service : ",slotData.date,"&",slotData.startTime)
-      const isExist = await this.advisorRepository.findExistingSlot(slotData.date, slotData.startTime);
-      console.log("existingSlot-service : ",isExist)
-      if (isExist) {
-        throw new Error("A slot already exists for the given date and time.");
-      }
-      const creatingSlot: Partial<Slot> = {
-        advisorId : id,
-        date : slotData.date,
-        startTime : slotData.startTime,
-        endTime : slotData.endTime,
-        duration : slotData.duration,
-        maxBookings : slotData.maxBookings,
-        status : slotData.status,
-        bookedBy : {},
-        location : slotData.location,
-        locationDetails : slotData.locationDetails,
-        description : slotData.description
-      }
-      const slot = await this.advisorRepository.createSlot(creatingSlot as Slot)
-      return slot
-    }catch(err){
-      throw new Error('Error creating slot')
+  async createSlot(id: string, slotData: Slot): Promise<Slot> {
+    try {
+        console.log("advisorId-service : ", id);
+        console.log("date & time-service : ", slotData.date, "&", slotData.startTime);
+
+        const isExist = await this.advisorRepository.findExistingSlot(slotData.date, slotData.startTime);
+        console.log("existingSlot-service : ", isExist);
+        if (isExist) {
+            throw new Error("A slot already exists for the given date and time.");
+        }
+
+        const advisor = await this.advisorRepository.findUserById(id);
+        if (!advisor) throw new Error('Advisor not found');
+
+        const creatingSlot: Partial<Slot> = {
+            advisorId: {
+                _id: new Types.ObjectId(advisor.id), 
+                username: advisor.username,
+                email: advisor.email,
+                profilePic: advisor.profilePic
+            },
+            date: slotData.date,
+            startTime: slotData.startTime,
+            endTime: slotData.endTime,
+            duration: slotData.duration,
+            maxBookings: slotData.maxBookings,
+            status: slotData.status,
+            bookedBy: {}, // Empty object by default
+            location: slotData.location,
+            locationDetails: slotData.locationDetails,
+            description: slotData.description
+        };
+
+        const slot = await this.advisorRepository.createSlot(creatingSlot as Slot);
+        return slot;
+    } catch (err) {
+        console.error('Error creating slot:', err);
+        throw new Error('Error creating slot');
     }
-  }
+}
+
 
   async fetchSlots(page:number,limit:number):Promise<{slots:Slot[]|Slot,totalPages:number}>{
     try{
@@ -96,13 +110,13 @@ export default class AdvisorService implements IAdvisorService {
 
   async getBookedSlotsForAdvisor(advisorId:string,page:number,limit:number):Promise<{bookedSlots:Slot[] | Slot; totalPages:number}>{
     try{
-      console.log("advisorId-service :",advisorId)
+      // console.log("advisorId-service :",advisorId)
       const {bookedSlots,totalSlots} = await this.advisorRepository.getBookedSlotsForAdvisor(advisorId,page,limit)
       if(!bookedSlots){
         throw new Error('No slots found')
       }
       const totalPages = Math.ceil(totalSlots/limit)
-      console.log("getBookedSlotsForAdvisor :",bookedSlots)
+      // console.log("getBookedSlotsForAdvisor :",bookedSlots)
       return {bookedSlots,totalPages}
     }catch(err){
       console.error(err)
