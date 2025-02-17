@@ -9,7 +9,7 @@ const initializeSocket = (server: HttpServer): Server => {
       methods: ["GET", "POST"],
       credentials: true,
     },
-    transports: ["websocket", "polling"], 
+    transports: ["websocket", "polling"],
   });
 
   io.on("connection", (socket: Socket) => {
@@ -18,22 +18,32 @@ const initializeSocket = (server: HttpServer): Server => {
       console.log(`User joined room: ${roomId}`);
       socket.join(roomId);
     });
-    socket.on("send_message", async({ senderId, receiverId, roomId, text }) => {
-      try{
+    socket.on("send_message", async ({ senderId, receiverId, roomId, text }) => {
+      try {
         console.log("Message received on server:", { senderId, receiverId, roomId, text });
         const newMessage = await messageSchema.create({
-        senderId,
-        receiverId,
-        roomId,
-        text,
-        status: "sent",
-        // time: new Date(),
-      });
-      io.to(roomId).emit("receive_message", newMessage);
-      }catch(err){
-        console.error("error saving message : ",err)
+          senderId,
+          receiverId,
+          roomId,
+          text,
+          status: "sent",
+          // time: new Date(),
+        });
+        io.to(roomId).emit("receive_message", newMessage);
+      } catch (err) {
+        console.error("error saving message : ", err)
       }
-  });
+    });
+
+    socket.on("typing", ({ senderId, roomId }) => {
+      console.log("typing...",senderId," , ",roomId)
+      io.to(roomId).emit("display_typing", { senderId });
+    });
+
+    socket.on("stop_typing", ({ senderId, roomId }) => {
+      console.log("stop_typing...",senderId," , ",roomId)
+      io.to(roomId).emit("hide_typing", { senderId });
+    });
 
     socket.on("disconnect", () => {
       console.log(`User disconnected: ${socket.id}`);
