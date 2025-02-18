@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import upload from '../../middleware/multer';
+import {uploadProfile,uploadChatFile} from '../../middleware/multer';
 import { container } from 'tsyringe';
 import { IUserController } from '../../controllers/Interface/user/IUserController';
 import { IChatController } from '../../controllers/Interface/chat/IChatController';
@@ -9,7 +9,7 @@ const chatController = container.resolve<IChatController>('IChatController')
 const router = Router()
 
 
-router.post('/upload', upload.single('profilePic'), (req, res) =>{userController.uploadProfileImage(req, res)})
+router.post('/upload', uploadProfile.single('profilePic'), (req, res) =>{userController.uploadProfileImage(req, res)})
 router.patch('/editProfile', (req, res) =>userController.updateUser(req, res))
 router.get('/getExpenses/:userId', (req,res)=>userController.getExpenses(req,res))
 router.post('/createExpense/:userId',(req,res)=>userController.createExpense(req,res))
@@ -25,8 +25,6 @@ router.get('/fetchAdvisors/:id',(req,res)=>chatController.fetchAdvisors(req,res)
 router.get('/fetchChats/:id',(req,res)=>chatController.fetchChats(req,res))
 router.get('/fetchAllChats',(req,res)=>chatController.fetchAllChats(req,res))
 router.post('/createChat',(req,res)=>chatController.createChat(req,res))
-// router.get('/findMyFriends/:id',(req,res)=>chatController.findMyFriends(req,res))
-// router.get('/getMessage/:conversationId',(req,res)=>chatController.getMessage(req,res))
-// router.post('/postImage',upload.single('chatImage'),(req,res)=>chatController.postImage(req,res))
+router.post('/uploadChatFile',uploadChatFile.single('file'),(req,res)=>{chatController.uploadChatFile(req,res)})
 
 export default router

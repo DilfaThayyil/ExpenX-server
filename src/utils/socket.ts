@@ -18,17 +18,25 @@ const initializeSocket = (server: HttpServer): Server => {
       console.log(`User joined room: ${roomId}`);
       socket.join(roomId);
     });
-    socket.on("send_message", async ({ senderId, receiverId, roomId, text }) => {
+    socket.on("send_message", async ({ senderId, receiverId, roomId, text ,url, fileType, fileName}) => {
+      console.log("message-inServer : ",text," => ",url)
       try {
-        console.log("Message received on server:", { senderId, receiverId, roomId, text });
+        console.log("Message received on server:", { 
+          senderId, receiverId, roomId, text ,url, 
+          fileType: fileType || "none",
+          fileName: fileName || "none"
+        });
         const newMessage = await messageSchema.create({
           senderId,
           receiverId,
           roomId,
           text,
+          fileUrl:url,
+          fileType,
+          fileName,
           status: "sent",
-          // time: new Date(),
         });
+        console.log("savedNewMesssage : ",newMessage)
         io.to(roomId).emit("receive_message", newMessage);
       } catch (err) {
         console.error("error saving message : ", err)

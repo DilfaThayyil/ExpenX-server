@@ -4,9 +4,14 @@ export interface IMessage extends Document {
   senderId: string;
   receiverId: string;
   roomId: string;
-  text: string;
+  text?: string;
+  // audio?:string;
+  fileUrl?:string;
+  fileType?:string;
+  fileName?:string;
   status: 'sent' | 'delivered' | 'read'; 
-  // time: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 const MessageSchema = new Schema<IMessage>(
@@ -14,9 +19,12 @@ const MessageSchema = new Schema<IMessage>(
     senderId: { type: String},
     receiverId: { type: String},
     roomId: {type: String},
-    text: { type: String},
+    text: { type: String , default: ''},
+    // audio: { type: String},
+    fileUrl: { type: String , default: null},
+    fileType: { type: String , enum: ["image", "video", "pdf", "document", null], default: null},
+    fileName: { type: String , default: null},
     status: { type: String, enum: ['sent', 'delivered', 'read'], default: 'sent' }, 
-    // time: { type: Date, default: Date.now },
   },
   { timestamps: true }
 );

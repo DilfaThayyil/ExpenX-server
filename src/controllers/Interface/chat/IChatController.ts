@@ -8,7 +8,5 @@ export interface IChatController{
     fetchChats(req: Request, res: Response): Promise<Response>
     fetchAllChats(req: Request, res: Response): Promise<Response>
     createChat(req: Request, res: Response): Promise<Response>
-    // findMyFriends(req: Request, res: Response): Promise<void>
-    // getMessage(req: Request, res: Response):Promise<void>
-    // postImage(req: Request, res: Response):Promise<void>
+    uploadChatFile(req: Request, res:Response): Promise<Response>
 }

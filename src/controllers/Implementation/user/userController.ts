@@ -19,7 +19,7 @@ export default class UserController implements IUserController {
     try {
       const file = req.file;
       if (!file) {
-        res.status(400).json({ error: 'No file uploaded' });
+        res.status(HttpStatusCode.BAD_REQUEST).json({ error: 'No file uploaded' });
         return
       }
       const result = await cloudinary.uploader.upload(file.path, {
@@ -28,7 +28,7 @@ export default class UserController implements IUserController {
       // console.log("result : ", result)
       const imageUrl = result.secure_url;
       // console.log("imageUrl : ", imageUrl)
-      res.status(200).json({ url: imageUrl });
+      res.status(HttpStatusCode.OK).json({ url: imageUrl });
     } catch (error) {
       console.error('Error uploading image:', error);
       res.status(500).json({ error: 'Error uploading image' });

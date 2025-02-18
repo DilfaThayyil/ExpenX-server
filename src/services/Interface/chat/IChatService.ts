@@ -12,6 +12,4 @@ export interface IChatService{
     createChat(chat:IChat):Promise<IChat>
     getUserChats(id:string):Promise<IChat[]>
     getAllChats():Promise<IChat[]>
-    // findLists(id:string):Promise<IFriendsLists|null>
-    // getMessages(id:string):Promise<IMessage[]|null>
 }
