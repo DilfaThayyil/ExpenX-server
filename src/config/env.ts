@@ -13,3 +13,5 @@ export const GOOGLECLIENTID = process.env.GOOGLECLIENTID
 export const CLOUDNAME = process.env.CLOUDNAME
 export const APIKEY = process.env.APIKEY
 export const APISECRET = process.env.APISECRET
+export const STRIPEKEY = process.env.STRIPEKEY
+export const STRIPE_PUBLISHABLE_KEY = process.env.STRIPE_PUBLISHABLE_KEY

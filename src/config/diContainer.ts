@@ -37,6 +37,13 @@ import { IChatService } from '../services/Interface/chat/IChatService';
 import ChatService from '../services/Implementation/chat/chatService';
 import { ICategoryRepository } from '../repositories/Interface/ICategoryRepository';
 import { CategoryRepository } from '../repositories/Implementation/categoryRepository';
+import { IPaymentController } from '../controllers/Interface/user/IPaymentController';
+import PaymentController from '../controllers/Implementation/user/paymentController';
+import PaymentService from '../services/Implementation/user/paymentService';
+import { IPaymentService } from '../services/Interface/user/IPaymentService';
+import { IPaymentRepository } from '../repositories/Interface/IPaymentRepository';
+import PaymentRepository from '../repositories/Implementation/paymentRepository';
+import { STRIPEKEY } from './env';
 
 
 //user
@@ -64,3 +71,9 @@ container.register<IChatRepository>('IChatRepository',{useClass:ChatRepository})
 
 //category
 container.register<ICategoryRepository>('ICategoryRepository',{useClass:CategoryRepository})
+
+//payment
+container.register<IPaymentController>('IPaymentController',{useClass:PaymentController})
+container.register<IPaymentService>('IPaymentService',{useClass:PaymentService})
+container.register<IPaymentRepository>('IPaymentRepository',{useClass:PaymentRepository})
+container.register('StripeSecretKey', { useValue: STRIPEKEY });

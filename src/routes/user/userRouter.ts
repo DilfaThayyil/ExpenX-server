@@ -3,9 +3,11 @@ import {uploadProfile,uploadChatFile} from '../../middleware/multer';
 import { container } from 'tsyringe';
 import { IUserController } from '../../controllers/Interface/user/IUserController';
 import { IChatController } from '../../controllers/Interface/chat/IChatController';
+import { IPaymentController } from '../../controllers/Interface/user/IPaymentController';
 
 const userController = container.resolve<IUserController>('IUserController');
 const chatController = container.resolve<IChatController>('IChatController')
+const paymentController = container.resolve<IPaymentController>('IPaymentController')
 const router = Router()
 
 
@@ -26,5 +28,7 @@ router.get('/fetchChats/:id',(req,res)=>chatController.fetchChats(req,res))
 router.get('/fetchAllChats',(req,res)=>chatController.fetchAllChats(req,res))
 router.post('/createChat',(req,res)=>chatController.createChat(req,res))
 router.post('/uploadChatFile',uploadChatFile.single('file'),(req,res)=>{chatController.uploadChatFile(req,res)})
+router.post('/paymentInitiate',(req,res)=>paymentController.initiatePayment(req,res))
+router.post('/confirmPayment',(req,res)=>paymentController.confirmPayment(req,res))
 
 export default router
