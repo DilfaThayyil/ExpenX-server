@@ -2,12 +2,8 @@ import { inject, injectable } from 'tsyringe';
 import { IUserRepository } from '../../../repositories/Interface/IUserRepository';
 import { IUserService } from '../../Interface/user/IUserService';
 import { IExpense } from '../../../entities/expenseEntities';
-import IGroup from '../../../entities/groupEntities';
-import { IGroupExpense } from '../../../models/groupSchema';
+import { IGroup, IGroupExpense } from '../../../models/groupSchema';
 import { Slot } from '../../../models/slotSchema';
-import { Types } from 'mongoose';
-import { IMessage } from '../../../entities/messageEntities';
-import { IFriendsLists } from '../../../entities/friendsEntities';
 
 
 

@@ -1,10 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { IExpense } from "../../entities/expenseEntities";
-import { IFriendsLists } from "../../entities/friendsEntities";
-import IGroup from "../../entities/groupEntities";
-import { IMessage } from "../../entities/messageEntities";
 import IUser from "../../entities/userEntities";
-import { IGroupExpense } from "../../models/groupSchema";
+import { IGroup, IGroupExpense } from "../../models/groupSchema";
 import { Slot } from "../../models/slotSchema";
 
 export interface IUserRepository {

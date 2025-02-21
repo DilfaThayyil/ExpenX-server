@@ -106,6 +106,9 @@ export default class UserController implements IUserController {
         name,
         members,
         splitMethod,
+        expenses: [], 
+        createdAt: new Date(),
+        updatedAt: new Date()
       });
       // console.log("newGroup in contrllr : ",newGroup)
       res.status(201).json(newGroup);
@@ -147,7 +150,7 @@ export default class UserController implements IUserController {
       res.status(200).json({
         success: true,
         message: 'Member added successfully',
-        data: updatedGroup
+        groups: updatedGroup
       });
     } catch (error) {
       res.status(400).json({
@@ -170,7 +173,7 @@ export default class UserController implements IUserController {
       res.status(200).json({
         success: true,
         message: 'Group updated successfully',
-        data: { group: updatedGroup },
+        groups: updatedGroup,
       });
     } catch (err) {
       console.error(err);
