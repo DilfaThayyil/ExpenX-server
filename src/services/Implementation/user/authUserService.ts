@@ -8,7 +8,6 @@ import { validateEmail } from '../../validator';
 // import { googleVerify } from '../../utils/googleOAuth';
 import { injectable,inject } from 'tsyringe';
 import redisClient from '../../../utils/redisClient';
-import { JwtPayload } from 'jsonwebtoken';
 import { NotFoundError,ValidationError,ExpiredError } from '../../../utils/errors';
 
 
@@ -103,17 +102,21 @@ export default class AuthUserService implements IAuthUserService {
 
   async  setNewAccessToken(refreshToken:string):Promise<any> {
     try {
+      console.log("setting new acessToken....")
       const decoded = verifyRefreshToken(refreshToken);
-      const employeeData = decoded?.employeeData
-      if (!decoded || !employeeData) {
+      console.log("decoded-service : ",decoded)
+      const user = decoded
+      console.log("user-service : ",user)
+      if (!decoded || !user) {
         throw new Error("Invalid or expired refresh token");
       }
-      const accessToken = generateAccessToken({ employeeData });
+      const accessToken = generateAccessToken({ user });
+      console.log("new accessToken ===>",accessToken)
       return {
         accessToken,
         message: "Access token set successfully from service ",
         success: true,
-        businessOwnerId: employeeData.businessOwnerId
+        user:user
       }
     } catch (error:any) {
       throw new Error("Error generating new access token: " + error.message);

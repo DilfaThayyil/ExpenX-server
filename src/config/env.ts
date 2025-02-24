@@ -15,3 +15,5 @@ export const APIKEY = process.env.APIKEY
 export const APISECRET = process.env.APISECRET
 export const STRIPEKEY = process.env.STRIPEKEY
 export const STRIPE_PUBLISHABLE_KEY = process.env.STRIPE_PUBLISHABLE_KEY
+export const ACCESSTOKEN_SECRET = process.env.ACCESSTOKEN_SECRET
+export const REFRESHTOKEN_SECRET = process.env.REFRESHTOKEN_SECRET

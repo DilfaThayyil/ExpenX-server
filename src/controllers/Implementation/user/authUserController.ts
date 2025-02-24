@@ -89,7 +89,7 @@ export default class AuthUserController implements IAuthUserController {
     try {
       const { email, password } = req.body;
       const user = await this.authUserService.loginUser(email, password);
-      // console.log("user-controller : ", user);
+      console.log("LoginUser-controller : ", user);
       const user2 = mapUserProfile(user)
       // Set access token and refresh token in cookies
       res.cookie('accessToken', user.accessToken, {
@@ -104,6 +104,7 @@ export default class AuthUserController implements IAuthUserController {
         maxAge: 30 * 24 * 60 * 60 * 1000, 
         sameSite: 'lax',
       })
+
       res.status(HttpStatusCode.OK).json({ message: 'Login successful', user2 });
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
@@ -115,13 +116,14 @@ export default class AuthUserController implements IAuthUserController {
 
   async setNewAccessToken(req: Request, res: Response): Promise<Response> {
     try {
+      console.log("starting... setNewAccessToken--------------------RETIU74")
         const refreshToken = req.cookies?.refreshToken;
+        console.log("refreshToken : ",refreshToken)
         if (!refreshToken) return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: "No token provided" });
         const result = await this.authUserService.setNewAccessToken(refreshToken);
-        // console.log("-----result--- : ",result)
+        console.log("-----result--- : ",result)
         if (!result.accessToken) return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: 'Failed to generate token' });
         res.cookie('accessToken', result.accessToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production', maxAge: 3600000, sameSite: 'strict' });
-        // await connectDB(result.businessOwnerId);
         return res.status(HttpStatusCode.OK).json({ message: "Token set successfully", success: result.success });
     } catch (error) {
         console.error(error);
@@ -197,14 +199,15 @@ export default class AuthUserController implements IAuthUserController {
 
 
 
-  // async logout(req: Request, res: Response): Promise<Response> {
-  //   try {
-  //       res.clearCookie('refreshToken').clearCookie('accessToken');
-  //       return res.status(HttpStatusCode.OK).json({ message: 'Logged out successfully' });
-  //   } catch (error) {
-  //       return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: 'Failed to logout' });
-  //   }
-  // }
+  async logout(req: Request, res: Response): Promise<Response> {
+    console.log('calling logout ..................6666666666555555')
+    try {
+        res.clearCookie('refreshToken').clearCookie('accessToken');
+        return res.status(HttpStatusCode.OK).json({ message: 'Logged out successfully' });
+    } catch (error) {
+        return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: 'Failed to logout' });
+    }
+  }
 
 
   

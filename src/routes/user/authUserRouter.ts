@@ -17,5 +17,6 @@ router.post('/forgetPassword', (req, res) => authUserController.forgotPassword(r
 router.post('/forgetPassOtp', (req, res) => authUserController.verifyForgotPasswordOtp(req, res));
 router.post('/resetPassword', (req, res) => authUserController.resetPassword(req, res));
 router.post('/googleAuth', (req, res) => authUserController.googleAuth(req, res));
+router.post('/logout',(req,res)=> authUserController.logout(req,res))
 
 export default router

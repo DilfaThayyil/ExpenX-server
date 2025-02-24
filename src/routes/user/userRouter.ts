@@ -4,6 +4,7 @@ import { container } from 'tsyringe';
 import { IUserController } from '../../controllers/Interface/user/IUserController';
 import { IChatController } from '../../controllers/Interface/chat/IChatController';
 import { IPaymentController } from '../../controllers/Interface/user/IPaymentController';
+import { AuthMiddleware } from '../../middleware/authorisation';
 
 const userController = container.resolve<IUserController>('IUserController');
 const chatController = container.resolve<IChatController>('IChatController')
@@ -13,7 +14,7 @@ const router = Router()
 
 router.post('/upload', uploadProfile.single('profilePic'), (req, res) =>{userController.uploadProfileImage(req, res)})
 router.patch('/editProfile', (req, res) =>userController.updateUser(req, res))
-router.get('/getExpenses/:userId', (req,res)=>userController.getExpenses(req,res))
+router.get('/getExpenses/:userId', AuthMiddleware.authenticateUser,(req,res)=>userController.getExpenses(req,res))
 router.post('/createExpense/:userId',(req,res)=>userController.createExpense(req,res))
 router.post('/createGroup',(req,res)=>userController.createGroup(req,res))
 router.get('/getUserGroups/:userId',(req,res)=>userController.getUserGroups(req,res))
