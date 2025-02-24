@@ -9,6 +9,7 @@ import dotenv from 'dotenv';
 import { CLIENTURL, PORT } from "./config/env";
 import router from './routes';
 import initializeSocket from "./utils/socket";  
+import cookieParser from 'cookie-parser';
 
 dotenv.config();
 
@@ -18,13 +19,14 @@ const server = createServer(app);
 // Middleware
 app.use(cors({
   origin: CLIENTURL,
-  methods: ['GET', 'POST', 'PATCH', 'DELETE'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 }));
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // Routes
 app.get('/', (req, res) => {
