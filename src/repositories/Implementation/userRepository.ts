@@ -2,21 +2,12 @@ import { IUserRepository } from '../Interface/IUserRepository';
 import userSchema from '../../models/userSchema';
 import { IExpense } from '../../entities/expenseEntities';
 import expenseSchema from '../../models/expenseSchema';
-import groupSchema, { IGroup } from '../../models/groupSchema';
+import groupSchema from '../../models/groupSchema';
 import IUser from '../../entities/userEntities';
-import { IGroupExpense } from '../../models/groupSchema';
 import slotSchema, { Slot } from '../../models/slotSchema';
-import { IMessage } from '../../entities/messageEntities';
-import { IFriendsLists } from '../../entities/friendsEntities';
-import Message from '../../models/messageSchema';
-import Conversation from '../../models/chatSchema';
 import mongoose, { Types } from 'mongoose';
+import { GroupMember, IGroup, IGroupExpense } from '../../entities/groupEntities';
 
-
-const isValidObjectId = (id: string): boolean => {
-    return mongoose.Types.ObjectId.isValid(id);
-  }
- 
 
 export default class UserRepository implements IUserRepository {
 
@@ -24,11 +15,11 @@ export default class UserRepository implements IUserRepository {
         console.log("finding....")
         return await userSchema.findOne({ email });
     }
-    
+
     async createUser(userData: any): Promise<any> {
         console.log("vanuuuu");
         console.log(userData, 'dfghjngvvhh');
-        
+
         return await userSchema.create(userData);
     }
 
@@ -46,69 +37,77 @@ export default class UserRepository implements IUserRepository {
     async createExpense(expenseData: IExpense): Promise<IExpense> {
         return expenseSchema.create(expenseData);
     }
-    
+
     async createGroup(groupData: IGroup): Promise<IGroup> {
         console.log("repo calling...")
         console.log("groupData in repo : ", groupData)
         return groupSchema.create(groupData)
     }
-    
+
     async getUserGroups(email: string): Promise<IGroup[]> {
-        return groupSchema.find({ members: email });
+        const groups = await groupSchema.find({ members: { $elemMatch: { email } } });
+        console.log("groups-repo : ", JSON.stringify(groups, null, 2));
+        return groups
     }
-    
 
     async fetchUsers(page: number, limit: number): Promise<{ users: IUser[]; totalUsers: number }> {
         const skip = (page - 1) * limit;
         console.log("Fetching users, skip:", skip);
-        
+
         const [users, totalUsers] = await Promise.all([
             userSchema.find({ isAdmin: false }).skip(skip).limit(limit),
-            userSchema.countDocuments({ isAdmin: false }), 
+            userSchema.countDocuments({ isAdmin: false }),
         ]);
-        
+
         return { users, totalUsers };
     }
 
-    
-    async findAdmin():Promise<any>{
-        return await userSchema.findOne({isAdmin:true})
+
+    async findAdmin(): Promise<any> {
+        return await userSchema.findOne({ isAdmin: true })
     }
 
-    async updateAdmin(admin: any): Promise<any> { 
-        console.log("admin-repo : ",admin)
+    async updateAdmin(admin: any): Promise<any> {
+        console.log("admin-repo : ", admin)
         return await userSchema.findOneAndUpdate({ isAdmin: true }, admin, { new: true });
     }
 
     async updateUserStatus(email: string, isBlock: boolean): Promise<void> {
-        await userSchema.updateOne({email}, {$set:{isBlocked:isBlock}})
+        await userSchema.updateOne({ email }, { $set: { isBlocked: isBlock } })
     }
 
     async findById(groupId: string): Promise<IGroup | null> {
-        return await groupSchema.findById(groupId)
+        return await groupSchema.findById(groupId).populate("expenses")
     }
 
-    async addMember(groupId: string, memberEmail: string): Promise<IGroup> {
+    async addMember(groupId: string, newMember: GroupMember): Promise<IGroup> {
         const group = await groupSchema.findByIdAndUpdate(
             groupId,
-            {$addToSet:{members:memberEmail}},
-            {new:true}
+            { $addToSet: { members: newMember } },
+            { new: true }
         )
-        if(!group){
+        if (!group) {
             throw new Error('group not found')
         }
         return group
     }
 
-    async addExpenseInGroup(groupId:string,expense:IGroupExpense):Promise<IGroup>{
+    async findByEmail(email: string): Promise<IUser | null> {
+        const user = await userSchema.findOne({ email });
+        return user
+    }    
+
+    async addExpenseInGroup(groupId: string, expense: IGroupExpense): Promise<IGroup> {
+        console.log("expense-repo : ",expense)
         const updatedGroup = await groupSchema.findByIdAndUpdate(
-            groupId,
-            {$push:{expenses:expense}},
-            {new:true}
-        ).exec()
-        if(!updatedGroup){
+            new Types.ObjectId(groupId),
+            { $push: { expenses: expense } },
+            { new: true }
+        )
+        if (!updatedGroup) {
             throw new Error('group not found')
         }
+        console.log("****updatedGroup-repo**** : ",updatedGroup)
         return updatedGroup
     }
 
@@ -120,11 +119,11 @@ export default class UserRepository implements IUserRepository {
         return await userSchema.findById(userId)
     }
 
-    async bookSlot(slotId:string,slot:Slot):Promise<Slot | null>{
-        console.log("slotId-repo :",slotId)
-        console.log("slot-repo :",slot)
-        const bookedSlot = await slotSchema.findOneAndUpdate({_id:slotId},slot,{new:true})
-        console.log("bookedslot-repo :",bookedSlot)
+    async bookSlot(slotId: string, slot: Slot): Promise<Slot | null> {
+        console.log("slotId-repo :", slotId)
+        console.log("slot-repo :", slot)
+        const bookedSlot = await slotSchema.findOneAndUpdate({ _id: slotId }, slot, { new: true })
+        console.log("bookedslot-repo :", bookedSlot)
         return bookedSlot
     }
 
@@ -144,6 +143,6 @@ export default class UserRepository implements IUserRepository {
         return await userSchema.findOneAndUpdate({ email }, { refreshToken: null }, { new: true })
     }
 
-    
+
 
 }

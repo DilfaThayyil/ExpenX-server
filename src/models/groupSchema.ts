@@ -1,51 +1,37 @@
-import mongoose, { Schema, Document } from 'mongoose';
-
-export interface IGroupExpense{
-  date:Date
-  description:string
-  amount:number
-  paidBy:string
-  splitMethod?:string
-}
-
-export interface IGroup extends Document {
-  name: string;
-  members: string[];
-  expenses: IGroupExpense[]
-  splitMethod: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
+import mongoose, { Schema } from 'mongoose';
+import { IGroup } from '../entities/groupEntities';
 
 const GroupSchema = new Schema<IGroup>(
   {
     name: { type: String},
-    members: { type: [String]},
+    createdBy: {type: String},
+    members: { type: [{
+      id: {type: String},
+      name: {type: String},
+      email: {type: String},
+      avatar: {type: String},
+      paid: {type: Number},
+      owed: {type: Number}
+    }]},
     expenses: { type: [{ 
-      description: String, 
-      amount: Number, 
+      groupId: String,
+      date: String,
+      title: String, 
+      totalAmount: Number, 
       paidBy: String, 
-      splitMethod: String, 
-      date: Date 
-    }]}, 
-    splitMethod: { type: String},
+      splitMethod: String,
+      splits: [
+        {
+          user: { type:String},
+          amountOwed: { type: Number},
+          percentage: { type: Number},
+          customAmount: { type: Number},
+          status: { type: String, enum: ["pending", "paid"]},
+        },
+      ]
+    }]},
   },
-  { timestamps: true }
+    { timestamps: true }
 )
 
 export default mongoose.model<IGroup>('Group', GroupSchema);
-
-  // import { model, Schema } from "mongoose";
-  // import IGroup from "../entities/groupEntities";
-  
-  // const GroupSchema: Schema = new Schema(
-  //     {
-  //         name: { type: String },
-  //         members: [{ type:String}],
-  //         expenses: [{ type: String }],
-  //         splitMethod: { type: String },
-  //         createdBy: {type:String}
-  //     },
-  //     { timestamps: true }
-  // )
-  // export default model<IGroup>('Group', GroupSchema)

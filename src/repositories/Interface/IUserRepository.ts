@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { IExpense } from "../../entities/expenseEntities";
+import { GroupMember, IGroup, IGroupExpense } from "../../entities/groupEntities";
 import IUser from "../../entities/userEntities";
-import { IGroup, IGroupExpense } from "../../models/groupSchema";
 import { Slot } from "../../models/slotSchema";
 
 export interface IUserRepository {
@@ -21,7 +21,8 @@ export interface IUserRepository {
   updateAdmin(admin:any):Promise<any>
   updateUserStatus(email:string, isBlock:boolean):Promise<void>
   findById(groupId:string):Promise<IGroup | null>
-  addMember(groupId:string,memberEmail:string):Promise<IGroup>
+  findByEmail(email: string): Promise<IUser | null>
+  addMember(groupId:string,newMember:GroupMember):Promise<IGroup>
   addExpenseInGroup(groupId:string,expense:IGroupExpense):Promise<IGroup>
   findSlot(slotId:string):Promise<Slot | null>
   findUserById(userId:string):Promise<IUser | null>

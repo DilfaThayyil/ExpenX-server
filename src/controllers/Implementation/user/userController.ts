@@ -4,7 +4,7 @@ import { IUserService } from '../../../services/Interface/user/IUserService';
 import cloudinary from '../../../config/cloudinaryConfig';
 import { Request, Response } from 'express';
 import { HttpStatusCode } from '../../../utils/httpStatusCode';
-import { IGroupExpense } from '../../../models/groupSchema';
+import { GroupMember, IGroupExpense } from '../../../entities/groupEntities';
 
 @injectable()
 export default class UserController implements IUserController {
@@ -31,7 +31,7 @@ export default class UserController implements IUserController {
       res.status(HttpStatusCode.OK).json({ url: imageUrl });
     } catch (error) {
       console.error('Error uploading image:', error);
-      res.status(500).json({ error: 'Error uploading image' });
+      res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: 'Error uploading image' });
     }
   }
 
@@ -40,7 +40,7 @@ export default class UserController implements IUserController {
     try {
       const { profilePic, username, email, phone, country, language } = req.body;
       if (!email || !username) {
-        res.status(400).json({ error: 'Email and username are required' });
+        res.status(HttpStatusCode.BAD_REQUEST).json({ error: 'Email and username are required' });
       }
       const updatedUser = await this.userService.updateUserProfile({
         profilePic,
@@ -51,10 +51,10 @@ export default class UserController implements IUserController {
         language,
       });
       // console.log("updatedUser : ",updatedUser)
-      res.status(200).json(updatedUser);
+      res.status(HttpStatusCode.OK).json(updatedUser);
     } catch (error) {
       console.error('Error updating user:', error);
-      res.status(500).json({ error: 'Error updating user' });
+      res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: 'Error updating user' });
     }
   }
 
@@ -63,10 +63,10 @@ export default class UserController implements IUserController {
     try {
       const { userId } = req.params; 
       const expenses = await this.userService.getExpensesByUserId(userId);
-      res.status(200).json(expenses);
+      res.status(HttpStatusCode.OK).json(expenses);
     } catch (error) {
       console.error('Error fetching expenses:', error);
-      res.status(500).json({ error: 'Error fetching expenses' });
+      res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: 'Error fetching expenses' });
     }
   }
 
@@ -76,7 +76,7 @@ export default class UserController implements IUserController {
       const {userId} = req.params
       const { date, amount, category, description } = req.body;
       if (!date || !amount || !category || !description) {
-        res.status(400).json({ error: 'All fields are required' });
+        res.status(HttpStatusCode.BAD_REQUEST).json({ error: 'All fields are required' });
         return;
       }
       const newExpense = await this.userService.createExpense({
@@ -87,56 +87,45 @@ export default class UserController implements IUserController {
         description,
       });
       // console.log("new expense: ",newExpense)
-      res.status(201).json(newExpense);
+      res.status(HttpStatusCode.CREATED).json(newExpense);
     } catch (error) {
       console.error('Error creating expense:', error);
-      res.status(500).json({ error: 'Error creating expense' });
+      res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: 'Error creating expense' });
     }
   }
 
-  async createGroup(req: Request, res: Response): Promise<void> {
+  async createGroup(req: Request, res: Response): Promise<Response> {
     try {
-      // console.log('req.body : ',req.body)
-      const { name, members, splitMethod } = req.body;
-      if (!name || !Array.isArray(members) || members.length === 0 || !splitMethod) {
-        res.status(400).json({ error: 'All fields are required (name, members, splitMethod).' });
-        return;
+      console.log('req.body : ',req.body)
+      const {userId, name, members } = req.body;
+      if(!userId || !name || !members){
+        return res.status(HttpStatusCode.BAD_REQUEST).json({error: 'All fields are required!'})
       }
-      const newGroup = await this.userService.createGroup({
-        name,
-        members,
-        splitMethod,
-        expenses: [], 
-        createdAt: new Date(),
-        updatedAt: new Date()
-      });
-      // console.log("newGroup in contrllr : ",newGroup)
-      res.status(201).json(newGroup);
+      const newGroup = await this.userService.createGroup(userId,name,members)
+      console.log("newGroup in contrllr : ",newGroup)
+      return res.status(HttpStatusCode.CREATED).json(newGroup);
     } catch (error) {
       console.error('Error creating group:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: 'Internal server error' });
     }
   }
 
 
-  async getUserGroups(req: Request, res: Response): Promise<void> {
+  async getUserGroups(req: Request, res: Response): Promise<Response> {
     try {
-      // console.log("req.parmas: ",req.params)
-      const { email } = req.params;
-      if (!email) {
-        res.status(400).json({ error: 'Email is required' });
-        return;
+      const { userId } = req.params;
+      if (!userId) {
+        return res.status(HttpStatusCode.BAD_REQUEST).json({ error: 'userId is required' });
       }
-      const groups = await this.userService.getUserGroups(email);
+      const groups = await this.userService.getUserGroups(userId);
       if (groups.length === 0) {
-        res.status(404).json({ message: 'No groups found for this user' });
-        return;
+        return res.status(HttpStatusCode.NOT_FOUND).json({ message: 'No groups found for this user' });
       }
-      // console.log("groups: ",groups)
-      res.status(200).json({ groups });
+      console.log("groups-contrll : ",groups)
+      return res.status(HttpStatusCode.OK).json({ groups });
     } catch (error) {
       console.error('Error fetching groups:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: 'Internal server error' });
     }
   }
 
@@ -147,37 +136,38 @@ export default class UserController implements IUserController {
 
       const updatedGroup = await this.userService.addMember(groupId, memberEmail);
 
-      res.status(200).json({
+      res.status(HttpStatusCode.OK).json({
         success: true,
         message: 'Member added successfully',
         groups: updatedGroup
       });
     } catch (error) {
-      res.status(400).json({
+      res.status(HttpStatusCode.BAD_REQUEST).json({
         success: false,
         message: error instanceof Error ? error.message : 'Failed to add member'
       });
     }
   }
 
-  async addExpenseInGroup(req: Request, res: Response): Promise<void> {
+  async addExpenseInGroup(req: Request, res: Response): Promise<Response> {
     try {
       const { groupId } = req.params;
       const expenseData: IGroupExpense = req.body;
-  
-      if (!expenseData.description || !expenseData.amount || !expenseData.paidBy) {
-         res.status(400).json({ success: false, error: 'Missing required fields' });
+      console.log("expenseData-contrll : ",expenseData)
+      if (!expenseData.title || !expenseData.totalAmount || !expenseData.paidBy) {
+        console.log("^^^missing required filelds-contllr^^^")
+        return res.status(HttpStatusCode.BAD_REQUEST).json({ success: false, error: 'Missing required fields' });
       }
-  
       const updatedGroup = await this.userService.addExpenseInGroup(groupId, expenseData);
-      res.status(200).json({
+      console.log("updatedGroup-contrll : ",updatedGroup)
+      return res.status(HttpStatusCode.OK).json({
         success: true,
-        message: 'Group updated successfully',
+        message: 'Expense added successfully',
         groups: updatedGroup,
       });
     } catch (err) {
       console.error(err);
-      res.status(400).json({ success: false, error: 'Failed to update group' });
+      return res.status(HttpStatusCode.BAD_REQUEST).json({ success: false, error: 'Failed to update group' });
     }
   }
 
