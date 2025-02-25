@@ -12,7 +12,6 @@ import { GroupMember, IGroup, IGroupExpense } from '../../entities/groupEntities
 export default class UserRepository implements IUserRepository {
 
     async findUserByEmail(email: string): Promise<any> {
-        console.log("finding....")
         return await userSchema.findOne({ email });
     }
 

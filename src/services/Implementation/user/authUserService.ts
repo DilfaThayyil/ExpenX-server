@@ -86,14 +86,10 @@ export default class AuthUserService implements IAuthUserService {
   async loginUser(email: string, password: string): Promise<any> {
     const user = await this.userRepository.findUserByEmail(email);
     if (!user) throw new Error('Invalid credentials');
-    console.log('loginUser : ',user)
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) throw new Error('Invalid credentials');
-    console.log("isValidPassword : ",validPassword)
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
-    console.log("access : ",accessToken)
-    console.log("refresh : ",refreshToken)
     user.accessToken = accessToken
     user.refreshToken = refreshToken
     return user

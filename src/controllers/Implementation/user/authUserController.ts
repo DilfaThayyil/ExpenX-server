@@ -91,7 +91,6 @@ export default class AuthUserController implements IAuthUserController {
       const user = await this.authUserService.loginUser(email, password);
       console.log("LoginUser-controller : ", user);
       const user2 = mapUserProfile(user)
-      // Set access token and refresh token in cookies
       res.cookie('accessToken', user.accessToken, {
         httpOnly: true,  
         secure: process.env.NODE_ENV === 'production', 

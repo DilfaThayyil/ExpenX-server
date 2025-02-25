@@ -4,7 +4,7 @@ import { container } from 'tsyringe';
 import { IUserController } from '../../controllers/Interface/user/IUserController';
 import { IChatController } from '../../controllers/Interface/chat/IChatController';
 import { IPaymentController } from '../../controllers/Interface/user/IPaymentController';
-import { AuthMiddleware } from '../../middleware/authorisation';
+import { AuthMiddleware } from '../../middleware/authMiddleware';
 
 const userController = container.resolve<IUserController>('IUserController');
 const chatController = container.resolve<IChatController>('IChatController')
