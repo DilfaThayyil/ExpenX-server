@@ -188,10 +188,4 @@ export default class UserService implements IUserService {
     }
   }
 
-  async logout(): Promise<void> {
-    console.log("logoutUser service called...", localStorage)
-    localStorage.removeItem('refreshToken');
-  }
-
-
 }
