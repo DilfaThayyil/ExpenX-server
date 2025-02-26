@@ -11,7 +11,7 @@ const refreshTokenSecret = REFRESHTOKEN_SECRET as string;
 
 export const generateAccessToken = (user: any): string => {
   return jwt.sign(
-    { id: user._id, email: user.email, admin: user.isAdmin },
+    { id: user._id, email: user.email, admin: user.isAdmin, role: user.role },
     accessTokenSecret,
     { expiresIn: '1m' }
   );
@@ -19,7 +19,7 @@ export const generateAccessToken = (user: any): string => {
 
 export const generateRefreshToken = (user: any): string => {
   return jwt.sign(
-    { id: user._id, email: user.email, admin: user.isAdmin },
+    { id: user._id, email: user.email, admin: user.isAdmin, role:user.role},
     refreshTokenSecret,
     { expiresIn: '3m' }
   );

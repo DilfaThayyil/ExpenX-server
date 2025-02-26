@@ -3,7 +3,8 @@ import IUser from "../../../entities/userEntities";
 import { ICategory } from "../../../models/categorySchema";
 
 export interface IAdminService {
-  adminLogin(username:string, email: string, password: string): Promise<{ accessToken: string; refreshToken: string }>;
+  validateCredentials(email:string,password:string):boolean
+  // adminLogin(email: string, password: string): Promise<{ accessToken: string; refreshToken: string }>;
   fetchUsers(page: number, limit: number): Promise<{ users: IUser[]; totalPages: number }>;
   fetchAdvisors(page: number, limit: number): Promise<{ users: IAdvisor[]; totalPages: number }>;
   updateAdmin(name:string,email:string,password:string): Promise<any>

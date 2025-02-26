@@ -22,17 +22,23 @@ export default class AuthAdvisorService implements IAuthAdvisorService {
   }
 
   async register(username: string, email: string, password: string): Promise<void> {
+    console.log("  register-service -advisor ----------fksdj83457")
     const existingUser = await this.advisorRepository.findUserByEmail(email);
+    console.log("existing user : ",existingUser)
     if (existingUser) throw new Error('Email is already in use')
+      console.log("^^^ next is redisclient ^^^^^")
     await redisClient.setEx(`email:${email}`, 3600, JSON.stringify({ username, email, password }))    
   }
   
 
   async generateOTP(email: string): Promise<void> {
+    console.log("generte-otp-advisor : email: ",email)
     const user = await this.advisorRepository.findUserByEmail(email);
+    console.log("user ---> ",user)
     if (user) throw new Error('Email already verified');
 
     const otp = (Math.floor(Math.random() * 10000)).toString().padStart(4, '0');
+    console.log("otp ldsfksd  : ",otp)
     const expiresAt = new Date(Date.now() + 1 * 60 * 1000);
 
     await Otp.findOneAndUpdate(
@@ -58,6 +64,7 @@ export default class AuthAdvisorService implements IAuthAdvisorService {
 
  
   async verifyOTP(email: string, otp: string): Promise<void> {
+    console.log("verfiying otp-advisor-email : ",otp ," , ",email)
     const otpRecord = await Otp.findOne({ email });
     if (!otpRecord) {
       throw new NotFoundError('OTP not found.');

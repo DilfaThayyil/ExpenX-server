@@ -6,6 +6,7 @@ import { IAdvisorRepository } from '../Interface/IAdvisorRepository';
 
 export default class AdvisorRepository implements IAdvisorRepository {
     async findUserByEmail(email: string): Promise<any> {
+        console.log("lsdjf- fininguser by email--advisor-relpo : ",email)
         return await advisorSchema.findOne({ email });
     }
 

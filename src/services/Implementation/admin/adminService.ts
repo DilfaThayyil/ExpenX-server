@@ -7,6 +7,7 @@ import bcrypt from 'bcrypt';
 import { generateAccessToken, generateRefreshToken } from "../../../utils/jwt";
 import { ICategoryRepository } from "../../../repositories/Interface/ICategoryRepository";
 import { ICategory } from "../../../models/categorySchema";
+import { ADMINEMAIL, ADMINPASSWORD } from "../../../config/env";
 
 
 
@@ -26,36 +27,38 @@ export default class AdminService implements IAdminService {
         this.categoryRepository = categoryRepository
     }
 
-
-    async adminLogin(username: string, email: string, password: string): Promise<{ accessToken: string; refreshToken: string; admin: any }> {
-        const admin = await this.userRepository.findAdmin();
-        console.log("admin-service : ", admin);
-        if (!admin) {
-            throw new Error('No admin found');
-        }
-        if (!admin.password) {
-            admin.username = username;
-            admin.email = email;
-            admin.password = await bcrypt.hash(password, 10);
-            const updatedUser = await this.userRepository.updateAdmin(admin)
-            console.log('Admin credentials saved : ',updatedUser);
-        } else {
-            const validPassword = await bcrypt.compare(password, admin.password);
-            if (!validPassword) {
-                throw new Error('Invalid credentials');
-            }
-            console.log("isValidPassword : ", validPassword);
-        }
-        const accessToken = generateAccessToken(admin);
-        const refreshToken = generateRefreshToken(admin);
-        console.log("accessToken : ", accessToken);
-        console.log("refreshToken : ", refreshToken);
-        admin.accessToken = accessToken;
-        admin.refreshToken = refreshToken;
-        console.log("admin-service : ",admin)
-        return { accessToken, refreshToken, admin };
+    validateCredentials(email: string, password: string): boolean {
+        return email === ADMINEMAIL && password === ADMINPASSWORD;
     }
-    
+
+    // async adminLogin(email: string, password: string): Promise<{ accessToken: string; refreshToken: string; admin: any }> {
+    //     const admin = await this.userRepository.findAdmin();
+    //     console.log("admin-service : ", admin);
+    //     if (!admin) {
+    //         throw new Error('No admin found');
+    //     }
+    //     if (!admin.password) {
+    //         admin.email = email;
+    //         admin.password = await bcrypt.hash(password, 10);
+    //         const updatedUser = await this.userRepository.updateAdmin(admin)
+    //         console.log('Admin credentials saved : ',updatedUser);
+    //     } else {
+    //         const validPassword = await bcrypt.compare(password, admin.password);
+    //         if (!validPassword) {
+    //             throw new Error('Invalid credentials');
+    //         }
+    //         console.log("isValidPassword : ", validPassword);
+    //     }
+    //     const accessToken = generateAccessToken(admin);
+    //     const refreshToken = generateRefreshToken(admin);
+    //     console.log("accessToken : ", accessToken);
+    //     console.log("refreshToken : ", refreshToken);
+    //     admin.accessToken = accessToken;
+    //     admin.refreshToken = refreshToken;
+    //     console.log("admin-service : ",admin)
+    //     return { accessToken, refreshToken, admin };
+    // }
+
 
 
     async fetchUsers(page: number, limit: number): Promise<{ users: IUser[]; totalPages: number }> {
@@ -73,18 +76,18 @@ export default class AdminService implements IAdminService {
         const totalPages = Math.ceil(totalUsers / limit);
         console.log()
         return { users, totalPages };
-    } 
+    }
 
 
-    async updateAdmin(name:string,email:string,password:string):Promise<any>{
-        try{
-            const hashedPassword = await bcrypt.hash(password,10)
-            const admin={username:name,email,password:hashedPassword}
-            console.log("admin-service : ",admin)
+    async updateAdmin(name: string, email: string, password: string): Promise<any> {
+        try {
+            const hashedPassword = await bcrypt.hash(password, 10)
+            const admin = { username: name, email, password: hashedPassword }
+            console.log("admin-service : ", admin)
             const updatedAdmin = await this.userRepository.updateAdmin(admin)
-            console.log('updatedAdmin-service : ',updatedAdmin)
+            console.log('updatedAdmin-service : ', updatedAdmin)
             return updatedAdmin
-        }catch(err){
+        } catch (err) {
             console.error(err)
             throw new Error('Error updating admin in service')
         }
@@ -92,25 +95,25 @@ export default class AdminService implements IAdminService {
 
 
     async updateUserBlockStatus(action: string, email: string): Promise<{ message: string; error?: string }> {
-        try{
+        try {
             const isBlocked = action === 'block'
             await this.userRepository.updateUserStatus(email, isBlocked)
-            return {message : `User ${action}ed successfully`}
-        }catch(err){
+            return { message: `User ${action}ed successfully` }
+        } catch (err) {
             const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred";
-            return {message : 'Failed to update user status ',error:errorMessage}
+            return { message: 'Failed to update user status ', error: errorMessage }
         }
     }
 
 
     async updateAdvisorBlockStatus(action: string, email: string): Promise<{ message: string; error?: string }> {
-        try{
+        try {
             const isBlocked = action === 'block'
             await this.advisorRepository.updateAdvisorStatus(email, isBlocked)
-            return {message : `Advisor ${action}ed successfully`}
-        }catch(err){
+            return { message: `Advisor ${action}ed successfully` }
+        } catch (err) {
             const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred";
-            return {message : 'Failed to update advisor status ',error:errorMessage}
+            return { message: 'Failed to update advisor status ', error: errorMessage }
         }
     }
 
@@ -122,25 +125,25 @@ export default class AdminService implements IAdminService {
         return { categories, totalPages };
     }
 
-    async addCategory(name:string):Promise<ICategory>{
+    async addCategory(name: string): Promise<ICategory> {
         const existingCategory = await this.categoryRepository.findCategory(name)
-        if(existingCategory){
+        if (existingCategory) {
             throw new Error('Category already exist')
         }
         const category = await this.categoryRepository.addCategory(name)
-        console.log("category-service :",category)
+        console.log("category-service :", category)
         return category
     }
 
-    async updateCategory(id:string,name:string):Promise<ICategory | null>{
-        const updatedCategory = await this.categoryRepository.updateCategory(id,name)
-        console.log("updtCategry: ",updatedCategory)
+    async updateCategory(id: string, name: string): Promise<ICategory | null> {
+        const updatedCategory = await this.categoryRepository.updateCategory(id, name)
+        console.log("updtCategry: ", updatedCategory)
         return updatedCategory
     }
 
-    async deleteCategory(id:string):Promise<ICategory | null>{
+    async deleteCategory(id: string): Promise<ICategory | null> {
         const deleteCategory = await this.categoryRepository.deleteCategory(id)
-        console.log("deleteCategory-serv : ",deleteCategory)
+        console.log("deleteCategory-serv : ", deleteCategory)
         return deleteCategory
     }
 

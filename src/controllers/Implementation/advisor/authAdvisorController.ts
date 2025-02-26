@@ -16,8 +16,12 @@ export default class AuthAdvisorController implements IAuthAdvisorController {
 
     async register(req: Request, res: Response): Promise<void> {
     try {
+      console.log('register-contrll-advisor ----sdkjfksdjf')
       const { username, email, password } = req.body;
-      await this.authAdvisorService.register(username, email, password);
+      console.log("req.body : ",req.body)
+      const regi = await this.authAdvisorService.register(username, email, password);
+      console.log("regi ===> , ",regi)
+      console.log(' ====> =====> ======> success register')
       res.status(HttpStatusCode.CREATED).json({ message: 'User registered successfully' });
     } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';

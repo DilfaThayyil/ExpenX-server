@@ -4,6 +4,9 @@ import { IAdminController } from "../../Interface/admin/IAdminController";
 import { IAdminService } from "../../../services/Interface/admin/IAdminService";
 import { HttpStatusCode } from "../../../utils/httpStatusCode";
 import { IUserService } from "../../../services/Interface/user/IUserService";
+import { ACCESSTOKEN_SECRET } from "../../../config/env";
+import jwt from "jsonwebtoken";
+
 
 
 
@@ -20,31 +23,53 @@ export default class AdminController implements IAdminController{
     this.userService = userService
   }
 
-  
+
   async adminLogin(req: Request, res: Response): Promise<Response> {
     try {
-      // console.log("req body : ",req.body)
-      const {username, email, password } = req.body;
-      const admin = await this.adminService.adminLogin(username, email, password);
-      // console.log("admin-controller : ",admin)
-      res.cookie('accessToken', admin.accessToken, {
-        httpOnly: true,  
-        secure: process.env.NODE_ENV === 'production', 
-        maxAge: 15 * 60 * 1000, 
-        sameSite: 'lax',
-      })
-      res.cookie('refreshToken', admin.refreshToken, {
+      const { email, password } = req.body;
+      const isValid = this.adminService.validateCredentials(email, password);
+      if (!isValid) {
+        return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: "Invalid admin credentials" });
+      }
+      const token = jwt.sign({ role: "admin" }, ACCESSTOKEN_SECRET as string, {
+        expiresIn: "2m",
+      });
+      res.cookie("adminToken", token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 30 * 24 * 60 * 60 * 1000, 
-        sameSite: 'lax',
-      })
-      return res.status(HttpStatusCode.OK).json({ message: "Admin logged in successfully", admin });
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
-      return res.status(HttpStatusCode.UNAUTHORIZED).json({ error: errorMessage });
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+      });
+      return res.status(HttpStatusCode.OK).json({ message: "Admin logged in successfully",token });
+    } catch (error) {
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: "Server error" });
     }
   }
+
+  
+  // async adminLogin(req: Request, res: Response): Promise<Response> {
+  //   try {
+  //     // console.log("req body : ",req.body)
+  //     const {email, password } = req.body;
+  //     const admin = await this.adminService.adminLogin(email, password);
+  //     // console.log("admin-controller : ",admin)
+  //     res.cookie('accessToken', admin.accessToken, {
+  //       httpOnly: true,  
+  //       secure: process.env.NODE_ENV === 'production', 
+  //       maxAge: 15 * 60 * 1000, 
+  //       sameSite: 'lax',
+  //     })
+  //     res.cookie('refreshToken', admin.refreshToken, {
+  //       httpOnly: true,
+  //       secure: process.env.NODE_ENV === 'production',
+  //       maxAge: 30 * 24 * 60 * 60 * 1000, 
+  //       sameSite: 'lax',
+  //     })
+  //     return res.status(HttpStatusCode.OK).json({ message: "Admin logged in successfully", admin });
+  //   } catch (err) {
+  //     const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
+  //     return res.status(HttpStatusCode.UNAUTHORIZED).json({ error: errorMessage });
+  //   }
+  // }
 
   async fetchUsers(req: Request, res: Response): Promise<Response> {
     try {
@@ -176,5 +201,10 @@ export default class AdminController implements IAdminController{
       console.error(err)
       return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({error:"Error deleting category"})
     }
+  }
+
+  async adminLogout(req: Request, res: Response): Promise<Response> {
+    res.clearCookie("adminToken", { httpOnly: true, secure: process.env.NODE_ENV === "production" });
+    return res.status(HttpStatusCode.OK).json({ message: "Admin logged out successfully" });
   }
 }
