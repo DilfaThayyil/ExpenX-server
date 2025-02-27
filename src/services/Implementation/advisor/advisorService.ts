@@ -40,7 +40,7 @@ export default class AdvisorService implements IAdvisorService {
 
         const creatingSlot: Partial<Slot> = {
             advisorId: {
-                _id: new Types.ObjectId(advisor.id), 
+                _id: new Types.ObjectId(advisor._id), 
                 username: advisor.username,
                 email: advisor.email,
                 profilePic: advisor.profilePic

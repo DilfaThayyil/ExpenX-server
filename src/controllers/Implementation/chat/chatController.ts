@@ -40,7 +40,6 @@ export default class ChatController implements IChatController {
       }
 
       const messages = await this.chatService.fetchMessages(senderId, receiverId);
-      console.log("messages-contrll : ", messages)
       return res.status(HttpStatusCode.OK).json(messages);
     } catch (error) {
       return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });

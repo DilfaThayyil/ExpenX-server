@@ -16,5 +16,6 @@ router.post('/forgetPassword', (req, res) => authAdvisorController.forgotPasswor
 router.post('/forgetPassOtp', (req, res) => authAdvisorController.verifyForgotPasswordOtp(req, res));
 router.post('/resetPassword', (req, res) => authAdvisorController.resetPassword(req, res));
 router.post('/googleAuth', (req, res) => authAdvisorController.googleAuth(req, res));
+router.post('/logout',(req,res)=>authAdvisorController.logout(req,res))
 
 export default router;

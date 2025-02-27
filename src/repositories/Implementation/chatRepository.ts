@@ -24,14 +24,12 @@ export default class ChatRepository implements IChatRepository {
     }
 
     async fetchMessages(senderId: string, receiverId: string): Promise<IMessage[]> {
-        console.log("fetchMessage-repo : +++++++++++ ",senderId,receiverId)
         const messages = await messageSchema.find({
             $or: [
                 { senderId: senderId, receiverId: receiverId },
                 { senderId: receiverId, receiverId: senderId },
             ],
         }).sort({ createdAt: 1 });
-        console.log("message-repo :",messages)
         return messages
     }
 

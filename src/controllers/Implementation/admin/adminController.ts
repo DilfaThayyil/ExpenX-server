@@ -32,7 +32,7 @@ export default class AdminController implements IAdminController{
         return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: "Invalid admin credentials" });
       }
       const token = jwt.sign({ role: "admin" }, ACCESSTOKEN_SECRET as string, {
-        expiresIn: "2m",
+        expiresIn: "50m",
       });
       res.cookie("adminToken", token, {
         httpOnly: true,
