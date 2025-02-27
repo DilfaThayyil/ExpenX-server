@@ -13,7 +13,7 @@ export const generateAccessToken = (user: any): string => {
   return jwt.sign(
     { id: user._id, email: user.email, admin: user.isAdmin, role: user.role },
     accessTokenSecret,
-    { expiresIn: '1m' }
+    { expiresIn: '50m' }
   );
 };
 
@@ -21,7 +21,7 @@ export const generateRefreshToken = (user: any): string => {
   return jwt.sign(
     { id: user._id, email: user.email, admin: user.isAdmin, role:user.role},
     refreshTokenSecret,
-    { expiresIn: '3m' }
+    { expiresIn: '7d' }
   );
 };
 

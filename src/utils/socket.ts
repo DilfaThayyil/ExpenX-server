@@ -1,60 +1,86 @@
-import { Server, Socket } from "socket.io";
 import { Server as HttpServer } from "http";
+import { Server, Socket } from "socket.io";
+import { CLIENTURL } from "../config/env";
 import messageSchema from "../models/messageSchema";
 
-const initializeSocket = (server: HttpServer): Server => {
+interface IUser {
+  userId: string;
+  socketId: string;
+}
+
+let users: IUser[] = [];
+
+const initializeSocket = (server: HttpServer) => {
   const io = new Server(server, {
     cors: {
-      origin: "http://localhost:5173",
+      origin: CLIENTURL,
       methods: ["GET", "POST"],
       credentials: true,
     },
-    transports: ["websocket", "polling"],
+    path: "/socket.io",
   });
 
   io.on("connection", (socket: Socket) => {
     console.log(`User connected: ${socket.id}`);
-    socket.on("joinRoom", (roomId) => {
-      console.log(`User joined room: ${roomId}`);
-      socket.join(roomId);
+
+    // Add user to connected users
+    socket.on("addUser", (userId: string) => {
+      // Remove any existing socket for this user
+      users = users.filter((user) => user.userId !== userId);
+      // Add new socket connection
+      users.push({ userId, socketId: socket.id });
+      console.log(`User ${userId} added with socket ${socket.id}`);
+      console.log("Current users:", users);
     });
-    socket.on("send_message", async ({ senderId, receiverId, roomId, text ,url, fileType, fileName}) => {
-      console.log("message-inServer : ",text," => ",url)
+
+    // Join a chat room
+    socket.on("joinRoom", (roomId: string) => {
+      socket.join(roomId);
+      console.log(`Socket ${socket.id} joined room: ${roomId}`);
+    });
+
+    // Leave a chat room
+    socket.on("leaveRoom", (roomId: string) => {
+      socket.leave(roomId);
+      console.log(`Socket ${socket.id} left room: ${roomId}`);
+    });
+
+    // Handle sent messages
+    socket.on("send_message", async (messageData) => {
+      io.to(messageData.roomId).emit("receive_message", messageData);
       try {
-        console.log("Message received on server:", { 
-          senderId, receiverId, roomId, text ,url, 
-          fileType: fileType || "none",
-          fileName: fileName || "none"
-        });
-        const newMessage = await messageSchema.create({
-          senderId,
-          receiverId,
-          roomId,
-          text,
-          fileUrl:url,
-          fileType,
-          fileName,
+        console.log("Message received:", messageData);
+        const newMessage = new messageSchema({
+          senderId: messageData.senderId,
+          receiverId: messageData.receiverId,
+          roomId: messageData.roomId,
+          text: messageData.text || "",
+          fileUrl: messageData.fileUrl || null,
+          fileType: messageData.fileType || null,
+          fileName: messageData.fileName || null,
           status: "sent",
         });
-        console.log("savedNewMesssage : ",newMessage)
-        io.to(roomId).emit("receive_message", newMessage);
-      } catch (err) {
-        console.error("error saving message : ", err)
+        const savedMessage = await newMessage.save();
+        console.log("savedMessage : ", savedMessage)
+      } catch (error) {
+        console.error("Error saving message:", error);
       }
     });
 
+    // Handle typing indicators
     socket.on("typing", ({ senderId, roomId }) => {
-      console.log("typing...",senderId," , ",roomId)
-      io.to(roomId).emit("display_typing", { senderId });
+      socket.to(roomId).emit("display_typing", { senderId });
     });
 
     socket.on("stop_typing", ({ senderId, roomId }) => {
-      console.log("stop_typing...",senderId," , ",roomId)
-      io.to(roomId).emit("hide_typing", { senderId });
+      socket.to(roomId).emit("hide_typing");
     });
 
+    // Handle disconnection
     socket.on("disconnect", () => {
       console.log(`User disconnected: ${socket.id}`);
+      users = users.filter((user) => user.socketId !== socket.id);
+      console.log("Remaining users:", users);
     });
   });
 

@@ -24,7 +24,6 @@ export default class ChatService implements IChatService {
     async fetchMessages(senderId: string, receiverId: string): Promise<IMessage[]> {
       console.log("fetchmsg-service : +++++++++++++++++++ ",senderId,receiverId)
         const messages = await this.chatRepository.fetchMessages(senderId, receiverId)
-        console.log("messages-serv : ",messages)
         return messages
     }
 

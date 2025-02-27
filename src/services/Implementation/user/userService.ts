@@ -174,7 +174,7 @@ export default class UserService implements IUserService {
 
       slot.status = "Booked";
       slot.bookedBy = {
-        _id: user.id,
+        _id: user._id,
         username: user.username,
         email: user.email,
         profilePic: user.profilePic
