@@ -204,7 +204,12 @@ export default class AdminController implements IAdminController{
   }
 
   async adminLogout(req: Request, res: Response): Promise<Response> {
-    res.clearCookie("adminToken", { httpOnly: true, secure: process.env.NODE_ENV === "production" });
-    return res.status(HttpStatusCode.OK).json({ message: "Admin logged out successfully" });
+    try{
+      res.clearCookie("adminToken");
+      return res.status(HttpStatusCode.OK).json({ message: "Admin logged out successfully" });
+    }catch(err){
+      console.error(err)
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({error:"Error logging out the admin"})
+    }
   }
 }

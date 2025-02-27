@@ -11,8 +11,6 @@ export class AdminAuthMiddleware {
   static async authorizeAdmin(req: AdminAuthRequest, res: Response, next: NextFunction) {
     try {
       console.log("🔹 AdminAuthMiddleware Hit");
-
-      console.log("Raw cookies:", req.headers.cookie);
       console.log("cookies : ",req.cookies)
       const token = req.cookies?.adminToken;
       console.log("token : ",token)
@@ -25,6 +23,7 @@ export class AdminAuthMiddleware {
       req.admin = decoded;
 
       if (decoded.role !== "admin") {
+        console.log("decoded-role : ",decoded.role)
         return res.status(HttpStatusCode.FORBIDDEN).json({ message: "Forbidden: Admin access only." });
       }
 

@@ -16,6 +16,6 @@ router.get("/categories",AdminAuthMiddleware.authorizeAdmin,(req,res)=>adminCont
 router.post("/addCategory",AdminAuthMiddleware.authorizeAdmin, (req,res)=>adminController.addCategory(req,res))
 router.patch("/updateCategory/:id",AdminAuthMiddleware.authorizeAdmin, (req,res)=>adminController.updateCategory(req,res))
 router.delete("/deleteCategory/:id",AdminAuthMiddleware.authorizeAdmin, (req,res)=>adminController.deleteCategory(req,res))
-router.post("/logout",AdminAuthMiddleware.authorizeAdmin,(req,res)=>adminController.adminLogout(req,res))
+router.post("/logout",(req,res)=>adminController.adminLogout(req,res))
 
 export default router;
