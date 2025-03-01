@@ -212,4 +212,19 @@ export default class AdminController implements IAdminController{
       return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({error:"Error logging out the admin"})
     }
   }
+
+
+  async fetchReports(req:Request, res:Response):Promise<Response>{
+    try{
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+      console.log("page,limit-controll : ",page,",",limit)
+      const reports = await this.adminService.fetchReports(page,limit)
+      console.log("fetchReports-control : ",reports)
+      return res.status(HttpStatusCode.OK).json({success:true,data:{reports}})
+    }catch(err){
+      console.error(err)
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({error:"Error fetching reports"})
+    }
+  }
 }

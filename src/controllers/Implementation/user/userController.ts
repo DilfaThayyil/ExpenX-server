@@ -186,4 +186,17 @@ export default class UserController implements IUserController {
   }
 
   
+  async reportAdvisor(req: Request, res: Response): Promise<Response> {
+    try {
+        const { userId, advisorId, reason, customReason } = req.body;
+        console.log("req body : ", req.body);
+        const report = await this.userService.reportAdvisor(userId, advisorId, reason, customReason);
+        console.log("report-controller : ", report);
+        return res.status(201).json({ message: "Report submitted successfully", report });
+    } catch (error) {
+        return res.status(500).json({ message: "Error submitting report", error });
+    }
+}
+
+  
 }

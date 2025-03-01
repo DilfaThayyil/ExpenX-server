@@ -10,4 +10,5 @@ export interface IUserController {
   addMember(req: Request, res:Response): Promise<void>
   addExpenseInGroup(req: Request, res:Response): Promise<Response>
   bookslot(req: Request, res: Response): Promise<void>
+  reportAdvisor(req:Request, res:Response): Promise<Response>
 }

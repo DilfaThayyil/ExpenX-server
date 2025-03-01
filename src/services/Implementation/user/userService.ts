@@ -3,9 +3,9 @@ import { IUserRepository } from '../../../repositories/Interface/IUserRepository
 import { IUserService } from '../../Interface/user/IUserService';
 import { IExpense } from '../../../entities/expenseEntities';
 import { Slot } from '../../../models/slotSchema';
-import { GroupMember, IGroup, IGroupExpense, ISplit } from '../../../entities/groupEntities';
+import { GroupMember, IGroup, ISplit } from '../../../entities/groupEntities';
 import { Types } from 'mongoose';
-
+import { IReport } from '../../../models/reportSchema';
 
 @injectable()
 export default class UserService implements IUserService {
@@ -187,5 +187,16 @@ export default class UserService implements IUserService {
       return null;
     }
   }
+
+  async reportAdvisor(userId: string, advisorId: string, reason: "Spam" | "Inappropriate Content" | "Harassment" | "Other", customReason?: string): Promise<IReport> {
+      
+      const data: IReport = {userId: new Types.ObjectId(userId),  advisorId: new Types.ObjectId(advisorId), reason, customReason, status: "pending", createdAt: new Date()};
+      console.log("data-service : ", data);
+      const report = await this.userRepository.createReport(data);
+      console.log("report-service : ", report);
+      return report;
+  }
+  
+
 
 }

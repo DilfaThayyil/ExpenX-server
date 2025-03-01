@@ -5,8 +5,10 @@ import expenseSchema from '../../models/expenseSchema';
 import groupSchema from '../../models/groupSchema';
 import IUser from '../../entities/userEntities';
 import slotSchema, { Slot } from '../../models/slotSchema';
-import mongoose, { Types } from 'mongoose';
+import { Types } from 'mongoose';
 import { GroupMember, IGroup, IGroupExpense } from '../../entities/groupEntities';
+import reportSchema, { IReport } from '../../models/reportSchema';
+import Report from '../../models/reportSchema';
 
 
 export default class UserRepository implements IUserRepository {
@@ -125,7 +127,14 @@ export default class UserRepository implements IUserRepository {
         console.log("bookedslot-repo :", bookedSlot)
         return bookedSlot
     }
-
+    async createReport(data: IReport): Promise<IReport> {
+        console.log("data-repo : ", data);
+        const report = await Report.create(data);
+        console.log("report-repo : ", report);
+        return report;
+    }
+    
+    
     async findUserByRefreshToken(refreshToken: string): Promise<any> {
         return await userSchema.findOne({ refreshToken })
     }

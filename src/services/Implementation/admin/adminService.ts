@@ -8,6 +8,8 @@ import { generateAccessToken, generateRefreshToken } from "../../../utils/jwt";
 import { ICategoryRepository } from "../../../repositories/Interface/ICategoryRepository";
 import { ICategory } from "../../../models/categorySchema";
 import { ADMINEMAIL, ADMINPASSWORD } from "../../../config/env";
+import IAdvisor from "../../../entities/advisorEntities";
+import { IReport } from "../../../models/reportSchema";
 
 
 
@@ -147,4 +149,11 @@ export default class AdminService implements IAdminService {
         return deleteCategory
     }
 
+
+
+    async fetchReports(page:number,limit:number){
+        const report = await this.advisorRepository.fetchReports(page,limit);
+        console.log("fetchReport-service : ",report)
+        return report
+    }
 }

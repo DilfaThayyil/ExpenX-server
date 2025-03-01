@@ -2,6 +2,7 @@
 import { IExpense } from "../../entities/expenseEntities";
 import { GroupMember, IGroup, IGroupExpense } from "../../entities/groupEntities";
 import IUser from "../../entities/userEntities";
+import { IReport } from "../../models/reportSchema";
 import { Slot } from "../../models/slotSchema";
 
 export interface IUserRepository {
@@ -27,5 +28,5 @@ export interface IUserRepository {
   findSlot(slotId:string):Promise<Slot | null>
   findUserById(userId:string):Promise<IUser | null>
   bookSlot(slotId:string,slot:Slot):Promise<Slot | null>
-
+  createReport(data:IReport):Promise<IReport>
 }

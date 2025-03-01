@@ -31,5 +31,6 @@ router.post('/createChat',AuthMiddleware.authorizeUser,(req,res)=>chatController
 router.post('/uploadChatFile',AuthMiddleware.authorizeUser,uploadChatFile.single('file'),(req,res)=>{chatController.uploadChatFile(req,res)})
 router.post('/paymentInitiate',AuthMiddleware.authorizeUser,(req,res)=>paymentController.initiatePayment(req,res))
 router.post('/confirmPayment',AuthMiddleware.authorizeUser,(req,res)=>paymentController.confirmPayment(req,res))
+router.post("/reportAdvisor",AuthMiddleware.authorizeUser,(req,res)=>userController.reportAdvisor(req,res))
 
 export default router

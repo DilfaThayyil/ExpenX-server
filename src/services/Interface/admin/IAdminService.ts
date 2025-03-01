@@ -1,6 +1,7 @@
 import IAdvisor from "../../../entities/advisorEntities";
 import IUser from "../../../entities/userEntities";
 import { ICategory } from "../../../models/categorySchema";
+import { IReport } from "../../../models/reportSchema";
 
 export interface IAdminService {
   validateCredentials(email:string,password:string):boolean
@@ -14,4 +15,5 @@ export interface IAdminService {
   addCategory(name:string):Promise<ICategory>
   updateCategory(id:string,name:string):Promise<ICategory | null>
   deleteCategory(id:string):Promise<ICategory | null>
+  fetchReports(page:number,limit:number):Promise<{reports:IReport[], totalReports:number}>
 }

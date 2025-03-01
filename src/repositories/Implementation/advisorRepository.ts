@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import IAdvisor from '../../entities/advisorEntities';
 import advisorSchema from '../../models/advisorSchema';
+import Report, { IReport } from "../../models/reportSchema";
 import slotSchema, { Slot } from '../../models/slotSchema';
 import { IAdvisorRepository } from '../Interface/IAdvisorRepository';
 
 export default class AdvisorRepository implements IAdvisorRepository {
     async findUserByEmail(email: string): Promise<any> {
-        console.log("lsdjf- fininguser by email--advisor-relpo : ",email)
+        console.log("lsdjf- fininguser by email--advisor-relpo : ", email)
         return await advisorSchema.findOne({ email });
     }
 
@@ -48,15 +49,15 @@ export default class AdvisorRepository implements IAdvisorRepository {
         return !!result
     }
 
-    async fetchSlots(page:number,limit:number): Promise<{slots:Slot[] | Slot; totalSlots:number}> {
+    async fetchSlots(page: number, limit: number): Promise<{ slots: Slot[] | Slot; totalSlots: number }> {
         const skip = (page - 1) * limit
         // console.log("skip:", skip);
-        const [slots,totalSlots] = await Promise.all([
+        const [slots, totalSlots] = await Promise.all([
             slotSchema.find().skip(skip).limit(limit),
             slotSchema.countDocuments()
         ])
         // console.log("fetchSlot-repo :",slots,totalSlots)
-        return {slots,totalSlots}
+        return { slots, totalSlots }
     }
 
     async findSlotById(slotId: string): Promise<Slot | null> {
@@ -76,25 +77,37 @@ export default class AdvisorRepository implements IAdvisorRepository {
         return await advisorSchema.findById(id)
     }
 
-    async getBookedSlotsForAdvisor(advisorId: string,page:number,limit:number): Promise<{bookedSlots:Slot[] | Slot; totalSlots:number}> {
+    async getBookedSlotsForAdvisor(advisorId: string, page: number, limit: number): Promise<{ bookedSlots: Slot[] | Slot; totalSlots: number }> {
         try {
-            const skip = (page-1)*limit
+            const skip = (page - 1) * limit
             const [bookedSlots, totalSlots] = await Promise.all([
                 slotSchema
-                  .find({ 'advisorId._id': advisorId, status: "Booked" })
-                  .skip(skip)
-                  .limit(limit)
-                  .populate("bookedBy", "username email")
-                  .exec(),
-          
+                    .find({ 'advisorId._id': advisorId, status: "Booked" })
+                    .skip(skip)
+                    .limit(limit)
+                    .populate("bookedBy", "username email")
+                    .exec(),
+
                 slotSchema.countDocuments({ 'advisorId._id': advisorId, status: "Booked" })
-              ]);
+            ]);
             //   console.log("bookedSlots-repo : ",bookedSlots)
-              return { bookedSlots, totalSlots };
+            return { bookedSlots, totalSlots };
         } catch (err) {
             throw err
         }
     }
+
+   
+
+    async fetchReports(page: number, limit: number): Promise<{ reports: IReport[], totalReports: number }> {
+        const skip = (page - 1) * limit;
+        const [reports, totalReports] = await Promise.all([
+            Report.find().sort({ createdAt: -1 }).skip(skip).limit(limit),
+            Report.countDocuments()
+        ]);        
+        console.log("[reports,total]-repo : ", reports, "-->>", totalReports);
+        return { reports, totalReports };
+    }    
 
     async findUserByRefreshToken(refreshToken: string): Promise<any> {
         return await advisorSchema.findOne({ refreshToken });

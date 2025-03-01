@@ -1,5 +1,6 @@
 import { IExpense } from "../../../entities/expenseEntities";
 import { IGroup, IGroupExpense } from "../../../entities/groupEntities";
+import { IReport } from "../../../models/reportSchema";
 import { Slot } from "../../../models/slotSchema";
 
 export interface IUserService {
@@ -12,4 +13,5 @@ export interface IUserService {
     addMember(groupId:string,memberEmail:string):Promise<IGroup>
     addExpenseInGroup(groupId:string,expenseData:any):Promise<IGroup>
     bookslot(slotId:string,userId:string):Promise<Slot | null>
+    reportAdvisor(userId:string,advisorId:string,reason:string,customReason:string):Promise<IReport>
 }

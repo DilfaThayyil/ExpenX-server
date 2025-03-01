@@ -17,5 +17,6 @@ router.post("/addCategory",AdminAuthMiddleware.authorizeAdmin, (req,res)=>adminC
 router.patch("/updateCategory/:id",AdminAuthMiddleware.authorizeAdmin, (req,res)=>adminController.updateCategory(req,res))
 router.delete("/deleteCategory/:id",AdminAuthMiddleware.authorizeAdmin, (req,res)=>adminController.deleteCategory(req,res))
 router.post("/logout",(req,res)=>adminController.adminLogout(req,res))
+router.get("/reports",AdminAuthMiddleware.authorizeAdmin, (req,res)=>adminController.fetchReports(req,res))
 
 export default router;

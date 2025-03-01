@@ -12,4 +12,5 @@ export interface IAdminController{
     updateCategory(req:Request, res:Response):Promise<Response>
     deleteCategory(req:Request, res:Response):Promise<Response>
     adminLogout(req:Request, res:Response): Promise<Response>
+    fetchReports(req:Request, res:Response): Promise<Response>
 }
