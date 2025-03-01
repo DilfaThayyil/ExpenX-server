@@ -13,16 +13,13 @@ const reportSchema: Schema<IReport> = new Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
-        required: true,
     },
     advisorId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Advisor",
-        required: true,
     },
     reason: {
         type: String,
-        required: true,
         enum: ["Spam", "Inappropriate Content", "Harassment", "Other"],
     },
     customReason: {

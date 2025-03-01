@@ -18,9 +18,6 @@ export default class UserRepository implements IUserRepository {
     }
 
     async createUser(userData: any): Promise<any> {
-        console.log("vanuuuu");
-        console.log(userData, 'dfghjngvvhh');
-
         return await userSchema.create(userData);
     }
 
@@ -29,9 +26,7 @@ export default class UserRepository implements IUserRepository {
     }
 
     async findExpensesByUserId(userId: string): Promise<IExpense[]> {
-        console.log("userId from repository: ", userId)
         const expense = await expenseSchema.find({ userId });
-        console.log("expense from repo : ", expense)
         return expense
     }
 
@@ -40,21 +35,16 @@ export default class UserRepository implements IUserRepository {
     }
 
     async createGroup(groupData: IGroup): Promise<IGroup> {
-        console.log("repo calling...")
-        console.log("groupData in repo : ", groupData)
         return groupSchema.create(groupData)
     }
 
     async getUserGroups(email: string): Promise<IGroup[]> {
         const groups = await groupSchema.find({ members: { $elemMatch: { email } } });
-        console.log("groups-repo : ", JSON.stringify(groups, null, 2));
         return groups
     }
 
     async fetchUsers(page: number, limit: number): Promise<{ users: IUser[]; totalUsers: number }> {
         const skip = (page - 1) * limit;
-        console.log("Fetching users, skip:", skip);
-
         const [users, totalUsers] = await Promise.all([
             userSchema.find({ isAdmin: false }).skip(skip).limit(limit),
             userSchema.countDocuments({ isAdmin: false }),
@@ -69,7 +59,6 @@ export default class UserRepository implements IUserRepository {
     }
 
     async updateAdmin(admin: any): Promise<any> {
-        console.log("admin-repo : ", admin)
         return await userSchema.findOneAndUpdate({ isAdmin: true }, admin, { new: true });
     }
 
@@ -99,7 +88,6 @@ export default class UserRepository implements IUserRepository {
     }    
 
     async addExpenseInGroup(groupId: string, expense: IGroupExpense): Promise<IGroup> {
-        console.log("expense-repo : ",expense)
         const updatedGroup = await groupSchema.findByIdAndUpdate(
             new Types.ObjectId(groupId),
             { $push: { expenses: expense } },
@@ -108,7 +96,6 @@ export default class UserRepository implements IUserRepository {
         if (!updatedGroup) {
             throw new Error('group not found')
         }
-        console.log("****updatedGroup-repo**** : ",updatedGroup)
         return updatedGroup
     }
 
@@ -121,16 +108,11 @@ export default class UserRepository implements IUserRepository {
     }
 
     async bookSlot(slotId: string, slot: Slot): Promise<Slot | null> {
-        console.log("slotId-repo :", slotId)
-        console.log("slot-repo :", slot)
         const bookedSlot = await slotSchema.findOneAndUpdate({ _id: slotId }, slot, { new: true })
-        console.log("bookedslot-repo :", bookedSlot)
         return bookedSlot
     }
     async createReport(data: IReport): Promise<IReport> {
-        console.log("data-repo : ", data);
         const report = await Report.create(data);
-        console.log("report-repo : ", report);
         return report;
     }
 
@@ -147,7 +129,6 @@ export default class UserRepository implements IUserRepository {
             .limit(limit)
             .sort({ date: 1 }) 
             .lean();
-            console.log("slots-repo : ",{slots,totalPages})
           return { slots, totalPages };
         } catch (error:any) {
           throw new Error(`Error fetching slots: ${error.message}`);

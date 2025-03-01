@@ -149,9 +149,7 @@ export default class AdminService implements IAdminService {
         return deleteCategory
     }
 
-
-
-    async fetchReports(page:number,limit:number){
+    async fetchReports(page:number,limit:number):Promise<{reports:IReport[], totalReports:number}>{
         const report = await this.advisorRepository.fetchReports(page,limit);
         console.log("fetchReport-service : ",report)
         return report

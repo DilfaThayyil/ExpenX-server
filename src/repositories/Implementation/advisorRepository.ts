@@ -97,17 +97,19 @@ export default class AdvisorRepository implements IAdvisorRepository {
         }
     }
 
-   
 
     async fetchReports(page: number, limit: number): Promise<{ reports: IReport[], totalReports: number }> {
         const skip = (page - 1) * limit;
         const [reports, totalReports] = await Promise.all([
-            Report.find().sort({ createdAt: -1 }).skip(skip).limit(limit),
+            Report.find()
+            .populate("userId", "username email isBlocked")
+            .populate("advisorId", "username email isBlocked")
+            .sort({ createdAt: -1 }).skip(skip).limit(limit),
             Report.countDocuments()
-        ]);        
+        ])
         console.log("[reports,total]-repo : ", reports, "-->>", totalReports);
         return { reports, totalReports };
-    }    
+    }
 
     async findUserByRefreshToken(refreshToken: string): Promise<any> {
         return await advisorSchema.findOne({ refreshToken });

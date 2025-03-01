@@ -125,7 +125,6 @@ export default class AdminController implements IAdminController{
       if (result.error) {
         return res.status(HttpStatusCode.BAD_REQUEST).json({ error: result.error });
       }
-      
       return res.status(HttpStatusCode.OK).json({ message: result.message });
     } catch (error) {
       console.error(error)
