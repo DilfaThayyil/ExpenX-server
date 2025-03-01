@@ -153,7 +153,6 @@ export default class UserService implements IUserService {
         splitMethod,
         splits
       };
-      console.log("Validated Expense Data: ", expense);
       return await this.userRepository.addExpenseInGroup(groupId, expense);
     } catch (err) {
       console.error(err);
@@ -190,15 +189,12 @@ export default class UserService implements IUserService {
 
   async reportAdvisor(userId: string, advisorId: string, reason: "Spam" | "Inappropriate Content" | "Harassment" | "Other", customReason?: string): Promise<IReport> {
     const data: IReport = { userId: new Types.ObjectId(userId), advisorId: new Types.ObjectId(advisorId), reason, customReason, status: "pending", createdAt: new Date() };
-    console.log("data-service : ", data);
     const report = await this.userRepository.createReport(data);
-    console.log("report-service : ", report);
     return report;
   }
 
   async fetchSlotsByUser(userId: string, page: number, limit: number): Promise<{ slots: Slot[], totalPages: number }> {
     const result = await this.userRepository.fetchSlotsByUser(userId, page, limit);
-    console.log("result-service : ",result)
     return result
   }
 

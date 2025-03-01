@@ -207,7 +207,6 @@ export default class UserController implements IUserController {
         return res.status(HttpStatusCode.BAD_REQUEST).json({ message: "User ID is required" });
       }
       const data = await this.userService.fetchSlotsByUser(userId, page, limit);
-      console.log("data-contrll : ",data)
       return res.status(HttpStatusCode.OK).json({ success: true, data });
     } catch (error:any) {
       return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: error.message });
