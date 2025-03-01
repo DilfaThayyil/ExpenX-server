@@ -61,7 +61,7 @@ export default class UserController implements IUserController {
 
   async getExpenses(req: Request, res: Response): Promise<void> {
     try {
-      const { userId } = req.params; 
+      const { userId } = req.params;
       const expenses = await this.userService.getExpensesByUserId(userId);
       res.status(HttpStatusCode.OK).json(expenses);
     } catch (error) {
@@ -73,7 +73,7 @@ export default class UserController implements IUserController {
   async createExpense(req: Request, res: Response): Promise<void> {
     try {
       // console.log('dillll')
-      const {userId} = req.params
+      const { userId } = req.params
       const { date, amount, category, description } = req.body;
       if (!date || !amount || !category || !description) {
         res.status(HttpStatusCode.BAD_REQUEST).json({ error: 'All fields are required' });
@@ -96,13 +96,13 @@ export default class UserController implements IUserController {
 
   async createGroup(req: Request, res: Response): Promise<Response> {
     try {
-      console.log('req.body : ',req.body)
-      const {userId, name, members } = req.body;
-      if(!userId || !name || !members){
-        return res.status(HttpStatusCode.BAD_REQUEST).json({error: 'All fields are required!'})
+      console.log('req.body : ', req.body)
+      const { userId, name, members } = req.body;
+      if (!userId || !name || !members) {
+        return res.status(HttpStatusCode.BAD_REQUEST).json({ error: 'All fields are required!' })
       }
-      const newGroup = await this.userService.createGroup(userId,name,members)
-      console.log("newGroup in contrllr : ",newGroup)
+      const newGroup = await this.userService.createGroup(userId, name, members)
+      console.log("newGroup in contrllr : ", newGroup)
       return res.status(HttpStatusCode.CREATED).json(newGroup);
     } catch (error) {
       console.error('Error creating group:', error);
@@ -121,7 +121,7 @@ export default class UserController implements IUserController {
       if (groups.length === 0) {
         return res.status(HttpStatusCode.NOT_FOUND).json({ message: 'No groups found for this user' });
       }
-      console.log("groups-contrll : ",groups)
+      console.log("groups-contrll : ", groups)
       return res.status(HttpStatusCode.OK).json({ groups });
     } catch (error) {
       console.error('Error fetching groups:', error);
@@ -129,7 +129,7 @@ export default class UserController implements IUserController {
     }
   }
 
-  async addMember(req:Request,res:Response):Promise<void>{
+  async addMember(req: Request, res: Response): Promise<void> {
     try {
       const { groupId } = req.params;
       const { memberEmail } = req.body;
@@ -153,13 +153,13 @@ export default class UserController implements IUserController {
     try {
       const { groupId } = req.params;
       const expenseData: IGroupExpense = req.body;
-      console.log("expenseData-contrll : ",expenseData)
+      console.log("expenseData-contrll : ", expenseData)
       if (!expenseData.title || !expenseData.totalAmount || !expenseData.paidBy) {
         console.log("^^^missing required filelds-contllr^^^")
         return res.status(HttpStatusCode.BAD_REQUEST).json({ success: false, error: 'Missing required fields' });
       }
       const updatedGroup = await this.userService.addExpenseInGroup(groupId, expenseData);
-      console.log("updatedGroup-contrll : ",updatedGroup)
+      console.log("updatedGroup-contrll : ", updatedGroup)
       return res.status(HttpStatusCode.OK).json({
         success: true,
         message: 'Expense added successfully',
@@ -171,32 +171,47 @@ export default class UserController implements IUserController {
     }
   }
 
-  async bookslot(req:Request,res:Response):Promise<void>{
-    try{
-      const {slotId,userId} = req.body
+  async bookslot(req: Request, res: Response): Promise<void> {
+    try {
+      const { slotId, userId } = req.body
       // console.log("req.body : ",req.body)
-      const bookedSlot = await this.userService.bookslot(slotId,userId)
+      const bookedSlot = await this.userService.bookslot(slotId, userId)
       // console.log("bookedSlot-contrll :",bookedSlot)
-      res.status(HttpStatusCode.OK).json({message:"slot booked successfully",slot:bookedSlot})
-    }catch(err){
+      res.status(HttpStatusCode.OK).json({ message: "slot booked successfully", slot: bookedSlot })
+    } catch (err) {
       console.error(err)
-      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred' 
-      res.status(HttpStatusCode.NOT_FOUND).json({message:errorMessage})
+      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred'
+      res.status(HttpStatusCode.NOT_FOUND).json({ message: errorMessage })
     }
   }
 
-  
+
   async reportAdvisor(req: Request, res: Response): Promise<Response> {
     try {
-        const { userId, advisorId, reason, customReason } = req.body;
-        console.log("req body : ", req.body);
-        const report = await this.userService.reportAdvisor(userId, advisorId, reason, customReason);
-        console.log("report-controller : ", report);
-        return res.status(201).json({ message: "Report submitted successfully", report });
+      const { userId, advisorId, reason, customReason } = req.body
+      console.log("req body : ", req.body)
+      const report = await this.userService.reportAdvisor(userId, advisorId, reason, customReason);
+      console.log("report-controller : ", report);
+      return res.status(HttpStatusCode.CREATED).json({ message: "Report submitted successfully", report });
     } catch (error) {
-        return res.status(500).json({ message: "Error submitting report", error });
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: "Error submitting report", error });
     }
-}
+  }
 
-  
+  async fetchSlotsByUser(req: Request, res: Response): Promise<Response> {
+    try {
+      const { userId } = req.params;
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+      if (!userId) {
+        return res.status(HttpStatusCode.BAD_REQUEST).json({ message: "User ID is required" });
+      }
+      const data = await this.userService.fetchSlotsByUser(userId, page, limit);
+      console.log("data-contrll : ",data)
+      return res.status(HttpStatusCode.OK).json({ success: true, data });
+    } catch (error:any) {
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: error.message });
+    }
+  }
+
 }

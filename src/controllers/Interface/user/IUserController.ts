@@ -11,4 +11,5 @@ export interface IUserController {
   addExpenseInGroup(req: Request, res:Response): Promise<Response>
   bookslot(req: Request, res: Response): Promise<void>
   reportAdvisor(req:Request, res:Response): Promise<Response>
+  fetchSlotsByUser(req:Request, res:Response): Promise<Response>
 }

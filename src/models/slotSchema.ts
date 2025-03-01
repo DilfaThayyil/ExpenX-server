@@ -1,6 +1,6 @@
 import {model, Schema, Document, Types } from "mongoose";
 
-export interface Slot extends Document {
+export interface Slot {
   advisorId: {
     _id:Types.ObjectId
     username:string
@@ -10,7 +10,7 @@ export interface Slot extends Document {
   date: string;
   startTime: string;
   endTime: string;
-  duration: number;
+  duration: number;  
   maxBookings: number;
   status: 'Available' | 'Booked' | 'Cancelled';
   bookedBy: {

@@ -29,4 +29,5 @@ export interface IUserRepository {
   findUserById(userId:string):Promise<IUser | null>
   bookSlot(slotId:string,slot:Slot):Promise<Slot | null>
   createReport(data:IReport):Promise<IReport>
+  fetchSlotsByUser(userId: string, page: number, limit: number): Promise<{ slots: Slot[], totalPages: number }> 
 }

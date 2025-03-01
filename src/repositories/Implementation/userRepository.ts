@@ -133,6 +133,26 @@ export default class UserRepository implements IUserRepository {
         console.log("report-repo : ", report);
         return report;
     }
+
+    async fetchSlotsByUser(userId: string, page: number, limit: number): Promise<{ slots: Slot[], totalPages: number }> {
+        try {
+          const userObjectId = new Types.ObjectId(userId);
+          const filter = {
+            $or: [{ "bookedBy._id": userObjectId }, { status: "Available" }],
+          };
+          const totalSlots = await slotSchema.countDocuments(filter);
+          const totalPages = Math.ceil(totalSlots / limit);
+          const slots = await slotSchema.find(filter)
+            .skip((page - 1) * limit)
+            .limit(limit)
+            .sort({ date: 1 }) 
+            .lean();
+            console.log("slots-repo : ",{slots,totalPages})
+          return { slots, totalPages };
+        } catch (error:any) {
+          throw new Error(`Error fetching slots: ${error.message}`);
+        }
+      }
     
     
     async findUserByRefreshToken(refreshToken: string): Promise<any> {

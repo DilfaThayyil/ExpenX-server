@@ -14,4 +14,5 @@ export interface IUserService {
     addExpenseInGroup(groupId:string,expenseData:any):Promise<IGroup>
     bookslot(slotId:string,userId:string):Promise<Slot | null>
     reportAdvisor(userId:string,advisorId:string,reason:string,customReason:string):Promise<IReport>
+    fetchSlotsByUser(userId: string, page: number, limit: number): Promise<{ slots: Slot[], totalPages: number }>
 }

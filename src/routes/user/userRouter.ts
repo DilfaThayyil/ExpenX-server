@@ -32,5 +32,6 @@ router.post('/uploadChatFile',AuthMiddleware.authorizeUser,uploadChatFile.single
 router.post('/paymentInitiate',AuthMiddleware.authorizeUser,(req,res)=>paymentController.initiatePayment(req,res))
 router.post('/confirmPayment',AuthMiddleware.authorizeUser,(req,res)=>paymentController.confirmPayment(req,res))
 router.post("/reportAdvisor",AuthMiddleware.authorizeUser,(req,res)=>userController.reportAdvisor(req,res))
+router.get("/fetchSlotsByUser/:userId",AuthMiddleware.authorizeUser,(req,res)=>userController.fetchSlotsByUser(req,res))
 
 export default router
