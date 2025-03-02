@@ -1,7 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { Types } from 'mongoose';
 import IAdvisor from '../../entities/advisorEntities';
 import advisorSchema from '../../models/advisorSchema';
 import Report, { IReport } from "../../models/reportSchema";
+import reviewSchema, { IReview } from '../../models/reviewSchema';
 import slotSchema, { Slot } from '../../models/slotSchema';
 import { IAdvisorRepository } from '../Interface/IAdvisorRepository';
 
@@ -102,13 +104,22 @@ export default class AdvisorRepository implements IAdvisorRepository {
         const skip = (page - 1) * limit;
         const [reports, totalReports] = await Promise.all([
             Report.find()
-            .populate("userId", "username email isBlocked")
-            .populate("advisorId", "username email isBlocked")
-            .sort({ createdAt: -1 }).skip(skip).limit(limit),
+                .populate("userId", "username email isBlocked")
+                .populate("advisorId", "username email isBlocked")
+                .sort({ createdAt: -1 }).skip(skip).limit(limit),
             Report.countDocuments()
         ])
         console.log("[reports,total]-repo : ", reports, "-->>", totalReports);
         return { reports, totalReports };
+    }
+
+    async fetchReviews(advisorId: string): Promise<IReview[]> {
+        const reviews = await reviewSchema
+            .find({ advisorId: new Types.ObjectId(advisorId) })
+            .populate('userId', 'username profilePic')
+            .sort({ createdAt: -1 });
+        console.log("review-repo : ", reviews)
+        return reviews
     }
 
     async findUserByRefreshToken(refreshToken: string): Promise<any> {

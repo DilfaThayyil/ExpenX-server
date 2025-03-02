@@ -1,5 +1,6 @@
 import IAdvisor from "../../entities/advisorEntities";
 import { IReport } from "../../models/reportSchema";
+import { IReview } from "../../models/reviewSchema";
 import { Slot } from "../../models/slotSchema";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -21,5 +22,6 @@ export interface IAdvisorRepository {
     getBookedSlotsForAdvisor(advisorid:string,page:number,limit:number):Promise<{bookedSlots:Slot[] | Slot; totalSlots:number}>
     findUserById(id:string):Promise<IAdvisor | null>
     fetchReports(page:number,limit:number):Promise<{reports:IReport[], totalReports:number}>
+    fetchReviews(advisorId:string):Promise<IReview[]>
   }
   

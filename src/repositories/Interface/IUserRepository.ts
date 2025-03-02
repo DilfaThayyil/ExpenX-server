@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import IAdvisor from "../../entities/advisorEntities";
 import { IExpense } from "../../entities/expenseEntities";
 import { GroupMember, IGroup, IGroupExpense } from "../../entities/groupEntities";
 import IUser from "../../entities/userEntities";
 import { IReport } from "../../models/reportSchema";
+import { IReview } from "../../models/reviewSchema";
 import { Slot } from "../../models/slotSchema";
 
 export interface IUserRepository {
@@ -30,4 +32,5 @@ export interface IUserRepository {
   bookSlot(slotId:string,slot:Slot):Promise<Slot | null>
   createReport(data:IReport):Promise<IReport>
   fetchSlotsByUser(userId: string, page: number, limit: number): Promise<{ slots: Slot[], totalPages: number }> 
-}
+  getAdvisors():Promise<IAdvisor[]>
+  createReview(advisorId: string, userId: string, rating: number, review: string): Promise<IReview>;}

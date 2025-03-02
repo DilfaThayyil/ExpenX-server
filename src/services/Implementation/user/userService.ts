@@ -6,6 +6,8 @@ import { Slot } from '../../../models/slotSchema';
 import { GroupMember, IGroup, ISplit } from '../../../entities/groupEntities';
 import { Types } from 'mongoose';
 import { IReport } from '../../../models/reportSchema';
+import IAdvisor from '../../../entities/advisorEntities';
+import { IReview } from '../../../models/reviewSchema';
 
 @injectable()
 export default class UserService implements IUserService {
@@ -198,4 +200,15 @@ export default class UserService implements IUserService {
     return result
   }
 
+  async getAdvisors():Promise<IAdvisor[]>{
+    const advisors = await this.userRepository.getAdvisors()
+    return advisors
+  }
+
+
+  async createReview(advisorId: string, userId: string, rating: number, review: string): Promise<IReview> {
+    const newReview = await this.userRepository.createReview(advisorId, userId, rating, review);
+    console.log("newReview-serv : ",newReview)
+    return newReview
+  }
 }

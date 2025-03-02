@@ -127,15 +127,22 @@ export default class AdvisorController implements IAdvisorController {
       const advisorId = req.params.advisorId
       const page = parseInt(req.query.page as string) || 1
       const limit = parseInt(req.query.limit as string) || 10
-      // console.log("booked-page-contrll :",page)
-      // console.log("advisorId-contrll : ",advisorId)
       const {bookedSlots,totalPages} = await this.advisorService.getBookedSlotsForAdvisor(advisorId,page,limit)
-      // console.log("bookedSlot-contrll,totalPages : ",bookedSlots," ",totalPages)
       return  res.status(HttpStatusCode.OK).json({ success:true,data:{bookedSlots,totalPages} })
     } catch (error) {
       return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: "Error fetching booked slots" });
     }
   }
-  
-  
+
+  async fetchReviews(req: Request, res: Response): Promise<Response> {
+    try {
+      const { advisorId } = req.params;
+      console.log("advisrId-contrll : ",advisorId)
+      const reviews = await this.advisorService.fetchReviews(advisorId);
+      console.log("reveiws-contrll : ",reviews)
+      return res.status(200).json({success: true,data: reviews});
+    } catch (error) {
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({error:'Error fetching reviews'})
+    }
+  }
 }

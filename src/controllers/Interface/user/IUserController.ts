@@ -12,4 +12,6 @@ export interface IUserController {
   bookslot(req: Request, res: Response): Promise<void>
   reportAdvisor(req:Request, res:Response): Promise<Response>
   fetchSlotsByUser(req:Request, res:Response): Promise<Response>
+  getAdvisors(req: Request, res:Response): Promise<Response>
+  createReview(req: Request, res:Response): Promise<Response>
 }

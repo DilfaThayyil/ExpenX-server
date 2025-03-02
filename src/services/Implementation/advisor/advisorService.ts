@@ -3,6 +3,7 @@ import { IAdvisorRepository } from '../../../repositories/Interface/IAdvisorRepo
 import { IAdvisorService } from '../../Interface/advisor/IAdvisorService';
 import { Slot } from '../../../models/slotSchema';
 import { Types } from 'mongoose';
+import { IReview } from '../../../models/reviewSchema';
 
 
 @injectable()
@@ -110,17 +111,21 @@ export default class AdvisorService implements IAdvisorService {
 
   async getBookedSlotsForAdvisor(advisorId:string,page:number,limit:number):Promise<{bookedSlots:Slot[] | Slot; totalPages:number}>{
     try{
-      // console.log("advisorId-service :",advisorId)
       const {bookedSlots,totalSlots} = await this.advisorRepository.getBookedSlotsForAdvisor(advisorId,page,limit)
       if(!bookedSlots){
         throw new Error('No slots found')
       }
       const totalPages = Math.ceil(totalSlots/limit)
-      // console.log("getBookedSlotsForAdvisor :",bookedSlots)
       return {bookedSlots,totalPages}
     }catch(err){
       console.error(err)
       throw err
     }
+  }
+
+  async fetchReviews(advisorId: string): Promise<IReview[]> {
+    const reviews =  await this.advisorRepository.fetchReviews(advisorId);
+    console.log("reviews-serv : ",reviews)
+    return reviews
   }
 }

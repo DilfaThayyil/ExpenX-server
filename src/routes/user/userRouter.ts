@@ -33,5 +33,7 @@ router.post('/paymentInitiate',AuthMiddleware.authorizeUser,(req,res)=>paymentCo
 router.post('/confirmPayment',AuthMiddleware.authorizeUser,(req,res)=>paymentController.confirmPayment(req,res))
 router.post("/reportAdvisor",AuthMiddleware.authorizeUser,(req,res)=>userController.reportAdvisor(req,res))
 router.get("/fetchSlotsByUser/:userId",AuthMiddleware.authorizeUser,(req,res)=>userController.fetchSlotsByUser(req,res))
+router.get("/getAdvisors",(req,res)=>userController.getAdvisors(req,res))
+router.post("/createReview",(req,res)=>userController.createReview(req,res))
 
 export default router

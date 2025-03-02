@@ -1,3 +1,4 @@
+import { IReview } from "../../../models/reviewSchema";
 import { Slot } from "../../../models/slotSchema";
 
 export interface IAdvisorService {
@@ -8,4 +9,5 @@ export interface IAdvisorService {
     updateSlot(slotId:string,slot:Slot):Promise<Slot | null>
     deleteSlot(slotId:string):Promise<boolean>
     getBookedSlotsForAdvisor(advisorId:string,page:number,limit:number):Promise<{bookedSlots:Slot[] | Slot; totalPages:number}>
+    fetchReviews(advisorId:string):Promise<IReview[]>
 }

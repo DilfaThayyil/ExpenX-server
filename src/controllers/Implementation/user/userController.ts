@@ -213,4 +213,25 @@ export default class UserController implements IUserController {
     }
   }
 
+  async getAdvisors(req: Request, res: Response): Promise<Response> {
+    try {
+      const Advisors = await this.userService.getAdvisors()
+      return res.status(HttpStatusCode.OK).json({ Advisors })
+    } catch (err) {
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
+    }
+  }
+
+  async createReview(req: Request, res: Response): Promise<Response> {
+    try {
+      console.log("body : ",req.body)
+      const { advisorId,userId, rating, review } = req.body;
+      const newReview = await this.userService.createReview(advisorId, userId, rating, review);
+      console.log("newReview-cntrollr : ",newReview)
+      return res.status(HttpStatusCode.CREATED).json({success: true,data: newReview});
+    } catch (error) {
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({message: "Error creating reviews : ",error})
+    }
+  }
+
 }

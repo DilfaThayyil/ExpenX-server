@@ -9,6 +9,9 @@ import { Types } from 'mongoose';
 import { GroupMember, IGroup, IGroupExpense } from '../../entities/groupEntities';
 import reportSchema, { IReport } from '../../models/reportSchema';
 import Report from '../../models/reportSchema';
+import advisorSchema from '../../models/advisorSchema';
+import IAdvisor from '../../entities/advisorEntities';
+import reviewSchema, { IReview } from '../../models/reviewSchema';
 
 
 export default class UserRepository implements IUserRepository {
@@ -85,7 +88,7 @@ export default class UserRepository implements IUserRepository {
     async findByEmail(email: string): Promise<IUser | null> {
         const user = await userSchema.findOne({ email });
         return user
-    }    
+    }
 
     async addExpenseInGroup(groupId: string, expense: IGroupExpense): Promise<IGroup> {
         const updatedGroup = await groupSchema.findByIdAndUpdate(
@@ -118,24 +121,39 @@ export default class UserRepository implements IUserRepository {
 
     async fetchSlotsByUser(userId: string, page: number, limit: number): Promise<{ slots: Slot[], totalPages: number }> {
         try {
-          const userObjectId = new Types.ObjectId(userId);
-          const filter = {
-            $or: [{ "bookedBy._id": userObjectId }, { status: "Available" }],
-          };
-          const totalSlots = await slotSchema.countDocuments(filter);
-          const totalPages = Math.ceil(totalSlots / limit);
-          const slots = await slotSchema.find(filter)
-            .skip((page - 1) * limit)
-            .limit(limit)
-            .sort({ date: 1 }) 
-            .lean();
-          return { slots, totalPages };
-        } catch (error:any) {
-          throw new Error(`Error fetching slots: ${error.message}`);
+            const userObjectId = new Types.ObjectId(userId);
+            const filter = {
+                $or: [{ "bookedBy._id": userObjectId }, { status: "Available" }],
+            };
+            const totalSlots = await slotSchema.countDocuments(filter);
+            const totalPages = Math.ceil(totalSlots / limit);
+            const slots = await slotSchema.find(filter)
+                .skip((page - 1) * limit)
+                .limit(limit)
+                .sort({ date: 1 })
+                .lean();
+            return { slots, totalPages };
+        } catch (error: any) {
+            throw new Error(`Error fetching slots: ${error.message}`);
         }
+    }
+
+    async getAdvisors():Promise<IAdvisor[]>{
+        const advisors =  await advisorSchema.find({isBlocked:false})
+        return advisors
+    }
+
+    async createReview(advisorId: string, userId: string, rating: number, review: string): Promise<IReview> {
+        const newReview = await reviewSchema.create({
+          advisorId: new Types.ObjectId(advisorId),
+          userId: new Types.ObjectId(userId),
+          rating,
+          review
+        });
+        console.log("newRevie-reposi : ",newReview)
+        return newReview
       }
-    
-    
+
     async findUserByRefreshToken(refreshToken: string): Promise<any> {
         return await userSchema.findOne({ refreshToken })
     }
