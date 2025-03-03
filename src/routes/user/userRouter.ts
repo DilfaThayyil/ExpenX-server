@@ -31,9 +31,11 @@ router.post('/createChat',AuthMiddleware.authorizeUser,(req,res)=>chatController
 router.post('/uploadChatFile',AuthMiddleware.authorizeUser,uploadChatFile.single('file'),(req,res)=>{chatController.uploadChatFile(req,res)})
 router.post('/paymentInitiate',AuthMiddleware.authorizeUser,(req,res)=>paymentController.initiatePayment(req,res))
 router.post('/confirmPayment',AuthMiddleware.authorizeUser,(req,res)=>paymentController.confirmPayment(req,res))
-router.post("/reportAdvisor",AuthMiddleware.authorizeUser,(req,res)=>userController.reportAdvisor(req,res))
-router.get("/fetchSlotsByUser/:userId",AuthMiddleware.authorizeUser,(req,res)=>userController.fetchSlotsByUser(req,res))
-router.get("/getAdvisors",(req,res)=>userController.getAdvisors(req,res))
-router.post("/createReview",(req,res)=>userController.createReview(req,res))
+router.post('/reportAdvisor',AuthMiddleware.authorizeUser,(req,res)=>userController.reportAdvisor(req,res))
+router.get('/fetchSlotsByUser/:userId',AuthMiddleware.authorizeUser,(req,res)=>userController.fetchSlotsByUser(req,res))
+router.get('/getAdvisors',AuthMiddleware.authorizeUser,(req,res)=>userController.getAdvisors(req,res))
+router.post('/createReview',AuthMiddleware.authorizeUser,(req,res)=>userController.createReview(req,res))
+router.post('/createGoals/:userId',AuthMiddleware.authorizeUser,(req,res)=>userController.createGoal(req,res))
+router.get('/getGoals/:userId',AuthMiddleware.authorizeUser,(req,res)=>userController.getGoalsById(req,res))
 
 export default router

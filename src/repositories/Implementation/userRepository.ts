@@ -12,6 +12,7 @@ import Report from '../../models/reportSchema';
 import advisorSchema from '../../models/advisorSchema';
 import IAdvisor from '../../entities/advisorEntities';
 import reviewSchema, { IReview } from '../../models/reviewSchema';
+import goalsSchema, { IGoal } from '../../models/goalsSchema';
 
 
 export default class UserRepository implements IUserRepository {
@@ -138,21 +139,33 @@ export default class UserRepository implements IUserRepository {
         }
     }
 
-    async getAdvisors():Promise<IAdvisor[]>{
-        const advisors =  await advisorSchema.find({isBlocked:false})
+    async getAdvisors(): Promise<IAdvisor[]> {
+        const advisors = await advisorSchema.find({ isBlocked: false })
         return advisors
     }
 
     async createReview(advisorId: string, userId: string, rating: number, review: string): Promise<IReview> {
         const newReview = await reviewSchema.create({
-          advisorId: new Types.ObjectId(advisorId),
-          userId: new Types.ObjectId(userId),
-          rating,
-          review
+            advisorId: new Types.ObjectId(advisorId),
+            userId: new Types.ObjectId(userId),
+            rating,
+            review
         });
-        console.log("newRevie-reposi : ",newReview)
+        console.log("newRevie-reposi : ", newReview)
         return newReview
-      }
+    }
+
+    async createGoal(goalData: Partial<IGoal>): Promise<IGoal> {
+        const goal = await goalsSchema.create(goalData);
+        console.log("goal-repo : ",goal)
+        return goal
+    }
+
+    async getGoalsById(userId:string):Promise<IGoal[]>{
+        const goals = await goalsSchema.find({ userId }).sort({ deadline: 1 });
+        console.log("getGoals-repo : ",goals)
+        return goals
+    }
 
     async findUserByRefreshToken(refreshToken: string): Promise<any> {
         return await userSchema.findOne({ refreshToken })

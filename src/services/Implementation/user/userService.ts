@@ -8,6 +8,7 @@ import { Types } from 'mongoose';
 import { IReport } from '../../../models/reportSchema';
 import IAdvisor from '../../../entities/advisorEntities';
 import { IReview } from '../../../models/reviewSchema';
+import { IGoal } from '../../../models/goalsSchema';
 
 @injectable()
 export default class UserService implements IUserService {
@@ -188,13 +189,11 @@ export default class UserService implements IUserService {
       return null;
     }
   }
-
   async reportAdvisor(userId: string, advisorId: string, reason: "Spam" | "Inappropriate Content" | "Harassment" | "Other", customReason?: string): Promise<IReport> {
     const data: IReport = { userId: new Types.ObjectId(userId), advisorId: new Types.ObjectId(advisorId), reason, customReason, status: "pending", createdAt: new Date() };
     const report = await this.userRepository.createReport(data);
     return report;
   }
-
   async fetchSlotsByUser(userId: string, page: number, limit: number): Promise<{ slots: Slot[], totalPages: number }> {
     const result = await this.userRepository.fetchSlotsByUser(userId, page, limit);
     return result
@@ -205,10 +204,22 @@ export default class UserService implements IUserService {
     return advisors
   }
 
-
   async createReview(advisorId: string, userId: string, rating: number, review: string): Promise<IReview> {
     const newReview = await this.userRepository.createReview(advisorId, userId, rating, review);
     console.log("newReview-serv : ",newReview)
     return newReview
   }
+
+  async createGoal(userId: string, goalData: Partial<IGoal>): Promise<IGoal> {
+    const goal = await this.userRepository.createGoal({ ...goalData, userId });
+    console.log("goal-service : ",goal)
+    return goal
+  }
+
+  async getGoalsById(userId: string): Promise<IGoal[]> {
+    const goals = await this.userRepository.getGoalsById(userId);
+    console.log("getGoals-service : ",goals)
+    return goals
+  }
+
 }

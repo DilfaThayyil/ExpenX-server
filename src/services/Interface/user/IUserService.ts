@@ -1,6 +1,7 @@
 import IAdvisor from "../../../entities/advisorEntities";
 import { IExpense } from "../../../entities/expenseEntities";
 import { IGroup, IGroupExpense } from "../../../entities/groupEntities";
+import { IGoal } from "../../../models/goalsSchema";
 import { IReport } from "../../../models/reportSchema";
 import { IReview } from "../../../models/reviewSchema";
 import { Slot } from "../../../models/slotSchema";
@@ -19,4 +20,6 @@ export interface IUserService {
     fetchSlotsByUser(userId: string, page: number, limit: number): Promise<{ slots: Slot[], totalPages: number }>
     getAdvisors():Promise<IAdvisor[]>
     createReview(advisorId: string, userId: string, rating: number, review: string): Promise<IReview>;
+    createGoal(userId: string, goalData: Partial<IGoal>): Promise<IGoal>
+    getGoalsById(userId: string): Promise<IGoal[]>
 }

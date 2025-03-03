@@ -14,4 +14,6 @@ export interface IUserController {
   fetchSlotsByUser(req:Request, res:Response): Promise<Response>
   getAdvisors(req: Request, res:Response): Promise<Response>
   createReview(req: Request, res:Response): Promise<Response>
+  createGoal(req: Request, res:Response): Promise<Response>
+  getGoalsById(req: Request, res:Response): Promise<Response>
 }

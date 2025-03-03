@@ -234,4 +234,41 @@ export default class UserController implements IUserController {
     }
   }
 
+  async createGoal(req: Request, res: Response): Promise<Response> {
+    try {
+      const {userId} = req.params
+      const { title, description, target, current, deadline, category } = req.body;
+      if (!title || !target || !deadline) {
+        return res.status(HttpStatusCode.BAD_REQUEST).json({ message: 'Missing required fields' });
+      }
+      const goal = await this.userService.createGoal(userId, { 
+        title, 
+        description, 
+        target: Number(target), 
+        current: Number(current || 0), 
+        deadline: new Date(deadline),
+        category 
+      });
+      return res.status(HttpStatusCode.CREATED).json(goal);
+    } catch (error) {
+      console.error('Error creating goal:', error);
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: 'Failed to create goal' });
+    }
+  }
+
+  async getGoalsById(req: Request, res: Response): Promise<Response> {
+    try {
+      const { userId } = req.params;
+      const goal = await this.userService.getGoalsById(userId);  
+      if (!goal) {
+        return res.status(HttpStatusCode.NOT_FOUND).json({ message: 'Goal not found' });
+      }
+      return res.status(HttpStatusCode.OK).json(goal);
+    } catch (error) {
+      console.error('Error fetching goal:', error);
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: 'Failed to fetch goal' });
+    }
+  }
+
+
 }
