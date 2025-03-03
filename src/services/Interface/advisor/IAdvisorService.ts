@@ -10,4 +10,5 @@ export interface IAdvisorService {
     deleteSlot(slotId:string):Promise<boolean>
     getBookedSlotsForAdvisor(advisorId:string,page:number,limit:number):Promise<{bookedSlots:Slot[] | Slot; totalPages:number}>
     fetchReviews(advisorId:string):Promise<IReview[]>
+    addReplyToReview(reviewId:string,advisorId:string,text:string):Promise<IReview | null>
 }

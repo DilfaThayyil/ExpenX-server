@@ -14,7 +14,7 @@ export interface IReview{
 }
 
 const ReplySchema = new Schema({
-  userId: { type: Schema.Types.ObjectId, ref: 'Advisor'},
+  advisorId: { type: Schema.Types.ObjectId, ref: 'Advisor'},
   text: { type: String},
   createdAt: { type: Date, default: Date.now }
 });

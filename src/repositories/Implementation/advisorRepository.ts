@@ -9,14 +9,10 @@ import { IAdvisorRepository } from '../Interface/IAdvisorRepository';
 
 export default class AdvisorRepository implements IAdvisorRepository {
     async findUserByEmail(email: string): Promise<any> {
-        console.log("lsdjf- fininguser by email--advisor-relpo : ", email)
         return await advisorSchema.findOne({ email });
     }
 
     async createUser(userData: any): Promise<any> {
-        // console.log("vanuuuu");
-        // console.log(userData, 'dfghjngvvhh');
-
         return await advisorSchema.create(userData);
     }
 
@@ -25,13 +21,11 @@ export default class AdvisorRepository implements IAdvisorRepository {
     }
 
     async fetchAdvisors(page: number, limit: number): Promise<{ users: IAdvisor[]; totalUsers: number }> {
-        // console.log("reppostiry...")
         const skip = (page - 1) * limit;
         const [users, totalUsers] = await Promise.all([
             advisorSchema.find().skip(skip).limit(limit),
             advisorSchema.countDocuments(),
         ]);
-        // console.log("skip :", skip)
         return { users, totalUsers };
     }
 
@@ -40,25 +34,21 @@ export default class AdvisorRepository implements IAdvisorRepository {
     }
 
     async createSlot(slot: Slot): Promise<Slot> {
-        // console.log("creating...")
         const result = await slotSchema.create(slot)
         return result
     }
 
     async findExistingSlot(date: string, startTime: string): Promise<boolean> {
-        // console.log("findingSlot....")
         const result = await slotSchema.findOne({ date, startTime })
         return !!result
     }
 
     async fetchSlots(page: number, limit: number): Promise<{ slots: Slot[] | Slot; totalSlots: number }> {
         const skip = (page - 1) * limit
-        // console.log("skip:", skip);
         const [slots, totalSlots] = await Promise.all([
             slotSchema.find().skip(skip).limit(limit),
             slotSchema.countDocuments()
         ])
-        // console.log("fetchSlot-repo :",slots,totalSlots)
         return { slots, totalSlots }
     }
 
@@ -92,7 +82,6 @@ export default class AdvisorRepository implements IAdvisorRepository {
 
                 slotSchema.countDocuments({ 'advisorId._id': advisorId, status: "Booked" })
             ]);
-            //   console.log("bookedSlots-repo : ",bookedSlots)
             return { bookedSlots, totalSlots };
         } catch (err) {
             throw err
@@ -109,7 +98,6 @@ export default class AdvisorRepository implements IAdvisorRepository {
                 .sort({ createdAt: -1 }).skip(skip).limit(limit),
             Report.countDocuments()
         ])
-        console.log("[reports,total]-repo : ", reports, "-->>", totalReports);
         return { reports, totalReports };
     }
 
@@ -118,7 +106,6 @@ export default class AdvisorRepository implements IAdvisorRepository {
             .find({ advisorId: new Types.ObjectId(advisorId) })
             .populate('userId', 'username profilePic')
             .sort({ createdAt: -1 });
-        console.log("review-repo : ", reviews)
         return reviews
     }
 
@@ -132,5 +119,22 @@ export default class AdvisorRepository implements IAdvisorRepository {
 
     async removeRefreshToken(email: string): Promise<any> {
         return await advisorSchema.findOneAndUpdate({ email }, { refreshToken: null }, { new: true });
+    }
+
+    async addReplyToReview(reviewId: string, advisorId: string,text: string): Promise<IReview | null> {
+        const review = await reviewSchema.findByIdAndUpdate(
+            reviewId,
+            {
+                $push: {
+                    replies: {
+                        advisorId: new Types.ObjectId(advisorId),
+                        text,
+                        createdAt: new Date()
+                    }
+                }
+            },
+            { new: true }
+        ).populate('replies.advisorId', 'username profilePic');
+        return review
     }
 }

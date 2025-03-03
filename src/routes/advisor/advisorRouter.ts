@@ -15,6 +15,7 @@ router.get('/fetchSlots',AuthMiddleware.authorizeUser,(req,res)=>advisorControll
 router.patch('/updateSlot/:slotId',AuthMiddleware.authorizeUser,(req,res)=>advisorController.updateSlot(req,res))
 router.delete('/deleteSlot/:slotId',AuthMiddleware.authorizeUser,(req,res)=>advisorController.deleteSlot(req,res))
 router.get('/fetchSlotsAdvisor/:advisorId',AuthMiddleware.authorizeUser,(req,res)=>advisorController.getBookedSlotsForAdvisor(req,res))
-router.get('/getReviews/:advisorId',(req,res)=>advisorController.fetchReviews(req,res))
+router.get('/getReviews/:advisorId',AuthMiddleware.authorizeUser,(req,res)=>advisorController.fetchReviews(req,res))
+router.post('/addReply/:reviewId',AuthMiddleware.authorizeUser,(req,res)=>advisorController.addReplyToReview(req,res))
 
 export default router

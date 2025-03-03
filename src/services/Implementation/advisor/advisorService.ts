@@ -27,11 +27,7 @@ export default class AdvisorService implements IAdvisorService {
 
   async createSlot(id: string, slotData: Slot): Promise<Slot> {
     try {
-        console.log("advisorId-service : ", id);
-        console.log("date & time-service : ", slotData.date, "&", slotData.startTime);
-
         const isExist = await this.advisorRepository.findExistingSlot(slotData.date, slotData.startTime);
-        console.log("existingSlot-service : ", isExist);
         if (isExist) {
             throw new Error("A slot already exists for the given date and time.");
         }
@@ -69,7 +65,6 @@ export default class AdvisorService implements IAdvisorService {
 
   async fetchSlots(page:number,limit:number):Promise<{slots:Slot[]|Slot,totalPages:number}>{
     try{
-      console.log("fetchSlot-serv...")
       const {slots,totalSlots} = await this.advisorRepository.fetchSlots(page,limit)
       const totalPages = Math.ceil(totalSlots/limit)      
       return {slots,totalPages}
@@ -80,14 +75,11 @@ export default class AdvisorService implements IAdvisorService {
 
   async updateSlot(slotId:string,slot:Slot):Promise<Slot | null>{
     try{
-      console.log("slotId-service : ",slotId)
       const existingSlot = await this.advisorRepository.findSlotById(slotId)
-      console.log("existingSlot : ",existingSlot)
       if(!existingSlot){
         throw new Error('slot is not found')
       }
       const updatedSlot = await this.advisorRepository.updateSlot(slotId,slot)
-      console.log("updatedSlot-service ; ",updatedSlot)
       return updatedSlot
     }catch(err){
       console.error(err)
@@ -97,7 +89,6 @@ export default class AdvisorService implements IAdvisorService {
 
   async deleteSlot(slotId:string):Promise<boolean>{
     try{
-      console.log("slotId : ",slotId)
       const isDeleted = await this.advisorRepository.deleteSlot(slotId)
       if(!isDeleted){
         throw new Error('Cant found or delete the slot')
@@ -125,7 +116,11 @@ export default class AdvisorService implements IAdvisorService {
 
   async fetchReviews(advisorId: string): Promise<IReview[]> {
     const reviews =  await this.advisorRepository.fetchReviews(advisorId);
-    console.log("reviews-serv : ",reviews)
     return reviews
+  }
+
+  async addReplyToReview(reviewId:string,advisorId:string,text:string):Promise<IReview | null>{
+    const review = await this.advisorRepository.addReplyToReview(reviewId,advisorId,text)
+    return review
   }
 }

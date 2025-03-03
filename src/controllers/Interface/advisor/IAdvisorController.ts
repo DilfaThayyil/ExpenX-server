@@ -9,4 +9,5 @@ export interface IAdvisorController {
   deleteSlot(req:Request,res:Response): Promise<void>
   getBookedSlotsForAdvisor(req: Request, res: Response): Promise<Response>
   fetchReviews(req: Request, res: Response): Promise<Response>
+  addReplyToReview(req: Request, res: Response): Promise<Response>
 }

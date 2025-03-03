@@ -23,5 +23,6 @@ export interface IAdvisorRepository {
     findUserById(id:string):Promise<IAdvisor | null>
     fetchReports(page:number,limit:number):Promise<{reports:IReport[], totalReports:number}>
     fetchReviews(advisorId:string):Promise<IReview[]>
+    addReplyToReview(reviewId:string,advisorId:string,text:string):Promise<IReview | null>
   }
   
