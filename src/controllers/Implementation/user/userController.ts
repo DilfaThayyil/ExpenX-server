@@ -270,5 +270,71 @@ export default class UserController implements IUserController {
     }
   }
 
+  async updateGoal(req: Request, res: Response): Promise<Response> {
+    try {
+      const { id } = req.params;
+      const { title, description, target, current, deadline, category } = req.body;      
+      const existingGoal = await this.userService.getGoalById(id);
+      console.log("existingGoal-contrll : ",existingGoal)
+      if (!existingGoal) {
+      return res.status(HttpStatusCode.NOT_FOUND).json({ message: 'Goal not found' });
+      }
+      const updatedGoal = await this.userService.updateGoal(id, {
+        title,
+        description,
+        target: target !== undefined ? Number(target) : undefined,
+        current: current !== undefined ? Number(current) : undefined,
+        deadline: deadline ? new Date(deadline) : undefined,
+        category
+      });
+      console.log("updatedGoal-contrll : ",updatedGoal)
+      if (!updatedGoal) {
+        return res.status(HttpStatusCode.NOT_FOUND).json({ message: 'Goal not found' });
+      }
+      return res.status(HttpStatusCode.OK).json(updatedGoal);
+    } catch (error) {
+      console.error('Error updating goal:', error);
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: 'Failed to update goal' });
+    }
+  }
 
+  async deleteGoal(req: Request, res: Response): Promise<Response> {
+    try {
+      const { id } = req.params;
+      const existingGoal = await this.userService.getGoalById(id);
+      if (!existingGoal) {
+        return res.status(HttpStatusCode.NOT_FOUND).json({ message: 'Goal not found' });
+      }
+      const result = await this.userService.deleteGoal(id);
+      if (!result) {
+        return res.status(HttpStatusCode.NOT_FOUND).json({ message: 'Goal not found' });
+      }
+      return res.status(HttpStatusCode.OK).json({ message: 'Goal deleted successfully' });
+    } catch (error) {
+      console.error('Error deleting goal:', error);
+      return res.status(500).json({ message: 'Failed to delete goal' });
+    }
+  }
+
+  async updateGoalProgress(req: Request, res: Response): Promise<Response> {
+    try {
+      const { id } = req.params;
+      const { amount } = req.body;
+      if (amount === undefined) {
+        return res.status(HttpStatusCode.BAD_REQUEST).json({ message: 'Amount is required' });
+      }
+      const existingGoal = await this.userService.getGoalById(id);
+      if (!existingGoal) {
+        return res.status(HttpStatusCode.NOT_FOUND).json({ message: 'Goal not found' });
+      }
+      const updatedGoal = await this.userService.updateGoalProgress(id, Number(amount));
+      if (!updatedGoal) {
+        return res.status(HttpStatusCode.NOT_FOUND).json({ message: 'Goal not found' });
+      }
+      return res.status(HttpStatusCode.OK).json(updatedGoal);
+    } catch (error) {
+      console.error('Error updating goal progress:', error);
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: 'Failed to update goal progress' });
+    }
+  }
 }

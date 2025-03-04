@@ -37,5 +37,8 @@ router.get('/getAdvisors',AuthMiddleware.authorizeUser,(req,res)=>userController
 router.post('/createReview',AuthMiddleware.authorizeUser,(req,res)=>userController.createReview(req,res))
 router.post('/createGoals/:userId',AuthMiddleware.authorizeUser,(req,res)=>userController.createGoal(req,res))
 router.get('/getGoals/:userId',AuthMiddleware.authorizeUser,(req,res)=>userController.getGoalsById(req,res))
+router.patch('/updateGoal/:id',AuthMiddleware.authorizeUser,(req,res)=>userController.updateGoal(req,res))
+router.delete('/deleteGoal/:id',AuthMiddleware.authorizeUser,(req,res)=>userController.deleteGoal(req,res))
+router.patch('/updateGoalProgress/:id',AuthMiddleware.authorizeUser,(req,res)=>userController.updateGoalProgress(req,res))
 
 export default router

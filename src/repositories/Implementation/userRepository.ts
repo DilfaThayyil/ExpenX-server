@@ -151,20 +151,29 @@ export default class UserRepository implements IUserRepository {
             rating,
             review
         });
-        console.log("newRevie-reposi : ", newReview)
         return newReview
     }
 
     async createGoal(goalData: Partial<IGoal>): Promise<IGoal> {
         const goal = await goalsSchema.create(goalData);
-        console.log("goal-repo : ",goal)
         return goal
     }
 
     async getGoalsById(userId:string):Promise<IGoal[]>{
         const goals = await goalsSchema.find({ userId }).sort({ deadline: 1 });
-        console.log("getGoals-repo : ",goals)
         return goals
+    }
+
+    async getGoalById(id:string):Promise<IGoal | null>{
+        return await goalsSchema.findById(id)
+    }
+
+    async updateGoal(id:string,goalData:Partial<IGoal>):Promise<IGoal | null>{
+        return await goalsSchema.findByIdAndUpdate(id,{...goalData,updatedAt:new Date()},{new:true})
+    }
+
+    async deleteGoal(id:string):Promise<boolean | null>{
+        return await goalsSchema.findByIdAndDelete(id)
     }
 
     async findUserByRefreshToken(refreshToken: string): Promise<any> {

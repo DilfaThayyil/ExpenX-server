@@ -163,8 +163,6 @@ export default class UserService implements IUserService {
     }
   }
 
-
-
   async bookslot(slotId: string, userId: string): Promise<Slot | null> {
     try {
       const slot = await this.userRepository.findSlot(slotId);
@@ -189,6 +187,7 @@ export default class UserService implements IUserService {
       return null;
     }
   }
+
   async reportAdvisor(userId: string, advisorId: string, reason: "Spam" | "Inappropriate Content" | "Harassment" | "Other", customReason?: string): Promise<IReport> {
     const data: IReport = { userId: new Types.ObjectId(userId), advisorId: new Types.ObjectId(advisorId), reason, customReason, status: "pending", createdAt: new Date() };
     const report = await this.userRepository.createReport(data);
@@ -198,28 +197,45 @@ export default class UserService implements IUserService {
     const result = await this.userRepository.fetchSlotsByUser(userId, page, limit);
     return result
   }
-
   async getAdvisors():Promise<IAdvisor[]>{
     const advisors = await this.userRepository.getAdvisors()
     return advisors
   }
-
   async createReview(advisorId: string, userId: string, rating: number, review: string): Promise<IReview> {
     const newReview = await this.userRepository.createReview(advisorId, userId, rating, review);
     console.log("newReview-serv : ",newReview)
     return newReview
   }
-
   async createGoal(userId: string, goalData: Partial<IGoal>): Promise<IGoal> {
     const goal = await this.userRepository.createGoal({ ...goalData, userId });
     console.log("goal-service : ",goal)
     return goal
   }
-
   async getGoalsById(userId: string): Promise<IGoal[]> {
     const goals = await this.userRepository.getGoalsById(userId);
     console.log("getGoals-service : ",goals)
     return goals
+  }
+  async getGoalById(id:string):Promise<IGoal | null>{
+    const goal = await this.userRepository.getGoalById(id)
+    return goal
+  }
+  async updateGoal(id:string,goalData:Partial<IGoal>):Promise<IGoal | null>{
+    const updatedGoal = await this.userRepository.updateGoal(id,goalData)
+    console.log("updatedGoal-servie : ",updatedGoal)
+    return updatedGoal
+  }
+  async deleteGoal(id: string): Promise<boolean | null> {
+    return await this.userRepository.deleteGoal(id);
+  }
+
+  async updateGoalProgress(id: string, amount: number): Promise<IGoal | null> {
+    const goal = await this.userRepository.getGoalById(id);
+    console.log("goal-service : ",goal)
+    if (!goal) return null;
+    const newAmount = goal.current + amount;
+    const current = Math.max(0, Math.min(goal.target, newAmount));
+    return this.userRepository.updateGoal(id, { current });
   }
 
 }
