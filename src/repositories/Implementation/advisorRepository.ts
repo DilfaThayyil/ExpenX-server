@@ -7,6 +7,8 @@ import reviewSchema, { IReview } from '../../models/reviewSchema';
 import slotSchema, { Slot } from '../../models/slotSchema';
 import { IAdvisorRepository } from '../Interface/IAdvisorRepository';
 
+
+
 export default class AdvisorRepository implements IAdvisorRepository {
     async findUserByEmail(email: string): Promise<any> {
         return await advisorSchema.findOne({ email });
@@ -43,10 +45,10 @@ export default class AdvisorRepository implements IAdvisorRepository {
         return !!result
     }
 
-    async fetchSlots(page: number, limit: number): Promise<{ slots: Slot[] | Slot; totalSlots: number }> {
+    async fetchSlots(advisorId:string,page: number, limit: number): Promise<{ slots: Slot[] | Slot; totalSlots: number }> {
         const skip = (page - 1) * limit
         const [slots, totalSlots] = await Promise.all([
-            slotSchema.find().skip(skip).limit(limit),
+            slotSchema.find({ "advisorId._id": advisorId }).skip(skip).limit(limit),
             slotSchema.countDocuments()
         ])
         return { slots, totalSlots }
@@ -121,7 +123,7 @@ export default class AdvisorRepository implements IAdvisorRepository {
         return await advisorSchema.findOneAndUpdate({ email }, { refreshToken: null }, { new: true });
     }
 
-    async addReplyToReview(reviewId: string, advisorId: string,text: string): Promise<IReview | null> {
+    async addReplyToReview(reviewId: string, advisorId: string, text: string): Promise<IReview | null> {
         const review = await reviewSchema.findByIdAndUpdate(
             reviewId,
             {

@@ -100,14 +100,11 @@ export default class AuthUserService implements IAuthUserService {
     try {
       console.log("setting new acessToken....")
       const decoded = verifyRefreshToken(refreshToken);
-      console.log("decoded-service : ",decoded)
       const user = decoded
-      console.log("user-service : ",user)
       if (!decoded || !user) {
         throw new Error("Invalid or expired refresh token");
       }
       const accessToken = generateAccessToken({ user });
-      console.log("new accessToken ===>",accessToken)
       return {
         accessToken,
         message: "Access token set successfully from service ",

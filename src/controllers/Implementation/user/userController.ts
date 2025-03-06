@@ -188,10 +188,9 @@ export default class UserController implements IUserController {
 
   async reportAdvisor(req: Request, res: Response): Promise<Response> {
     try {
+      const {slotId} = req.params
       const { userId, advisorId, reason, customReason } = req.body
-      console.log("req body : ", req.body)
-      const report = await this.userService.reportAdvisor(userId, advisorId, reason, customReason);
-      console.log("report-controller : ", report);
+      const report = await this.userService.reportAdvisor(slotId,userId, advisorId, reason, customReason);
       return res.status(HttpStatusCode.CREATED).json({ message: "Report submitted successfully", report });
     } catch (error) {
       return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: "Error submitting report", error });
@@ -224,10 +223,8 @@ export default class UserController implements IUserController {
 
   async createReview(req: Request, res: Response): Promise<Response> {
     try {
-      console.log("body : ",req.body)
       const { advisorId,userId, rating, review } = req.body;
       const newReview = await this.userService.createReview(advisorId, userId, rating, review);
-      console.log("newReview-cntrollr : ",newReview)
       return res.status(HttpStatusCode.CREATED).json({success: true,data: newReview});
     } catch (error) {
       return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({message: "Error creating reviews : ",error})
@@ -312,7 +309,7 @@ export default class UserController implements IUserController {
       return res.status(HttpStatusCode.OK).json({ message: 'Goal deleted successfully' });
     } catch (error) {
       console.error('Error deleting goal:', error);
-      return res.status(500).json({ message: 'Failed to delete goal' });
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: 'Failed to delete goal' });
     }
   }
 

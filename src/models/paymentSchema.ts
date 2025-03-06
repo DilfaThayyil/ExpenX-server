@@ -20,7 +20,7 @@ const PaymentSchema = new Schema({
   status: { 
     type: String, 
     enum: ['pending', 'completed', 'failed'],
-    default: 'pending'
+    default: 'completed'
   },
   stripePaymentIntentId: { type: String },
   stripeClientSecret: { type: String }

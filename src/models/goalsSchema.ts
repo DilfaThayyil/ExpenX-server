@@ -1,4 +1,3 @@
-// src/models/Goal.ts
 import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IGoal extends Document {
@@ -9,6 +8,7 @@ export interface IGoal extends Document {
   current: number;
   deadline: Date;
   category: string;
+  status: "inProgress" | "completed" | "not Started"
   createdAt: Date;
   updatedAt: Date;
 }
@@ -21,6 +21,7 @@ const GoalSchema: Schema = new Schema({
   current: { type: Number, default: 0, min: 0 },
   deadline: { type: Date, required: true },
   category: { type: String, default: 'savings' },
+  status: { type: String, enum:["inProgress","completed","not Started"],default:"inProgress"},
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 }, { timestamps: true });

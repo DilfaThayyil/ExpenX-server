@@ -44,6 +44,8 @@ import { IPaymentService } from '../services/Interface/user/IPaymentService';
 import { IPaymentRepository } from '../repositories/Interface/IPaymentRepository';
 import PaymentRepository from '../repositories/Implementation/paymentRepository';
 import { STRIPEKEY } from './env';
+import { IAdvDashboardRepo } from '../repositories/Interface/IDashboardRepository';
+import AdvDashboardRepo from '../repositories/Implementation/dashboardRepository';
 
 
 //user
@@ -59,6 +61,7 @@ container.register<IAuthAdvisorService>('IAuthAdvisorService',{useClass:AuthAdvi
 container.register<IAdvisorRepository>('IAdvisorRepository',{useClass:AdvisorRepository})
 container.register<IAdvisorController>('IAdvisorController',{useClass:AdvisorController})
 container.register<IAdvisorService>('IAdvisorService',{useClass:AdvisorService})
+container.register<IAdvDashboardRepo>('IAdvDashboardRepo',{useClass:AdvDashboardRepo})
 
 //admin
 container.register<IAdminController>('IAdminController',{useClass: AdminController})

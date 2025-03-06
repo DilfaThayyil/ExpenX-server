@@ -115,6 +115,9 @@ export default class UserRepository implements IUserRepository {
         const bookedSlot = await slotSchema.findOneAndUpdate({ _id: slotId }, slot, { new: true })
         return bookedSlot
     }
+    async updateSlot(slotId: string): Promise<Slot | null> {
+        return await slotSchema.findOneAndUpdate({_id:slotId},{status:"Cancelled"},{new: true})
+    }
     async createReport(data: IReport): Promise<IReport> {
         const report = await Report.create(data);
         return report;

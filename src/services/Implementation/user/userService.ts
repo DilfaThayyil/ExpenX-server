@@ -188,9 +188,10 @@ export default class UserService implements IUserService {
     }
   }
 
-  async reportAdvisor(userId: string, advisorId: string, reason: "Spam" | "Inappropriate Content" | "Harassment" | "Other", customReason?: string): Promise<IReport> {
+  async reportAdvisor(slotId:string,userId: string, advisorId: string, reason: "Spam" | "Inappropriate Content" | "Harassment" | "Other", customReason?: string): Promise<IReport> {
     const data: IReport = { userId: new Types.ObjectId(userId), advisorId: new Types.ObjectId(advisorId), reason, customReason, status: "pending", createdAt: new Date() };
     const report = await this.userRepository.createReport(data);
+    const updateSlot = await this.userRepository.updateSlot(slotId)
     return report;
   }
   async fetchSlotsByUser(userId: string, page: number, limit: number): Promise<{ slots: Slot[], totalPages: number }> {

@@ -10,4 +10,9 @@ export interface IAdvisorController {
   getBookedSlotsForAdvisor(req: Request, res: Response): Promise<Response>
   fetchReviews(req: Request, res: Response): Promise<Response>
   addReplyToReview(req: Request, res: Response): Promise<Response>
+  fetchDashboard(req: Request, res: Response): Promise<Response>
+  fetchRevenue(req: Request, res: Response): Promise<Response>
+  fetchClientGoals(req: Request, res: Response): Promise<Response>
+  getUpcomingAppointments(req: Request, res: Response): Promise<Response>
+  getRecentClients(req: Request,res:Response): Promise<Response>
 }

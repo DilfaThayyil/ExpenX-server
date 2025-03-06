@@ -2,6 +2,7 @@ import IAdvisor from "../../entities/advisorEntities";
 import { IReport } from "../../models/reportSchema";
 import { IReview } from "../../models/reviewSchema";
 import { Slot } from "../../models/slotSchema";
+import { IAppointment } from "../../services/Implementation/advisor/advisorService";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export interface IAdvisorRepository {
@@ -15,7 +16,7 @@ export interface IAdvisorRepository {
     updateAdvisorStatus(email:string, isBlock:boolean): Promise<void>
     createSlot(slotData:Slot):Promise<Slot>
     findExistingSlot(date:string,startTime:string):Promise<boolean>
-    fetchSlots(page:number,limit:number):Promise<{slots:Slot[] | Slot; totalSlots:number}>
+    fetchSlots(advisorId:string,page:number,limit:number):Promise<{slots:Slot[] | Slot; totalSlots:number}>
     findSlotById(slotId:string):Promise<Slot | null>
     updateSlot(slotId:string,slot:Slot):Promise<Slot | null>
     deleteSlot(slotId:string):Promise<boolean>
@@ -24,5 +25,6 @@ export interface IAdvisorRepository {
     fetchReports(page:number,limit:number):Promise<{reports:IReport[], totalReports:number}>
     fetchReviews(advisorId:string):Promise<IReview[]>
     addReplyToReview(reviewId:string,advisorId:string,text:string):Promise<IReview | null>
+    
   }
   

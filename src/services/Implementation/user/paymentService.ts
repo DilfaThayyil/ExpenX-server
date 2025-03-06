@@ -70,6 +70,8 @@ export default class PaymentService implements IPaymentService {
   async confirmPayment(paymentIntentId: string) {
     try {
       const paymentIntent = await this.stripe.paymentIntents.retrieve(paymentIntentId);
+      console.log("paymentIntent-serv : ",paymentIntent)
+      console.log("paymentIntect.status-serv : ",paymentIntent.status)
       if (paymentIntent.status === 'succeeded') {
         const payment = await this.paymentRepository.updatePaymentStatus(paymentIntentId, 'completed');
         return payment!;

@@ -1,4 +1,4 @@
-import {model, Schema, Document, Types } from "mongoose";
+import {model, Schema, Types } from "mongoose";
 
 export interface Slot {
   advisorId: {
