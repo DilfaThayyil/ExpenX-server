@@ -13,6 +13,7 @@ import advisorSchema from '../../models/advisorSchema';
 import IAdvisor from '../../entities/advisorEntities';
 import reviewSchema, { IReview } from '../../models/reviewSchema';
 import goalsSchema, { IGoal } from '../../models/goalsSchema';
+import categorySchema, { ICategory } from '../../models/categorySchema';
 
 
 export default class UserRepository implements IUserRepository {
@@ -36,6 +37,10 @@ export default class UserRepository implements IUserRepository {
 
     async createExpense(expenseData: IExpense): Promise<IExpense> {
         return expenseSchema.create(expenseData);
+    }
+
+    async getCategories(): Promise<ICategory[]> {
+        return await categorySchema.find()
     }
 
     async createGroup(groupData: IGroup): Promise<IGroup> {

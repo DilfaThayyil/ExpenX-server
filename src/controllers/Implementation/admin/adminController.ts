@@ -212,7 +212,6 @@ export default class AdminController implements IAdminController{
     }
   }
 
-
   async fetchReports(req:Request, res:Response):Promise<Response>{
     try{
       const page = parseInt(req.query.page as string) || 1;
@@ -224,6 +223,48 @@ export default class AdminController implements IAdminController{
     }catch(err){
       console.error(err)
       return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({error:"Error fetching reports"})
+    }
+  }
+
+  async getMonthlyTrends(req:Request,res:Response):Promise<Response>{
+    try{
+      const months = req.query.months ? parseInt(req.query.months as string) : 6
+      const data = await this.adminService.getMonthlyTrends(months)
+      return res.status(HttpStatusCode.OK).json(data)
+    }catch(err){
+      console.error(err)
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({error:'Failed to get monthly trends'})
+    }
+  }
+
+  async getExpenseCategories(req:Request,res:Response):Promise<Response>{
+    try{
+      const data = await this.adminService.getExpenseCategories()
+      console.log("data-expnxCatgry-contrll : ",data)
+      return res.status(HttpStatusCode.OK).json(data)
+    }catch(err){
+      console.error(err)
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({error:'Failed to retrieve expense categories'})
+    }
+  }
+
+  async getDashboardStats(req:Request,res:Response):Promise<Response>{
+    try{
+      const data = await this.adminService.getDashboardStats()
+      return res.status(HttpStatusCode.OK).json(data)
+    }catch(err){
+      console.error(err)
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({error:'Failed to retrieve dashboard stats'})
+    }
+  }
+
+  async getUserGrowth(req:Request,res:Response):Promise<Response>{
+    try{
+      const data = await this.adminService.getUserGrowth()
+      return res.status(HttpStatusCode.OK).json(data)
+    }catch(err){
+      console.error(err)
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({error:'Failed to retrieve user growth stats'})
     }
   }
 }

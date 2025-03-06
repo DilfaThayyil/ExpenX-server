@@ -16,6 +16,7 @@ router.post('/upload',AuthMiddleware.authorizeUser,uploadProfile.single('profile
 router.patch('/editProfile',AuthMiddleware.authorizeUser, (req, res) =>userController.updateUser(req, res))
 router.get('/getExpenses/:userId', AuthMiddleware.authorizeUser,(req,res)=>userController.getExpenses(req,res))
 router.post('/createExpense/:userId',AuthMiddleware.authorizeUser,(req,res)=>userController.createExpense(req,res))
+router.get('/getCategories',AuthMiddleware.authorizeUser,(req,res)=>userController.getCategories(req,res))
 router.post('/createGroup',AuthMiddleware.authorizeUser,(req,res)=>userController.createGroup(req,res))
 router.get('/getUserGroups/:userId',AuthMiddleware.authorizeUser,(req,res)=>userController.getUserGroups(req,res))
 router.post('/addMember/:groupId',AuthMiddleware.authorizeUser,(req,res)=>userController.addMember(req,res))

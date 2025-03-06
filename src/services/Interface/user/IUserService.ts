@@ -1,6 +1,7 @@
 import IAdvisor from "../../../entities/advisorEntities";
 import { IExpense } from "../../../entities/expenseEntities";
 import { IGroup, IGroupExpense } from "../../../entities/groupEntities";
+import { ICategory } from "../../../models/categorySchema";
 import { IGoal } from "../../../models/goalsSchema";
 import { IReport } from "../../../models/reportSchema";
 import { IReview } from "../../../models/reviewSchema";
@@ -11,6 +12,7 @@ export interface IUserService {
     updateUserProfile(userData: { profilePic: string; username: string; email: string; phone: string; country: string; language: string }): Promise<any>;
     getExpensesByUserId(userId: string): Promise<IExpense[]>;
     createExpense(expenseData: IExpense): Promise<IExpense>;
+    getCategories():Promise<any[]>
     createGroup(userId:string,name:string,members:[string]): Promise<IGroup>
     getUserGroups(userId:string): Promise<IGroup[]>;
     addMember(groupId:string,memberEmail:string):Promise<IGroup>

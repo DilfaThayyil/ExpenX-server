@@ -9,6 +9,7 @@ import { IReport } from '../../../models/reportSchema';
 import IAdvisor from '../../../entities/advisorEntities';
 import { IReview } from '../../../models/reviewSchema';
 import { IGoal } from '../../../models/goalsSchema';
+import { ICategory } from '../../../models/categorySchema';
 
 @injectable()
 export default class UserService implements IUserService {
@@ -35,6 +36,10 @@ export default class UserService implements IUserService {
 
   async createExpense(expenseData: IExpense): Promise<IExpense> {
     return this.userRepository.createExpense(expenseData);
+  }
+
+  async getCategories(): Promise<ICategory[]> {
+    return this.userRepository.getCategories()
   }
 
   async createGroup(userId: string, name: string, members: string[]): Promise<IGroup> {

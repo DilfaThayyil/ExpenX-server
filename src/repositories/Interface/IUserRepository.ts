@@ -3,6 +3,7 @@ import IAdvisor from "../../entities/advisorEntities";
 import { IExpense } from "../../entities/expenseEntities";
 import { GroupMember, IGroup, IGroupExpense } from "../../entities/groupEntities";
 import IUser from "../../entities/userEntities";
+import { ICategory } from "../../models/categorySchema";
 import { IGoal } from "../../models/goalsSchema";
 import { IReport } from "../../models/reportSchema";
 import { IReview } from "../../models/reviewSchema";
@@ -18,6 +19,7 @@ export interface IUserRepository {
   removeRefreshToken(email: string): Promise<any>;
   findExpensesByUserId(userId: string): Promise<IExpense[]>;
   createExpense(expenseData: IExpense): Promise<IExpense>;
+  getCategories():Promise<ICategory[]>
   createGroup(groupData: IGroup):Promise<IGroup>
   getUserGroups(email:string):Promise<IGroup[]>
   fetchUsers(page: number, limit: number): Promise<{ users: IUser[]; totalUsers: number }>;

@@ -11,5 +11,4 @@ export default interface IUser{
     phone: string;
     description: string;
     country: string;
-
   }

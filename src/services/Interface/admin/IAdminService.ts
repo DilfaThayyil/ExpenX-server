@@ -2,6 +2,7 @@ import IAdvisor from "../../../entities/advisorEntities";
 import IUser from "../../../entities/userEntities";
 import { ICategory } from "../../../models/categorySchema";
 import { IReport } from "../../../models/reportSchema";
+import { CategoryData, DashboardStats, MonthlyData, UserGrowthData } from "../../../repositories/Implementation/adminRepository";
 
 export interface IAdminService {
   validateCredentials(email:string,password:string):boolean
@@ -16,4 +17,8 @@ export interface IAdminService {
   updateCategory(id:string,name:string):Promise<ICategory | null>
   deleteCategory(id:string):Promise<ICategory | null>
   fetchReports(page:number,limit:number):Promise<{reports:IReport[], totalReports:number}>
+  getMonthlyTrends(months?:number):Promise<MonthlyData[]>
+  getExpenseCategories():Promise<CategoryData[]>
+  getDashboardStats():Promise<DashboardStats>
+  getUserGrowth():Promise<UserGrowthData[]>
 }

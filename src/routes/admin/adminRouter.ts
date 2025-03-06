@@ -18,5 +18,9 @@ router.patch("/updateCategory/:id",AdminAuthMiddleware.authorizeAdmin, (req,res)
 router.delete("/deleteCategory/:id",AdminAuthMiddleware.authorizeAdmin, (req,res)=>adminController.deleteCategory(req,res))
 router.post("/logout",(req,res)=>adminController.adminLogout(req,res))
 router.get("/reports",AdminAuthMiddleware.authorizeAdmin, (req,res)=>adminController.fetchReports(req,res))
+router.get("/getMonthlyTrends",AdminAuthMiddleware.authorizeAdmin,(req,res)=>adminController.getMonthlyTrends(req,res))
+router.get("/getExpenseCategories",AdminAuthMiddleware.authorizeAdmin,(req,res)=>adminController.getExpenseCategories(req,res))
+router.get("/getDashboardStats",AdminAuthMiddleware.authorizeAdmin,(req,res)=>adminController.getDashboardStats(req,res))
+router.get("/getUserGrowth",AdminAuthMiddleware.authorizeAdmin,(req,res)=>adminController.getUserGrowth(req,res))
 
 export default router;

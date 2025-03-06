@@ -4,12 +4,12 @@ import { IUserRepository } from "../../../repositories/Interface/IUserRepository
 import IUser from "../../../entities/userEntities";
 import { IAdvisorRepository } from "../../../repositories/Interface/IAdvisorRepository";
 import bcrypt from 'bcrypt';
-import { generateAccessToken, generateRefreshToken } from "../../../utils/jwt";
 import { ICategoryRepository } from "../../../repositories/Interface/ICategoryRepository";
 import { ICategory } from "../../../models/categorySchema";
 import { ADMINEMAIL, ADMINPASSWORD } from "../../../config/env";
-import IAdvisor from "../../../entities/advisorEntities";
 import { IReport } from "../../../models/reportSchema";
+import { IAdminRepository } from "../../../repositories/Interface/IAdminRepository";
+import { CategoryData, DashboardStats, MonthlyData, UserGrowthData } from "../../../repositories/Implementation/adminRepository";
 
 
 
@@ -18,50 +18,23 @@ export default class AdminService implements IAdminService {
     private userRepository: IUserRepository
     private advisorRepository: IAdvisorRepository;
     private categoryRepository: ICategoryRepository
+    private adminRepository: IAdminRepository
 
     constructor(
         @inject('IUserRepository') userRepository: IUserRepository,
         @inject('IAdvisorRepository') advisorRepository: IAdvisorRepository,
-        @inject('ICategoryRepository') categoryRepository: ICategoryRepository
+        @inject('ICategoryRepository') categoryRepository: ICategoryRepository,
+        @inject('IAdminRepository') adminRepository: IAdminRepository
     ) {
         this.userRepository = userRepository
         this.advisorRepository = advisorRepository
         this.categoryRepository = categoryRepository
+        this.adminRepository = adminRepository
     }
 
     validateCredentials(email: string, password: string): boolean {
         return email === ADMINEMAIL && password === ADMINPASSWORD;
     }
-
-    // async adminLogin(email: string, password: string): Promise<{ accessToken: string; refreshToken: string; admin: any }> {
-    //     const admin = await this.userRepository.findAdmin();
-    //     console.log("admin-service : ", admin);
-    //     if (!admin) {
-    //         throw new Error('No admin found');
-    //     }
-    //     if (!admin.password) {
-    //         admin.email = email;
-    //         admin.password = await bcrypt.hash(password, 10);
-    //         const updatedUser = await this.userRepository.updateAdmin(admin)
-    //         console.log('Admin credentials saved : ',updatedUser);
-    //     } else {
-    //         const validPassword = await bcrypt.compare(password, admin.password);
-    //         if (!validPassword) {
-    //             throw new Error('Invalid credentials');
-    //         }
-    //         console.log("isValidPassword : ", validPassword);
-    //     }
-    //     const accessToken = generateAccessToken(admin);
-    //     const refreshToken = generateRefreshToken(admin);
-    //     console.log("accessToken : ", accessToken);
-    //     console.log("refreshToken : ", refreshToken);
-    //     admin.accessToken = accessToken;
-    //     admin.refreshToken = refreshToken;
-    //     console.log("admin-service : ",admin)
-    //     return { accessToken, refreshToken, admin };
-    // }
-
-
 
     async fetchUsers(page: number, limit: number): Promise<{ users: IUser[]; totalPages: number }> {
         console.log("service....")
@@ -71,7 +44,6 @@ export default class AdminService implements IAdminService {
         return { users, totalPages };
     }
 
-
     async fetchAdvisors(page: number, limit: number): Promise<{ users: IUser[]; totalPages: number }> {
         console.log("service....")
         const { users, totalUsers } = await this.advisorRepository.fetchAdvisors(page, limit);
@@ -79,7 +51,6 @@ export default class AdminService implements IAdminService {
         console.log()
         return { users, totalPages };
     }
-
 
     async updateAdmin(name: string, email: string, password: string): Promise<any> {
         try {
@@ -95,7 +66,6 @@ export default class AdminService implements IAdminService {
         }
     }
 
-
     async updateUserBlockStatus(action: string, email: string): Promise<{ message: string; error?: string }> {
         try {
             const isBlocked = action === 'block'
@@ -107,7 +77,6 @@ export default class AdminService implements IAdminService {
         }
     }
 
-
     async updateAdvisorBlockStatus(action: string, email: string): Promise<{ message: string; error?: string }> {
         try {
             const isBlocked = action === 'block'
@@ -118,7 +87,6 @@ export default class AdminService implements IAdminService {
             return { message: 'Failed to update advisor status ', error: errorMessage }
         }
     }
-
 
     async fetchCategories(page: number, limit: number): Promise<{ categories: ICategory[]; totalPages: number }> {
         console.log("service-category..")
@@ -154,4 +122,43 @@ export default class AdminService implements IAdminService {
         console.log("fetchReport-service : ",report)
         return report
     }
+
+    async getMonthlyTrends(months: number = 6): Promise<MonthlyData[]> {
+        const endDate = new Date();
+        const startDate = new Date();
+        startDate.setMonth(startDate.getMonth() - months);
+        const data = await this.adminRepository.getMonthlyTrends(startDate, endDate);
+        const result: MonthlyData[] = [];
+        for (let i = 0; i < months; i++) {
+          const date = new Date();
+          date.setMonth(date.getMonth() - (months - 1 - i));
+          const monthStr = date.toLocaleString('default', { month: 'short' });
+          const existingData = data.find(item => item.month === monthStr);
+          if (existingData) {
+            result.push(existingData);
+          } else {
+            result.push({
+              month: monthStr,
+              expenses: 0,
+              income: 0,
+              users: 0
+            });
+          }
+        }
+        return result;
+      }
+    
+      async getExpenseCategories(): Promise<CategoryData[]> {
+        const data = await this.adminRepository.getExpenseCategories();
+        console.log("data-expenseCatgry-service : ",data)
+        return data
+      }
+    
+      async getDashboardStats(): Promise<DashboardStats> {
+        return this.adminRepository.getDashboardStats();
+      }
+
+      async getUserGrowth(): Promise<UserGrowthData[]> {
+        return this.adminRepository.getUserGrowth();
+      }
 }

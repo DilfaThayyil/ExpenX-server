@@ -94,6 +94,16 @@ export default class UserController implements IUserController {
     }
   }
 
+  async getCategories(req: Request,res:Response):Promise<Response>{
+    try{
+      const categories = await this.userService.getCategories()
+      return res.status(HttpStatusCode.OK).json(categories)
+    }catch(err){
+      console.error(err)
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({messag:'Error fetching categories'})
+    }
+  }
+
   async createGroup(req: Request, res: Response): Promise<Response> {
     try {
       console.log('req.body : ', req.body)

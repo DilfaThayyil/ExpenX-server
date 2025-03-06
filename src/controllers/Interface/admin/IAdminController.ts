@@ -13,4 +13,8 @@ export interface IAdminController{
     deleteCategory(req:Request, res:Response):Promise<Response>
     adminLogout(req:Request, res:Response): Promise<Response>
     fetchReports(req:Request, res:Response): Promise<Response>
+    getMonthlyTrends(req:Request, res:Response): Promise<Response>
+    getExpenseCategories(req:Request,res:Response): Promise<Response>
+    getDashboardStats(req:Request,res:Response): Promise<Response>
+    getUserGrowth(req:Request,res:Response): Promise<Response>
 }

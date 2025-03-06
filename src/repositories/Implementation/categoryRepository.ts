@@ -33,4 +33,8 @@ export class CategoryRepository implements ICategoryRepository{
         console.log("findingCateg...")
         return await categorySchema.findOne({name:name})
     }
+
+    async getCategories():Promise<ICategory[]>{
+        return await categorySchema.find()
+    }
 }

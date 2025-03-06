@@ -46,6 +46,8 @@ import PaymentRepository from '../repositories/Implementation/paymentRepository'
 import { STRIPEKEY } from './env';
 import { IAdvDashboardRepo } from '../repositories/Interface/IDashboardRepository';
 import AdvDashboardRepo from '../repositories/Implementation/dashboardRepository';
+import { IAdminRepository } from '../repositories/Interface/IAdminRepository';
+import AdminRepository from '../repositories/Implementation/adminRepository';
 
 
 //user
@@ -66,6 +68,7 @@ container.register<IAdvDashboardRepo>('IAdvDashboardRepo',{useClass:AdvDashboard
 //admin
 container.register<IAdminController>('IAdminController',{useClass: AdminController})
 container.register<IAdminService>('IAdminService',{useClass:AdminService})
+container.register<IAdminRepository>('IAdminRepository',{useClass:AdminRepository})
 
 //chat
 container.register<IChatController>('IChatController',{useClass:ChatController})

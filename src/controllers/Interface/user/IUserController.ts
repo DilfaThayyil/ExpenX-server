@@ -5,6 +5,7 @@ export interface IUserController {
   updateUser(req: Request, res: Response): Promise<void>;
   getExpenses(req: Request, res: Response): Promise<void>;
   createExpense(req: Request, res: Response): Promise<void>;
+  getCategories(req: Request, res: Response): Promise<Response>;
   createGroup(req: Request, res: Response): Promise<Response>
   getUserGroups(req: Request, res:Response): Promise<Response>
   addMember(req: Request, res:Response): Promise<void>
