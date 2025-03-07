@@ -10,6 +10,7 @@ import IAdvisor from '../../../entities/advisorEntities';
 import { IReview } from '../../../models/reviewSchema';
 import { IGoal } from '../../../models/goalsSchema';
 import { ICategory } from '../../../models/categorySchema';
+import { DashboardData } from '../../../repositories/Implementation/userRepository';
 
 @injectable()
 export default class UserService implements IUserService {
@@ -242,6 +243,11 @@ export default class UserService implements IUserService {
     const newAmount = goal.current + amount;
     const current = Math.max(0, Math.min(goal.target, newAmount));
     return this.userRepository.updateGoal(id, { current });
+  }
+
+  async getDashboardData(userId:string):Promise<DashboardData>{
+    const data = await this.userRepository.getDashboardData(userId)
+    return data
   }
 
 }

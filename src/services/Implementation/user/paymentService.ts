@@ -16,7 +16,7 @@ interface Payment {
 
 @injectable()
 export default class PaymentService implements IPaymentService {
-  private stripe: Stripe;
+  private stripe: Stripe; 
   private paymentRepository: IPaymentRepository;
 
   constructor(
@@ -44,7 +44,6 @@ export default class PaymentService implements IPaymentService {
       if (!paymentIntent.client_secret) {
         throw new Error("Failed to generate payment client secret");
       }
-
       const payment = await this.paymentRepository.createPayment({
         slotId: slotObjectId,
         userId: userObjectId,

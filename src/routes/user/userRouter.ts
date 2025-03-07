@@ -41,6 +41,6 @@ router.get('/getGoals/:userId',AuthMiddleware.authorizeUser,(req,res)=>userContr
 router.patch('/updateGoal/:id',AuthMiddleware.authorizeUser,(req,res)=>userController.updateGoal(req,res))
 router.delete('/deleteGoal/:id',AuthMiddleware.authorizeUser,(req,res)=>userController.deleteGoal(req,res))
 router.patch('/updateGoalProgress/:id',AuthMiddleware.authorizeUser,(req,res)=>userController.updateGoalProgress(req,res))
-
+router.get('/getDashboardData/:userId',AuthMiddleware.authorizeUser,(req,res)=>userController.getDashboardData(req,res))
 
 export default router

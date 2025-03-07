@@ -9,6 +9,8 @@ export interface Payment extends Document {
   status: 'pending' | 'completed' | 'failed';
   stripePaymentIntentId: string;
   stripeClientSecret: string;
+  createdAt:Date
+  updatedAt:Date
 }
 
 const PaymentSchema = new Schema({

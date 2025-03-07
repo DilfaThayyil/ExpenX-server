@@ -20,4 +20,5 @@ export interface IUserController {
   updateGoal(req: Request, res:Response): Promise<Response>
   deleteGoal(req: Request, res:Response): Promise<Response>
   updateGoalProgress(req: Request, res:Response): Promise<Response>
+  getDashboardData(req: Request, res:Response): Promise<Response>
 }

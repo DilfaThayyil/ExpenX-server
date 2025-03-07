@@ -8,15 +8,12 @@ import { IGoal } from "../../models/goalsSchema";
 import { IReport } from "../../models/reportSchema";
 import { IReview } from "../../models/reviewSchema";
 import { Slot } from "../../models/slotSchema";
+import { DashboardData } from "../Implementation/userRepository";
 
 export interface IUserRepository {
   findUserByEmail(email: string): Promise<any>;
   createUser(userData: any): Promise<any>;
   updateUser(userData: any, email: string): Promise<any>;
-  findUserByRefreshToken(refreshToken: string): Promise<any>;
-  updateRefreshToken(refreshToken: string, email: string): Promise<any>;
-  findUserByPhoneNumber(phoneNumber: string): Promise<any>;
-  removeRefreshToken(email: string): Promise<any>;
   findExpensesByUserId(userId: string): Promise<IExpense[]>;
   createExpense(expenseData: IExpense): Promise<IExpense>;
   getCategories():Promise<ICategory[]>
@@ -43,4 +40,5 @@ export interface IUserRepository {
   getGoalById(id:string):Promise<IGoal | null>
   updateGoal(id:string,goalData:Partial<IGoal>):Promise<IGoal | null>
   deleteGoal(id:string):Promise<boolean | null>
+  getDashboardData(userId:string):Promise<DashboardData>
 }

@@ -6,6 +6,7 @@ import { IGoal } from "../../../models/goalsSchema";
 import { IReport } from "../../../models/reportSchema";
 import { IReview } from "../../../models/reviewSchema";
 import { Slot } from "../../../models/slotSchema";
+import { DashboardData } from "../../../repositories/Implementation/userRepository";
 
 export interface IUserService {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -28,4 +29,5 @@ export interface IUserService {
     updateGoal(id: string, goalData: Partial<IGoal>): Promise<IGoal | null>
     deleteGoal(id: string):Promise<boolean | null>
     updateGoalProgress(id:string,amount:number):Promise<IGoal | null>
+    getDashboardData(userId:string):Promise<DashboardData>
 }

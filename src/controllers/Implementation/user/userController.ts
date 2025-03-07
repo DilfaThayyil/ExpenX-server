@@ -344,4 +344,15 @@ export default class UserController implements IUserController {
       return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: 'Failed to update goal progress' });
     }
   }
+
+  async getDashboardData(req:Request,res:Response):Promise<Response>{
+    try{
+      const userId = req.params.userId
+      const data = await this.userService.getDashboardData(userId)
+      return res.status(HttpStatusCode.OK).json(data)
+    }catch(err){
+      console.error(err)
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({error:'Failed to fetch data for dashboard'})
+    }
+  }
 }
