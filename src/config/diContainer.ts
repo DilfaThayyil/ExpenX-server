@@ -48,6 +48,12 @@ import { IAdvDashboardRepo } from '../repositories/Interface/IDashboardRepositor
 import AdvDashboardRepo from '../repositories/Implementation/dashboardRepository';
 import { IAdminRepository } from '../repositories/Interface/IAdminRepository';
 import AdminRepository from '../repositories/Implementation/adminRepository';
+import { IExpenseController } from '../controllers/Interface/user/IExpenseController';
+import ExpenseController from '../controllers/Implementation/user/expenseController';
+import { IExpenseService } from '../services/Interface/user/IExpenseService';
+import ExpenseService from '../services/Implementation/user/expenseService';
+import { IExpenseRepository } from '../repositories/Interface/IExpenseRepository';
+import ExpenseRepository from '../repositories/Implementation/expenseRepository';
 
 
 //user
@@ -83,3 +89,8 @@ container.register<IPaymentController>('IPaymentController',{useClass:PaymentCon
 container.register<IPaymentService>('IPaymentService',{useClass:PaymentService})
 container.register<IPaymentRepository>('IPaymentRepository',{useClass:PaymentRepository})
 container.register('StripeSecretKey', { useValue: STRIPEKEY });
+
+//expense
+container.register<IExpenseController>('IExpenseController',{useClass:ExpenseController})
+container.register<IExpenseService>('IExpenseService',{useClass:ExpenseService})
+container.register<IExpenseRepository>('IExpenseRepository',{useClass:ExpenseRepository})

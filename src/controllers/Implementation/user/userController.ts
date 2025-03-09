@@ -355,4 +355,6 @@ export default class UserController implements IUserController {
       return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({error:'Failed to fetch data for dashboard'})
     }
   }
+
+  
 }

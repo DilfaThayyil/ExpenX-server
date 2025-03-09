@@ -5,10 +5,12 @@ import { IUserController } from '../../controllers/Interface/user/IUserControlle
 import { IChatController } from '../../controllers/Interface/chat/IChatController';
 import { IPaymentController } from '../../controllers/Interface/user/IPaymentController';
 import { AuthMiddleware } from '../../middleware/authMiddleware';
+import { IExpenseController } from '../../controllers/Interface/user/IExpenseController';
 
 const userController = container.resolve<IUserController>('IUserController');
 const chatController = container.resolve<IChatController>('IChatController')
 const paymentController = container.resolve<IPaymentController>('IPaymentController')
+const expenseController = container.resolve<IExpenseController>('IExpenseController')
 const router = Router()
 
 
@@ -42,5 +44,6 @@ router.patch('/updateGoal/:id',AuthMiddleware.authorizeUser,(req,res)=>userContr
 router.delete('/deleteGoal/:id',AuthMiddleware.authorizeUser,(req,res)=>userController.deleteGoal(req,res))
 router.patch('/updateGoalProgress/:id',AuthMiddleware.authorizeUser,(req,res)=>userController.updateGoalProgress(req,res))
 router.get('/getDashboardData/:userId',AuthMiddleware.authorizeUser,(req,res)=>userController.getDashboardData(req,res))
+router.get('/exportExpense/:userId',AuthMiddleware.authorizeUser,(req,res)=>expenseController.exportExpense(req,res))
 
 export default router
