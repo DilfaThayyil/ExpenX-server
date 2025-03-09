@@ -30,14 +30,7 @@ export default class UserService implements IUserService {
     }
   }
 
-  async getExpensesByUserId(userId: string): Promise<IExpense[]> {
-    console.log("userId from service : ", userId)
-    return this.userRepository.findExpensesByUserId(userId);
-  }
-
-  async createExpense(expenseData: IExpense): Promise<IExpense> {
-    return this.userRepository.createExpense(expenseData);
-  }
+  
 
   async getCategories(): Promise<ICategory[]> {
     return this.userRepository.getCategories()

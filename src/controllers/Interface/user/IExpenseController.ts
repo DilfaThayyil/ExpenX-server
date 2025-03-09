@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 
-export interface IExpenseController{
-    exportExpense(req: Request, res:Response): Promise<Response | void>
+export interface IExpenseController {
+    getExpenses(req: Request, res: Response): Promise<void>;
+    createExpense(req: Request, res: Response): Promise<void>;
+    exportExpense(req: Request, res: Response): Promise<Response | void>
 }

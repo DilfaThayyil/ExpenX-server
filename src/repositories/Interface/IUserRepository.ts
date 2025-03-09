@@ -14,8 +14,6 @@ export interface IUserRepository {
   findUserByEmail(email: string): Promise<any>;
   createUser(userData: any): Promise<any>;
   updateUser(userData: any, email: string): Promise<any>;
-  findExpensesByUserId(userId: string): Promise<IExpense[]>;
-  createExpense(expenseData: IExpense): Promise<IExpense>;
   getCategories():Promise<ICategory[]>
   createGroup(groupData: IGroup):Promise<IGroup>
   getUserGroups(email:string):Promise<IGroup[]>

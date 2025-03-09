@@ -2,6 +2,7 @@ import { inject, injectable } from "tsyringe";
 import { IExpenseController } from "../../Interface/user/IExpenseController";
 import { IExpenseService } from "../../../services/Interface/user/IExpenseService";
 import { Request, Response } from "express";
+import { HttpStatusCode } from "../../../utils/httpStatusCode";
 
 @injectable()
 export default class ExpenseController implements IExpenseController {
@@ -10,6 +11,42 @@ export default class ExpenseController implements IExpenseController {
     constructor(@inject('IExpenseService') expenseService: IExpenseService) {
         this.expenseService = expenseService
     }
+
+    async getExpenses(req: Request, res: Response): Promise<void> {
+        try {
+          const { userId } = req.params;
+          const expenses = await this.expenseService.getExpensesByUserId(userId);
+          res.status(HttpStatusCode.OK).json(expenses);
+        } catch (error) {
+          console.error('Error fetching expenses:', error);
+          res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: 'Error fetching expenses' });
+        }
+      }
+    
+      async createExpense(req: Request, res: Response): Promise<void> {
+        try {
+          // console.log('dillll')
+          const { userId } = req.params
+          const { date, amount, category, description } = req.body;
+          if (!date || !amount || !category || !description) {
+            res.status(HttpStatusCode.BAD_REQUEST).json({ error: 'All fields are required' });
+            return;
+          }
+          const newExpense = await this.expenseService.createExpense({
+            userId: userId,
+            date,
+            amount,
+            category,
+            description,
+          });
+          // console.log("new expense: ",newExpense)
+          res.status(HttpStatusCode.CREATED).json(newExpense);
+        } catch (error) {
+          console.error('Error creating expense:', error);
+          res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: 'Error creating expense' });
+        }
+      }
+    
 
     async exportExpense(req: Request, res: Response): Promise<Response | void> {
         try {

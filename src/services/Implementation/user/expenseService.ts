@@ -14,6 +14,16 @@ export default class ExpenseService implements IExpenseService {
     constructor(@inject('IExpenseRepository') expenseRepository: IExpenseRepository) {
         this.expenseRepository = expenseRepository
     }
+
+    async getExpensesByUserId(userId: string): Promise<IExpense[]> {
+        console.log("userId from service : ", userId)
+        return this.expenseRepository.findExpensesByUserId(userId);
+      }
+    
+      async createExpense(expenseData: IExpense): Promise<IExpense> {
+        return this.expenseRepository.createExpense(expenseData);
+      }
+
     async exportExpensesAsPDF(userId: string): Promise<NodeJS.ReadableStream> {
         try {
             const expenses = await this.expenseRepository.findByUserId(userId);

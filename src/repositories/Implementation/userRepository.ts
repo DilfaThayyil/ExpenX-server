@@ -74,13 +74,7 @@ export default class UserRepository implements IUserRepository {
     async updateUser(userData: any, email: string): Promise<any> {
         return await userSchema.findOneAndUpdate({ email }, userData, { new: true });
     }
-    async findExpensesByUserId(userId: string): Promise<IExpense[]> {
-        const expense = await expenseSchema.find({ userId });
-        return expense
-    }
-    async createExpense(expenseData: IExpense): Promise<IExpense> {
-        return expenseSchema.create(expenseData);
-    }
+
     async getCategories(): Promise<ICategory[]> {
         return await categorySchema.find()
     }

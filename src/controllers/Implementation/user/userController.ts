@@ -59,41 +59,7 @@ export default class UserController implements IUserController {
   }
 
 
-  async getExpenses(req: Request, res: Response): Promise<void> {
-    try {
-      const { userId } = req.params;
-      const expenses = await this.userService.getExpensesByUserId(userId);
-      res.status(HttpStatusCode.OK).json(expenses);
-    } catch (error) {
-      console.error('Error fetching expenses:', error);
-      res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: 'Error fetching expenses' });
-    }
-  }
-
-  async createExpense(req: Request, res: Response): Promise<void> {
-    try {
-      // console.log('dillll')
-      const { userId } = req.params
-      const { date, amount, category, description } = req.body;
-      if (!date || !amount || !category || !description) {
-        res.status(HttpStatusCode.BAD_REQUEST).json({ error: 'All fields are required' });
-        return;
-      }
-      const newExpense = await this.userService.createExpense({
-        userId: userId,
-        date,
-        amount,
-        category,
-        description,
-      });
-      // console.log("new expense: ",newExpense)
-      res.status(HttpStatusCode.CREATED).json(newExpense);
-    } catch (error) {
-      console.error('Error creating expense:', error);
-      res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: 'Error creating expense' });
-    }
-  }
-
+  
   async getCategories(req: Request,res:Response):Promise<Response>{
     try{
       const categories = await this.userService.getCategories()
