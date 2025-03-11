@@ -161,18 +161,19 @@ export default class AdminController implements IAdminController{
     }
   }
 
-  async addCategory(req:Request, res:Response):Promise<Response>{
-    try{
-      const {name} = req.body
-      const category = await this.adminService.addCategory(name)
-      // console.log("category-controll : ",category)
-      return res.status(HttpStatusCode.CREATED).json({success:true,data:{category}})
-    }catch(err){
-      console.error(err)
-      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({error:"Internal server error"})
-      
+  async addCategory(req: Request, res: Response): Promise<Response> {
+    try {
+        const { name } = req.body;
+        const category = await this.adminService.addCategory(name);
+        return res.status(HttpStatusCode.CREATED).json({ success: true, data: { category } });
+    } catch (err: any) {
+        console.error(err);
+        if (err.message === "CATEGORY_EXISTS") {
+            return res.status(HttpStatusCode.BAD_REQUEST).json({ success: false, error: "Category already exists" });
+        }
+        return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, error: "Internal server error" });
     }
-  }
+}
 
   async updateCategory(req:Request,res:Response):Promise<Response>{
     try{

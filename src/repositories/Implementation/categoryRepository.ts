@@ -7,7 +7,7 @@ export class CategoryRepository implements ICategoryRepository{
         console.log("repo-category...")
         const skip = (page - 1) * limit;
         const [categories, totalCategories] = await Promise.all([
-            categorySchema.find().skip(skip).limit(limit),
+            categorySchema.find().sort({ createdAt: -1 }).skip(skip).limit(limit),
             categorySchema.countDocuments(),
         ]);
         console.log("skip :", skip)
