@@ -161,7 +161,7 @@ export default class AdvDashboardRepo implements IAdvDashboardRepo {
 
             date: slot.date,
             startTime: slot.startTime,
-            endTime: slot.endTime,
+            fee: slot.fee,
             duration: slot.duration,
             maxBookings: slot.maxBookings,
             status: slot.status,

@@ -9,7 +9,7 @@ export interface Slot {
   } | {};
   date: string;
   startTime: string;
-  endTime: string;
+  fee: number;
   duration: number;  
   maxBookings: number;
   status: 'Available' | 'Booked' | 'Cancelled';
@@ -37,7 +37,7 @@ const SlotSchema: Schema = new Schema(
     },
     date: { type: String},
     startTime: { type: String},
-    endTime: { type: String},
+    fee: { type: Number},
     duration: { type: Number},
     maxBookings: { type: Number},
     status: { 

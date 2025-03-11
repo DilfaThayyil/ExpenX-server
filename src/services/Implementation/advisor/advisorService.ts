@@ -16,7 +16,7 @@ export interface IAppointment {
   };
   date: string;
   startTime: string;
-  endTime: string;
+  fee: number;
   duration: number;
   maxBookings: number;
   status: "Available" | "Booked" | "Cancelled";
@@ -87,7 +87,7 @@ export default class AdvisorService implements IAdvisorService {
             },
             date: slotData.date,
             startTime: slotData.startTime,
-            endTime: slotData.endTime,
+            fee: slotData.fee,
             duration: slotData.duration,
             maxBookings: slotData.maxBookings,
             status: slotData.status,
