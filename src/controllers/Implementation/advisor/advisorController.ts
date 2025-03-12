@@ -19,7 +19,7 @@ export default class AdvisorController implements IAdvisorController {
     try {
       const file = req.file;
       if (!file) {
-        res.status(400).json({ error: 'No file uploaded' });
+        res.status(HttpStatusCode.BAD_REQUEST).json({ error: 'No file uploaded' });
         return
       }
       const result = await cloudinary.uploader.upload(file.path, {
@@ -38,7 +38,7 @@ export default class AdvisorController implements IAdvisorController {
     try {
       const { profilePic, username, email, phone, country, language } = req.body;
       if (!email || !username) {
-        res.status(400).json({ error: 'Email and username are required' });
+        res.status(HttpStatusCode.BAD_REQUEST).json({ error: 'Email and username are required' });
       }
       const updatedUser = await this.advisorService.updateUserProfile({
         profilePic,

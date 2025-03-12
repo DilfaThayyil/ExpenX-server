@@ -70,7 +70,7 @@ export default class ExpenseController implements IExpenseController {
 
                     pdfStream.on('error', (err) => {
                         console.error("PDF Stream Error:", err);
-                        res.status(500).json({ message: 'Failed to generate PDF' });
+                        res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: 'Failed to generate PDF' });
                     });
 
                     return;
@@ -95,11 +95,11 @@ export default class ExpenseController implements IExpenseController {
 
 
                 default:
-                    return res.status(400).json({ message: 'Invalid export format' });
+                    return res.status(HttpStatusCode.BAD_REQUEST).json({ message: 'Invalid export format' });
             }
         } catch (error) {
             console.error('Export error:', error);
-            return res.status(500).json({ message: 'Failed to export expenses' });
+            return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: 'Failed to export expenses' });
         }
     }
 }

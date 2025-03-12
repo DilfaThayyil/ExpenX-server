@@ -5,6 +5,7 @@ import {IMessage} from "../../../models/messageSchema";
 import IAdvisor from "../../../entities/advisorEntities";
 import IUser from "../../../entities/userEntities";
 import { IChat } from "../../../models/chatSchema";
+import { INotification } from "../../../models/notificationSchema";
 
 
 
@@ -53,6 +54,46 @@ export default class ChatService implements IChatService {
       async getAllChats(): Promise<IChat[]> {
         return await this.chatRepository.getAllChats();
       }
+
+      // async createNotification(
+      //   receiverId: string, 
+      //   senderId: string, 
+      //   message: string, 
+      //   type: "message" | "payment" | "Appointment" | "other"
+      // ): Promise<INotification> {
+      //   const notification = await this.chatRepository.createNotification({
+      //     receiverId,
+      //     senderId,
+      //     message,
+      //     type,
+      //     isRead: false,
+      //     createdAt: new Date()
+      //   });
+        
+      //   this.sendRealTimeNotification(notification);
+        
+      //   return notification;
+      // }
+    
+      async getNotifications(userId: string): Promise<INotification[]> {
+        return await this.chatRepository.getNotificationsByUserId(userId);
+      }
+    
+      async markAsRead(notificationId: string): Promise<INotification | null> {
+        return await this.chatRepository.markAsRead(notificationId);
+      }
+    
+      async markAllAsRead(userId: string): Promise<boolean> {
+        return await this.chatRepository.markAllAsRead(userId);
+      }
+    
+      async deleteNotification(notificationId: string): Promise<boolean> {
+        return await this.chatRepository.deleteNotification(notificationId);
+      }
+    
+      // sendRealTimeNotification(notification: INotification): void {
+      //   io.to(`user_${notification.receiverId}`).emit('new_notification', notification);
+      // }
 
     // async findLists(id: string): Promise<IFriendsLists | null> {
     //     const lists = await this.chatRepository.findUsersConnections(id)

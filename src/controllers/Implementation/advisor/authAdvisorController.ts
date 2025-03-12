@@ -63,7 +63,7 @@ export default class AuthAdvisorController implements IAuthAdvisorController {
       } else if (err instanceof ValidationError) {
         return res.status(HttpStatusCode.BAD_REQUEST).json({ success: false, message: 'Invalid OTP.' });
       } else if (err instanceof ExpiredError) {
-        return res.status(410).json({ success: false, message: 'OTP expired.' });
+        return res.status(HttpStatusCode.GONE).json({ success: false, message: 'OTP expired.' });
       } else {
         const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
         return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: errorMessage });
@@ -132,7 +132,7 @@ export default class AuthAdvisorController implements IAuthAdvisorController {
       } else if (err instanceof ValidationError) {
         res.status(HttpStatusCode.BAD_REQUEST).json({ success: false, message: 'The OTP you entered is incorrect.' });
       } else if (err instanceof ExpiredError) {
-        res.status(410).json({ success: false, message: 'The OTP has expired. Please request a new one.' });
+        res.status(HttpStatusCode.GONE).json({ success: false, message: 'The OTP has expired. Please request a new one.' });
       } else {
         const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
         res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: errorMessage });

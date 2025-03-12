@@ -113,5 +113,86 @@ export default class ChatController implements IChatController {
     }
   }
 
+  async getNotifications(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = req.params.userId
+      
+      if (!userId) {
+        res.status(HttpStatusCode.BAD_REQUEST).json({ message: 'User ID is required' });
+        return;
+      }
+      
+      const notifications = await this.chatService.getNotifications(userId);
+      console.log("getNotifications-contrll : ",notifications)
+      res.status(HttpStatusCode.OK).json(notifications);
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+      res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: 'Failed to fetch notifications' });
+    }
+  }
+
+  async markAsRead(req: Request, res: Response): Promise<void> {
+    try {
+      const { notificationId } = req.params;
+      
+      if (!notificationId) {
+        res.status(HttpStatusCode.BAD_REQUEST).json({ message: 'Notification ID is required' });
+        return;
+      }
+      
+      const updatedNotification = await this.chatService.markAsRead(notificationId);
+      
+      if (!updatedNotification) {
+        res.status(HttpStatusCode.NOT_FOUND).json({ message: 'Notification not found' });
+        return;
+      }
+      
+      res.status(HttpStatusCode.OK).json(updatedNotification);
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
+      res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: 'Failed to update notification' });
+    }
+  }
+
+  async markAllAsRead(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = req.params.userId
+      
+      if (!userId) {
+        res.status(HttpStatusCode.BAD_REQUEST).json({ message: 'User ID is required' });
+        return;
+      }
+      
+      const result = await this.chatService.markAllAsRead(userId);
+      res.status(HttpStatusCode.OK).json({ success: result });
+    } catch (error) {
+      console.error('Error marking all notifications as read:', error);
+      res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: 'Failed to update notifications' });
+    }
+  }
+
+  async deleteNotification(req: Request, res: Response): Promise<void> {
+    try {
+      const { notificationId } = req.params;
+      
+      if (!notificationId) {
+        res.status(HttpStatusCode.BAD_REQUEST).json({ message: 'Notification ID is required' });
+        return;
+      }
+      
+      const result = await this.chatService.deleteNotification(notificationId);
+      
+      if (!result) {
+        res.status(HttpStatusCode.NOT_FOUND).json({ message: 'Notification not found' });
+        return;
+      }
+      
+      res.status(HttpStatusCode.OK).json({ success: true });
+    } catch (error) {
+      console.error('Error deleting notification:', error);
+      res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: 'Failed to delete notification' });
+    }
+  }
+
 
 }

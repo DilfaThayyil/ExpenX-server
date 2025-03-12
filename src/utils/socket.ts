@@ -2,6 +2,7 @@ import { Server as HttpServer } from "http";
 import { Server, Socket } from "socket.io";
 import { CLIENTURL } from "../config/env";
 import messageSchema from "../models/messageSchema";
+import notificationSchema from "../models/notificationSchema";
 
 interface IUser {
   userId: string;
@@ -23,30 +24,24 @@ const initializeSocket = (server: HttpServer) => {
   io.on("connection", (socket: Socket) => {
     console.log(`User connected: ${socket.id}`);
 
-    // Add user to connected users
     socket.on("addUser", (userId: string) => {
-      // Remove any existing socket for this user
       users = users.filter((user) => user.userId !== userId);
-      // Add new socket connection
       users.push({ userId, socketId: socket.id });
       console.log(`User ${userId} added with socket ${socket.id}`);
       console.log("Current users:", users);
     });
 
-    // Join a chat room
     socket.on("joinRoom", (roomId: string) => {
       socket.join(roomId);
       console.log(`Socket ${socket.id} joined room: ${roomId}`);
     });
 
-    // Leave a chat room
     socket.on("leaveRoom", (roomId: string) => {
       socket.leave(roomId);
       console.log(`Socket ${socket.id} left room: ${roomId}`);
     });
 
-    // Handle sent messages
-    socket.on("send_message", async (messageData) => {
+    socket.on("send_message", async (messageData) => { 
       io.to(messageData.roomId).emit("receive_message", messageData);
       try {
         console.log("Message received:", messageData);
@@ -62,12 +57,24 @@ const initializeSocket = (server: HttpServer) => {
         });
         const savedMessage = await newMessage.save();
         console.log("savedMessage : ", savedMessage)
+
+        const newNotification = new notificationSchema({
+          senderId: messageData.senderId,
+          receiverId: messageData.receiverId,
+          message: messageData.text || "Sent a file",
+          type: "message",
+          isRead: false,
+          createdAt: new Date(),
+        });
+
+        const savedNotification = await newNotification.save();
+        console.log("Notification saved-socket-utils:", savedNotification);
+        io.to(messageData.receiverId).emit("new_notification", savedNotification);
       } catch (error) {
-        console.error("Error saving message:", error);
+        console.error("Error saving message or notification:", error);
       }
     });
-
-    // Handle typing indicators
+ 
     socket.on("typing", ({ senderId, roomId }) => {
       socket.to(roomId).emit("display_typing", { senderId });
     });
@@ -76,7 +83,6 @@ const initializeSocket = (server: HttpServer) => {
       socket.to(roomId).emit("hide_typing");
     });
 
-    // Handle disconnection
     socket.on("disconnect", () => {
       console.log(`User disconnected: ${socket.id}`);
       users = users.filter((user) => user.socketId !== socket.id);

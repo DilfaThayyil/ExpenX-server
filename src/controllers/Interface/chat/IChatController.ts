@@ -9,4 +9,8 @@ export interface IChatController{
     fetchAllChats(req: Request, res: Response): Promise<Response>
     createChat(req: Request, res: Response): Promise<Response>
     uploadChatFile(req: Request, res:Response): Promise<Response>
+    getNotifications(req: Request, res: Response): Promise<void>;
+    markAsRead(req: Request, res: Response): Promise<void>;
+    markAllAsRead(req: Request, res: Response): Promise<void>;
+    deleteNotification(req: Request, res: Response): Promise<void>;
 }

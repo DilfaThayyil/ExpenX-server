@@ -45,5 +45,9 @@ router.delete('/deleteGoal/:id',AuthMiddleware.authorizeUser,(req,res)=>userCont
 router.patch('/updateGoalProgress/:id',AuthMiddleware.authorizeUser,(req,res)=>userController.updateGoalProgress(req,res))
 router.get('/getDashboardData/:userId',AuthMiddleware.authorizeUser,(req,res)=>userController.getDashboardData(req,res))
 router.get('/exportExpense/:userId',AuthMiddleware.authorizeUser,(req,res)=>expenseController.exportExpense(req,res))
+router.get('/getNotification/:userId',AuthMiddleware.authorizeUser,(req, res) => chatController.getNotifications(req, res));
+router.patch('/markRead/:notificationId',AuthMiddleware.authorizeUser,(req, res) => chatController.markAsRead(req, res));
+router.patch('/markAllRead/:userId',AuthMiddleware.authorizeUser,(req, res) => chatController.markAllAsRead(req, res));
+router.delete('/deleteNotification/:notificationId',AuthMiddleware.authorizeUser,(req, res) => chatController.deleteNotification(req, res));
 
 export default router
