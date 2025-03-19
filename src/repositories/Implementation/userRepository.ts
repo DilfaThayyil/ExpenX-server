@@ -314,7 +314,7 @@ export default class UserRepository implements IUserRepository {
                     id: payment._id.toString(),
                     date: payment.createdAt,
                     amount: payment.amount,
-                    description: `Payment to advisor ${payment.advisorId}`,
+                    description: `Payment to advisor`,
                     category: 'advisor-payments',
                     type: 'payment' as const
                 }))
@@ -328,8 +328,7 @@ export default class UserRepository implements IUserRepository {
                         count: category.count,
                         color: CATEGORY_COLORS[categoryKey] || CATEGORY_COLORS.default
                     };
-                });
-                
+                })
             // const sampleBudget = 2000; // This should come from a user's settings in the future
             // const budgetProgress = Math.min(Math.round((totalSpent / sampleBudget) * 100), 100);
             return {
