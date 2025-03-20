@@ -3,7 +3,7 @@ import { IAuthUserService } from '../../../services/Interface/user/IAuthuserServ
 import { HttpStatusCode } from '../../../utils/httpStatusCode';
 import { IAuthUserController } from '../../Interface/user/IAuthUserController';
 import { inject, injectable } from 'tsyringe';
-import { ValidationError,NotFoundError,ExpiredError } from '../../../utils/errors';
+import { ValidationError, NotFoundError, ExpiredError } from '../../../utils/errors';
 import { mapUserProfile } from '../../Interface/mappers/userMapper';
 
 
@@ -12,24 +12,24 @@ import { mapUserProfile } from '../../Interface/mappers/userMapper';
 export default class AuthUserController implements IAuthUserController {
   private authUserService: IAuthUserService;
 
-  constructor(@inject('IAuthUserService')authUserService: IAuthUserService) {
+  constructor(@inject('IAuthUserService') authUserService: IAuthUserService) {
     this.authUserService = authUserService;
   }
 
 
-    async register(req: Request, res: Response): Promise<void> {
+  async register(req: Request, res: Response): Promise<void> {
     try {
       const { username, email, password } = req.body
       await this.authUserService.register(username, email, password)
       res.status(HttpStatusCode.CREATED).json({ message: 'User registered successfully' })
     } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred'
+      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred'
       res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: errorMessage })
     }
   }
 
 
-    async generateOTP(req: Request, res: Response): Promise<void> {
+  async generateOTP(req: Request, res: Response): Promise<void> {
     try {
       // console.log('body in generateOTP ; ',req.body)
       const { email } = req.body
@@ -47,11 +47,11 @@ export default class AuthUserController implements IAuthUserController {
       await this.authUserService.resendOTP(email);
       return res.json({ message: 'OTP resent successfully' });
     } catch (err) {
-      const errorMessage = err instanceof Error?err.message:'An unexpected error occurred'
-      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error:errorMessage });
+      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred'
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: errorMessage });
     }
   }
-  
+
 
   async verifyOTP(req: Request, res: Response): Promise<Response> {
     try {
@@ -72,36 +72,25 @@ export default class AuthUserController implements IAuthUserController {
     }
   }
 
-  //////////////////////////////////////////// USER LOGIN /////////////////////////////////////////////////
-  //   async loginUser(req: Request, res: Response): Promise<void> {
-  //   try {
-  //     const { email, password } = req.body;
-  //     const user = await this.authUserService.loginUser(email, password);
-  //     console.log("user-controllr : ",user)
-  //     res.cookie('accessToken',user.accessToken)
-  //     res.status(HttpStatusCode.OK).json({ message: 'Login successfull', user });
-  //   } catch (err) {
-  //       const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
-  //     res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: errorMessage });
-  //   }
-  // }
   async loginUser(req: Request, res: Response): Promise<void> {
     try {
       const { email, password } = req.body;
-      const user = await this.authUserService.loginUser(email, password);
-      console.log("LoginUser-controller : ", user);
-      const user2 = mapUserProfile(user)
-      res.cookie('accessToken', user.accessToken, {
-        httpOnly: true,  
-        secure: process.env.NODE_ENV === 'production', 
-        maxAge: 15 * 60 * 1000, 
-        sameSite: 'lax',
-      })
-      res.cookie('refreshToken', user.refreshToken, {
+      const {userData,accessToken,refreshToken} = await this.authUserService.loginUser(email, password);
+      console.log("LoginUser-controller : ", userData);
+      console.log("accessToken-user------------------ : ",accessToken)
+      console.log("refreshToken-user================== : ",refreshToken)
+      const user2 = mapUserProfile(userData)
+      res.cookie('accessToken', accessToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        maxAge: 30 * 24 * 60 * 60 * 1000, 
-        sameSite: 'lax',
+        maxAge: 60 * 60 * 1000,
+        sameSite: 'strict',
+      })
+      res.cookie('refreshToken', refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 30 * 24 * 60 * 60 * 1000,
+        sameSite: 'strict',
       })
 
       res.status(HttpStatusCode.OK).json({ message: 'Login successful', user2 });
@@ -110,34 +99,40 @@ export default class AuthUserController implements IAuthUserController {
       res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: errorMessage });
     }
   }
-  
+
 
 
   async setNewAccessToken(req: Request, res: Response): Promise<Response> {
     try {
       console.log("starting... setNewAccessToken--------------------RETIU74")
-        const refreshToken = req.cookies?.refreshToken;
-        console.log("refreshToken : ",refreshToken)
-        if (!refreshToken) return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: "No token provided" });
-        const result = await this.authUserService.setNewAccessToken(refreshToken);
-        console.log("-----result--- : ",result)
-        if (!result.accessToken) return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: 'Failed to generate token' });
-        res.cookie('accessToken', result.accessToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production', maxAge: 3600000, sameSite: 'strict' });
-        return res.status(HttpStatusCode.OK).json({ message: "Token set successfully", success: result.success });
+      const refreshToken = req.cookies?.refreshToken;
+      console.log("refreshToken : ", refreshToken)
+      if (!refreshToken) return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: "No refresh token provided" });
+      const result = await this.authUserService.setNewAccessToken(refreshToken);
+      console.log("-----result--- : ", result)
+      if (!result.accessToken) return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: 'Failed to generate token' });
+      // res.cookie('accessToken', result.accessToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production', maxAge: 60*60*1000, sameSite: 'strict' });
+      res.cookie('accessToken', result.accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 60 * 60 * 1000,
+        sameSite: 'strict',
+      })
+      return res.status(HttpStatusCode.OK).json({ message: "Token set successfully", accessToken: result.accessToken, success: result.success });
     } catch (error) {
-        console.error(error);
-        return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: "Internal server error" });
+      console.error(error);
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: "Internal server error" });
     }
-}
+  }
 
 
-    async forgotPassword(req: Request, res: Response): Promise<void> {
+  async forgotPassword(req: Request, res: Response): Promise<void> {
     try {
       const { email } = req.body;
       await this.authUserService.forgotPassword(email);
       res.json({ message: 'Forgot password OTP sent successfully' });
     } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
+      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
       res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: errorMessage });
     }
   }
@@ -170,8 +165,8 @@ export default class AuthUserController implements IAuthUserController {
       await this.authUserService.resetPassword(email, password);
       res.status(HttpStatusCode.OK).json({ message: 'Password changed successfully' });
     } catch (err) {
-      console.error('Error resetting password : ',err)
-        const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
+      console.error('Error resetting password : ', err)
+      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
       res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: errorMessage });
     }
   }
@@ -183,15 +178,15 @@ export default class AuthUserController implements IAuthUserController {
       // console.log('recieved body : ',req.body)
       const { userCredential } = req.body
       const username = userCredential.name
-      const email = userCredential.email 
+      const email = userCredential.email
       const password = userCredential.sub
       const profilePic = userCredential.picture
-      const user = await this.authUserService.googleAuth(username,email,password,profilePic)
+      const user = await this.authUserService.googleAuth(username, email, password, profilePic)
       // console.log("user in controllr: ",user)
-      
+
       res.status(HttpStatusCode.OK).json({ message: 'You authenticated via Google', user })
     } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred'
+      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred'
       res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: errorMessage })
     }
   }
@@ -201,15 +196,15 @@ export default class AuthUserController implements IAuthUserController {
   async logout(req: Request, res: Response): Promise<Response> {
     console.log('calling logout ..................6666666666555555')
     try {
-        res.clearCookie('refreshToken').clearCookie('accessToken');
-        return res.status(HttpStatusCode.OK).json({ message: 'Logged out successfully' });
+      res.clearCookie('refreshToken').clearCookie('accessToken');
+      return res.status(HttpStatusCode.OK).json({ message: 'Logged out successfully' });
     } catch (error) {
-        return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: 'Failed to logout' });
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: 'Failed to logout' });
     }
   }
 
 
-  
+
 }
 
 

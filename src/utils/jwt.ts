@@ -1,7 +1,6 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { ACCESSTOKEN_SECRET, REFRESHTOKEN_SECRET } from '../config/env';
 
-// Ensure the secrets are defined
 if (!ACCESSTOKEN_SECRET || !REFRESHTOKEN_SECRET) {
   throw new Error("JWT secrets are missing. Check your environment variables.");
 }
@@ -11,17 +10,17 @@ const refreshTokenSecret = REFRESHTOKEN_SECRET as string;
 
 export const generateAccessToken = (user: any): string => {
   return jwt.sign(
-    { id: user._id, email: user.email, admin: user.isAdmin, role: user.role },
+    { id: user.id, email: user.email, admin: user.admin, role: user.role },
     accessTokenSecret,
-    { expiresIn: '30m' }
+    { expiresIn: '2m' }
   );
 };
 
 export const generateRefreshToken = (user: any): string => {
   return jwt.sign(
-    { id: user._id, email: user.email, admin: user.isAdmin, role:user.role},
+    { id: user.id, email: user.email, admin: user.admin, role:user.role},
     refreshTokenSecret,
-    { expiresIn: '1d' }
+    { expiresIn: '10m' }
   );
 };
 

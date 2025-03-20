@@ -84,15 +84,20 @@ export default class AuthUserService implements IAuthUserService {
   
 
   async loginUser(email: string, password: string): Promise<any> {
-    const user = await this.userRepository.findUserByEmail(email);
-    if (!user) throw new Error('Invalid credentials');
-    const validPassword = await bcrypt.compare(password, user.password);
+    const userData = await this.userRepository.findUserByEmail(email);
+    console.log("userData-service+++++++++++++++++++++++++++ : ",userData)
+    if (!userData) throw new Error('Invalid credentials');
+    const validPassword = await bcrypt.compare(password, userData.password);
     if (!validPassword) throw new Error('Invalid credentials');
+    const user = {
+      id: userData._id,
+      email: userData.email,
+      admin: userData.isAdmin,
+      role: userData.role,
+    };
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
-    user.accessToken = accessToken
-    user.refreshToken = refreshToken
-    return user
+    return {userData,accessToken,refreshToken}
   }  
 
 
@@ -100,16 +105,15 @@ export default class AuthUserService implements IAuthUserService {
     try {
       console.log("setting new acessToken....")
       const decoded = verifyRefreshToken(refreshToken);
-      const user = decoded
-      if (!decoded || !user) {
-        throw new Error("Invalid or expired refresh token");
-      }
-      const accessToken = generateAccessToken({ user });
+      console.log("setting new accessToken...decoded : ",decoded)
+      console.log("decodedi====================>>",decoded.id)
+      const accessToken = generateAccessToken(decoded);
+      console.log("accessToken from service layer ((((((((((()))))))))))))))) : ",accessToken)
       return {
         accessToken,
         message: "Access token set successfully from service ",
         success: true,
-        user:user
+        user:decoded
       }
     } catch (error:any) {
       throw new Error("Error generating new access token: " + error.message);
