@@ -16,43 +16,42 @@ export default class ExpenseService implements IExpenseService {
     }
 
     async getExpensesByUserId(userId: string): Promise<IExpense[]> {
-        console.log("userId from service : ", userId)
         return this.expenseRepository.findExpensesByUserId(userId);
-      }
-    
-      async createExpense(expenseData: IExpense): Promise<IExpense> {
+    }
+
+    async createExpense(expenseData: IExpense): Promise<IExpense> {
         return this.expenseRepository.createExpense(expenseData);
-      }
+    }
 
     async exportExpensesAsPDF(userId: string): Promise<NodeJS.ReadableStream> {
         try {
             const expenses = await this.expenseRepository.findByUserId(userId);
             const doc = new PDFDocument();
-    
+
             doc.fontSize(25).text('Expense Report', { align: 'center' });
             doc.moveDown();
             doc.fontSize(12).text(`Generated on: ${new Date().toLocaleDateString()}`, { align: 'right' });
             doc.moveDown();
-            
+
             const total = expenses.reduce((sum: number, expense: IExpense) => sum + expense.amount, 0);
             doc.fontSize(14).text(`Total Expenses: $${total.toFixed(2)}`, { align: 'left' });
             doc.moveDown();
-            
+
             // Table Headers
             const startX = 50;
             let startY = doc.y + 10;
             const rowHeight = 20;
             const colWidths = [120, 150, 100, 100];
-    
+
             doc.font('Helvetica-Bold');
             doc.text('Date', startX, startY);
             doc.text('Description', startX + colWidths[0], startY);
             doc.text('Category', startX + colWidths[0] + colWidths[1], startY);
             doc.text('Amount ($)', startX + colWidths[0] + colWidths[1] + colWidths[2], startY);
             doc.font('Helvetica');
-    
+
             startY += rowHeight;
-    
+
             expenses.forEach((expense: IExpense) => {
                 if (startY > doc.page.height - 50) {
                     doc.addPage();
@@ -65,21 +64,20 @@ export default class ExpenseService implements IExpenseService {
                 doc.text(expense.amount.toFixed(2), startX + colWidths[0] + colWidths[1] + colWidths[2], startY);
                 startY += rowHeight;
             });
-    
-            doc.end();  // ✅ Finalize the PDF stream
+
+            doc.end();
             return doc;
         } catch (err) {
             console.log(err);
             throw err;
         }
     }
-    
+
 
 
     async exportExpensesAsCSV(userId: string): Promise<string> {
         try {
             const expenses = await this.expenseRepository.findByUserId(userId);
-            console.log("expenses-CSV-serv : ", expenses)
             const formattedExpenses = expenses.map((expense: IExpense) => ({
                 Date: new Date(expense.date).toLocaleDateString(),
                 Description: expense.description || '',

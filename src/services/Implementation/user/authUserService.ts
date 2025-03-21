@@ -30,33 +30,25 @@ export default class AuthUserService implements IAuthUserService {
   async generateOTP(email: string): Promise<void> {
     const user = await this.userRepository.findUserByEmail(email);
     if (user) throw new Error('Email already verified');
-
     const otp = (Math.floor(Math.random() * 10000)).toString().padStart(4, '0');
     const expiresAt = new Date(Date.now() + 1 * 60 * 1000);
-
     await Otp.findOneAndUpdate(
       { email },
       { otp, expiresAt },
       { upsert: true, new: true, setDefaultsOnInsert: true }
     );
-
     await sendOtpEmail(email, otp);
   }
 
 
   async resendOTP(email: string): Promise<void> {
-    console.log('resendOTP service...')
-    console.log('diluuuuuuuuuuuuu')
     const otp = (Math.floor(Math.random() * 10000)).toString().padStart(4, '0');
     const expiresAt = new Date(Date.now() + 1 * 60 * 1000);
-  console.log("otp in service : ",otp)
-  console.log('dilllllffffaaaa')
     await Otp.findOneAndUpdate(
       { email },
       { otp, expiresAt },
       { upsert: true, new: true, setDefaultsOnInsert: true }
     );
-  
     await sendOtpEmail(email, otp);
   }
   
@@ -85,7 +77,6 @@ export default class AuthUserService implements IAuthUserService {
 
   async loginUser(email: string, password: string): Promise<any> {
     const userData = await this.userRepository.findUserByEmail(email);
-    console.log("userData-service+++++++++++++++++++++++++++ : ",userData)
     if (!userData) throw new Error('Invalid credentials');
     const validPassword = await bcrypt.compare(password, userData.password);
     if (!validPassword) throw new Error('Invalid credentials');
@@ -103,12 +94,8 @@ export default class AuthUserService implements IAuthUserService {
 
   async  setNewAccessToken(refreshToken:string):Promise<any> {
     try {
-      console.log("setting new acessToken....")
       const decoded = verifyRefreshToken(refreshToken);
-      console.log("setting new accessToken...decoded : ",decoded)
-      console.log("decodedi====================>>",decoded.id)
       const accessToken = generateAccessToken(decoded);
-      console.log("accessToken from service layer ((((((((((()))))))))))))))) : ",accessToken)
       return {
         accessToken,
         message: "Access token set successfully from service ",
@@ -124,10 +111,8 @@ export default class AuthUserService implements IAuthUserService {
   async forgotPassword(email: string): Promise<void> {
     const user = await this.userRepository.findUserByEmail(email);
     if (!user) throw new Error('Email not found');
-    console.log("user in forgotPass : ",user)
     const otp = (Math.floor(Math.random() * 10000)).toString().padStart(4, '0');
     const expiresAt = new Date(Date.now() + 1 * 60 * 1000);
-    console.log("otp : ",otp)
     await Otp.findOneAndUpdate(
       { email },
       { otp, expiresAt },
@@ -151,17 +136,17 @@ export default class AuthUserService implements IAuthUserService {
     }
   }
 
+
   async resetPassword(email: string, newPassword: string): Promise<void> {
-    console.log('Resetting password for email : ',email)
     const user = await this.userRepository.findUserByEmail(email);
     if(!user){
       console.error('User not found : ',email)
       throw new Error("User Not Found")
     }
     const hashedPassword = await bcrypt.hash(newPassword, 10);
-    console.log('Hashed password : ',hashedPassword)
     await this.userRepository.updateUser({ password: hashedPassword }, email);
   }
+
 
   async googleAuth(username:string,email: string,password: string,profilePic:string): Promise<any> {
     const userCredentials = {
@@ -170,14 +155,11 @@ export default class AuthUserService implements IAuthUserService {
       password,
       profilePic
     }
-    console.log("usercredentials in services ; ",userCredentials)
     let existingUser
      existingUser = await this.userRepository.findUserByEmail(userCredentials?.email);
     if (!existingUser) {
       existingUser = await this.userRepository.createUser(userCredentials);
-      console.log(existingUser,"userrrrrrrrrrrrr");
     }
-    console.log("existingUser : ",existingUser)
     return existingUser;
   }
 }

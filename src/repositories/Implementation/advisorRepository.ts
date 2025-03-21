@@ -15,7 +15,7 @@ export default class AdvisorRepository implements IAdvisorRepository {
     }
 
     async createUser(userData: any): Promise<any> {
-        return await advisorSchema.create(userData);
+        return await advisorSchema.create(userData); 
     }
 
     async updateUser(userData: any, email: string): Promise<any> {

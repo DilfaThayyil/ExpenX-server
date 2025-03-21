@@ -30,17 +30,14 @@ export default class PaymentService implements IPaymentService {
 
   async initiatePayment(slotId: string, userId: string, advisorId: string, amount: number): Promise<{ clientSecret: string; paymentId: string; }> {
     try {
-      console.log("service -: ",slotId,",",userId,",",advisorId,",",amount)
       const slotObjectId = new mongoose.Types.ObjectId(slotId);
       const userObjectId = new mongoose.Types.ObjectId(userId);
       const advisorObjectId = new mongoose.Types.ObjectId(advisorId);
-      console.log("Hello from service...")
       const paymentIntent = await this.stripe.paymentIntents.create({
         amount: amount * 100,
         currency: 'usd',
         metadata: { slotId, userId, advisorId }
       });
-      console.log("paymentIntent-service : ",paymentIntent)
       if (!paymentIntent.client_secret) {
         throw new Error("Failed to generate payment client secret");
       }
@@ -52,9 +49,7 @@ export default class PaymentService implements IPaymentService {
         stripePaymentIntentId: paymentIntent.id,
         stripeClientSecret: paymentIntent.client_secret,
       }) as Payment;
-      console.log("payment-service ; ",payment)
       const returning = {clientSecret: paymentIntent.client_secret,paymentId: payment._id.toString()};
-      console.log("returning object -service : ",returning)
       return returning
 
     } catch (error) {
@@ -69,8 +64,6 @@ export default class PaymentService implements IPaymentService {
   async confirmPayment(paymentIntentId: string) {
     try {
       const paymentIntent = await this.stripe.paymentIntents.retrieve(paymentIntentId);
-      console.log("paymentIntent-serv : ",paymentIntent)
-      console.log("paymentIntect.status-serv : ",paymentIntent.status)
       if (paymentIntent.status === 'succeeded') {
         const payment = await this.paymentRepository.updatePaymentStatus(paymentIntentId, 'completed');
         return payment!;

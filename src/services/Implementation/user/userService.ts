@@ -38,7 +38,6 @@ export default class UserService implements IUserService {
 
   async createGroup(userId: string, name: string, members: string[]): Promise<IGroup> {
     try {
-      console.log("userId,name,members-serv : ", userId, ',', name, ',', members)
       const modifiedMembers = members.map((memberEmail: string) => ({
         id: memberEmail.replace('@', '_'),
         name: memberEmail.split('@')[0],
@@ -47,7 +46,6 @@ export default class UserService implements IUserService {
         paid: 0,
         owed: 0,
       }))
-      console.log("modifiedMembers-serv : ", modifiedMembers)
       const newGroup: IGroup = {
         name,
         createdBy: userId,
@@ -64,7 +62,6 @@ export default class UserService implements IUserService {
   async getUserGroups(userId: string): Promise<IGroup[]> {
     const user = await this.userRepository.findUserById(userId)
     if (!user) {
-      console.log("!!! user not found !!!!!")
       throw new Error('User not found')
     }
     const groups = await this.userRepository.getUserGroups(user?.email)
@@ -80,7 +77,6 @@ export default class UserService implements IUserService {
     if (!group) {
       throw new Error('Group not found');
     }
-    console.log("group-serv : ", group)
     if (group.members.some((member) => member.email === memberEmail)) {
       throw new Error('Member already exists in the group')
     }
@@ -98,7 +94,6 @@ export default class UserService implements IUserService {
 
   async addExpenseInGroup(groupId: string, expenseData: any): Promise<IGroup> {
     try {
-      console.log("expenseData-serv : ", expenseData);
       if (!groupId || !expenseData.title || !expenseData.totalAmount || !expenseData.paidBy || !expenseData.splitMethod) {
         throw new Error('Missing required expense information');
       }
@@ -203,17 +198,14 @@ export default class UserService implements IUserService {
   }
   async createReview(advisorId: string, userId: string, rating: number, review: string): Promise<IReview> {
     const newReview = await this.userRepository.createReview(advisorId, userId, rating, review);
-    console.log("newReview-serv : ",newReview)
     return newReview
   }
   async createGoal(userId: string, goalData: Partial<IGoal>): Promise<IGoal> {
     const goal = await this.userRepository.createGoal({ ...goalData, userId });
-    console.log("goal-service : ",goal)
     return goal
   }
   async getGoalsById(userId: string): Promise<IGoal[]> {
     const goals = await this.userRepository.getGoalsById(userId);
-    console.log("getGoals-service : ",goals)
     return goals
   }
   async getGoalById(id:string):Promise<IGoal | null>{
@@ -222,7 +214,6 @@ export default class UserService implements IUserService {
   }
   async updateGoal(id:string,goalData:Partial<IGoal>):Promise<IGoal | null>{
     const updatedGoal = await this.userRepository.updateGoal(id,goalData)
-    console.log("updatedGoal-servie : ",updatedGoal)
     return updatedGoal
   }
   async deleteGoal(id: string): Promise<boolean | null> {
@@ -231,7 +222,6 @@ export default class UserService implements IUserService {
 
   async updateGoalProgress(id: string, amount: number): Promise<IGoal | null> {
     const goal = await this.userRepository.getGoalById(id);
-    console.log("goal-service : ",goal)
     if (!goal) return null;
     const newAmount = goal.current + amount;
     const current = Math.max(0, Math.min(goal.target, newAmount));

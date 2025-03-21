@@ -16,34 +16,26 @@ export class AuthMiddleware {
   static async authorizeUser(req: AuthRequest, res: Response, next: NextFunction): Promise<Response | void> {
     try {
       const accessToken = req.cookies?.accessToken;
-      console.log("accessToken-AuthMiddleware : ",accessToken)
       if (!accessToken) {
-        console.log("No accessToken-AuthMiddleware !!")
         return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: "Access denied. No token provided." });
       }
-      console.log("accessTokenSecret : ",ACCESSTOKEN_SECRET)
       const decoded = jwt.verify(accessToken, ACCESSTOKEN_SECRET as string) as JwtPayload;
-      console.log("decoded-AuthMiddleware : ",decoded)
-      req.user = {id:decoded.id,email:decoded.email,role:decoded.role,isAdmin:decoded.admin};
-      let entity; 
+      req.user = { id: decoded.id, email: decoded.email, role: decoded.role, isAdmin: decoded.admin };
+      let entity;
       if (decoded.role === "user") {
         entity = await userRepository.findUserById(decoded.id);
       } else if (decoded.role === "advisor") {
         entity = await advisorRepository.findUserById(decoded.id);
       }
-      console.log("entity-authMiddleware &&&&&&&&&&&&&&&& : ",entity)
       if (!entity) {
-        console.log("No entity-authMiddlware !!!!!!!!!!!!!!!!")
         return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: `${decoded.role} not found.` });
       }
 
       if (entity.isBlocked) {
-        console.log("enity is blocked !!!!!!!!!!!!!!!!!")
         return res.status(HttpStatusCode.FORBIDDEN).json({ message: "You have been blocked by the admin." });
       }
       next();
-    } catch (error:any) {
-      console.log("catching error in AuthMIDDLEWARE : ",error)
+    } catch (error: any) {
       if (error.name === 'TokenExpiredError') {
         return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: "Access token expired" });
       }
