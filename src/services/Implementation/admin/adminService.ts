@@ -119,7 +119,6 @@ export default class AdminService implements IAdminService {
 
     async fetchReports(page:number,limit:number):Promise<{reports:IReport[], totalReports:number}>{
         const report = await this.advisorRepository.fetchReports(page,limit);
-        console.log("fetchReport-service : ",report)
         return report
     }
 
@@ -150,7 +149,6 @@ export default class AdminService implements IAdminService {
     
       async getExpenseCategories(): Promise<CategoryData[]> {
         const data = await this.adminRepository.getExpenseCategories();
-        console.log("data-expenseCatgry-service : ",data)
         return data
       }
     

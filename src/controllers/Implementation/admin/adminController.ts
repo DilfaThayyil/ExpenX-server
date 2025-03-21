@@ -32,7 +32,7 @@ export default class AdminController implements IAdminController{
         return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: "Invalid admin credentials" });
       }
       const token = jwt.sign({ role: "admin" }, ACCESSTOKEN_SECRET as string, {
-        expiresIn: "50m",
+        expiresIn: "10m",
       });
       res.cookie("adminToken", token, {
         httpOnly: true,
@@ -219,7 +219,6 @@ export default class AdminController implements IAdminController{
       const limit = parseInt(req.query.limit as string) || 10;
       console.log("page,limit-controll : ",page,",",limit)
       const reports = await this.adminService.fetchReports(page,limit)
-      console.log("fetchReports-control : ",reports)
       return res.status(HttpStatusCode.OK).json({success:true,data:{reports}})
     }catch(err){
       console.error(err)
@@ -241,7 +240,6 @@ export default class AdminController implements IAdminController{
   async getExpenseCategories(req:Request,res:Response):Promise<Response>{
     try{
       const data = await this.adminService.getExpenseCategories()
-      console.log("data-expnxCatgry-contrll : ",data)
       return res.status(HttpStatusCode.OK).json(data)
     }catch(err){
       console.error(err)

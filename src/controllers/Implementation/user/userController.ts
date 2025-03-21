@@ -97,7 +97,7 @@ export default class UserController implements IUserController {
       if (groups.length === 0) {
         return res.status(HttpStatusCode.NOT_FOUND).json({ message: 'No groups found for this user' });
       }
-      console.log("groups-contrll : ", groups)
+      // console.log("groups-contrll : ", groups)
       return res.status(HttpStatusCode.OK).json({ groups });
     } catch (error) {
       console.error('Error fetching groups:', error);

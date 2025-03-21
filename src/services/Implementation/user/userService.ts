@@ -68,7 +68,7 @@ export default class UserService implements IUserService {
       throw new Error('User not found')
     }
     const groups = await this.userRepository.getUserGroups(user?.email)
-    console.log("groups-serv : ", groups)
+    // console.log("groups-serv : ", groups)
     return groups
   }
 
