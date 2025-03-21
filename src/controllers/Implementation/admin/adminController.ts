@@ -6,6 +6,7 @@ import { HttpStatusCode } from "../../../utils/httpStatusCode";
 import { IUserService } from "../../../services/Interface/user/IUserService";
 import { ACCESSTOKEN_SECRET } from "../../../config/env";
 import jwt from "jsonwebtoken";
+import { messageConstants } from "../../../utils/messageConstants";
 
 
 
@@ -73,43 +74,35 @@ export default class AdminController implements IAdminController{
 
   async fetchUsers(req: Request, res: Response): Promise<Response> {
     try {
-      // console.log("controler .....")
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
-      // console.log("page: ",page)
       const { users, totalPages } = await this.adminService.fetchUsers(page, limit);
-      // console.log("users , totalPages : ", users," , ",totalPages)
       return res.status(HttpStatusCode.OK).json({ success: true, data: { users, totalPages } });
     } catch (error) {
       console.error(error)
-      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: "Internal server error" });
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: messageConstants.INTERNAL_ERROR    });
     }
   }
   async fetchAdvisors(req: Request, res: Response): Promise<Response> {
     try {
-      // console.log("********controler .....")
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
-      // console.log("page: ",page)
       const { users, totalPages } = await this.adminService.fetchAdvisors(page, limit);
-      // console.log("users , totalPages : ", users," , ",totalPages)
       return res.status(HttpStatusCode.OK).json({ success: true, data: { users, totalPages } });
     } catch (error) {
       console.error(error)
-      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: "Internal server error" });
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: messageConstants.INTERNAL_ERROR    });
     }
   }
 
 
   async updateAdmin(req:Request, res:Response):Promise<void>{
     try{
-      // console.log("req body : ",req.body)
       const {name,email,password} = req.body
       if(!email || !password){
         res.status(HttpStatusCode.BAD_REQUEST).json({error: 'Email and password are required.'})
       }
       const updatedAdmin = await this.adminService.updateAdmin(name,email,password)
-      // console.log("updatedAdmin-contrllr : ",updatedAdmin)
       res.status(HttpStatusCode.OK).json(updatedAdmin)
     }catch(err){
       console.error(err)
@@ -128,7 +121,7 @@ export default class AdminController implements IAdminController{
       return res.status(HttpStatusCode.OK).json({ message: result.message });
     } catch (error) {
       console.error(error)
-      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: "Internal server error" });
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: messageConstants.INTERNAL_ERROR    });
     }
   }
 
@@ -142,22 +135,19 @@ export default class AdminController implements IAdminController{
       return res.status(HttpStatusCode.OK).json({message:result.message})
     }catch(error){
       console.error(error)
-      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({error: "Internal server error"})
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({error: messageConstants.INTERNAL_ERROR   })
     }
   }
 
   async fetchCategories(req: Request, res: Response): Promise<Response> {
     try {
-      // console.log("controler-category")
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
-      // console.log("page: ",page)
       const { categories, totalPages } = await this.adminService.fetchCategories(page, limit);
-      // console.log("categories , totalPages : ", categories," , ",totalPages)
       return res.status(HttpStatusCode.OK).json({ success: true, data: { categories, totalPages } });
     } catch (error) {
       console.error(error)
-      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: "Internal server error" });
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: messageConstants.INTERNAL_ERROR    });
     }
   }
 
@@ -171,7 +161,7 @@ export default class AdminController implements IAdminController{
         if (err.message === "CATEGORY_EXISTS") {
             return res.status(HttpStatusCode.BAD_REQUEST).json({ success: false, error: "Category already exists" });
         }
-        return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, error: "Internal server error" });
+        return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, error: messageConstants.INTERNAL_ERROR    });
     }
 }
 
@@ -179,13 +169,11 @@ export default class AdminController implements IAdminController{
     try{
       const {id} = req.params
       const {name} = req.body
-      // console.log("catgry-update (id , name) : ",id," ",name)
       const updatedCategory = await this.adminService.updateCategory(id,name)
-      // console.log("categ-updat-contrll :",updatedCategory)
       return res.status(HttpStatusCode.OK).json({success:true,data:{updatedCategory}})
     }catch(err){
       console.error(err)
-      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({error: "Internal server error"})
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({error: messageConstants.INTERNAL_ERROR   })
     }
   }
 

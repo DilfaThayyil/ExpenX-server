@@ -5,6 +5,7 @@ import cloudinary from '../../../config/cloudinaryConfig';
 import { Request, Response } from 'express';
 import { HttpStatusCode } from '../../../utils/httpStatusCode';
 import { Types } from 'mongoose';
+import { messageConstants } from '../../../utils/messageConstants';
 
 @injectable()
 export default class AdvisorController implements IAdvisorController {
@@ -94,7 +95,7 @@ export default class AdvisorController implements IAdvisorController {
       res.status(HttpStatusCode.OK).json({ message: "Slot updated successfully", slot: updatedSlot });
     } catch (error) {
       console.error("Error updating slot:", error);
-      res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
+      res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: messageConstants.INTERNAL_ERROR });
     }
   }
 
@@ -107,7 +108,7 @@ export default class AdvisorController implements IAdvisorController {
       }
       res.status(HttpStatusCode.OK).json({ message: "Slot deleted successfully" })
     } catch (err) {
-      res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: "Internal server error" })
+      res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: messageConstants.INTERNAL_ERROR })
     }
   }
 
@@ -168,7 +169,7 @@ export default class AdvisorController implements IAdvisorController {
       return res.status(HttpStatusCode.OK).json({ revenue })
     } catch (error) {
       console.error("Error fetching revenue:", error)
-      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: "Internal server error" })
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: messageConstants.INTERNAL_ERROR })
     }
   }
 

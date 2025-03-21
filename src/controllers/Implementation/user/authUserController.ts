@@ -5,6 +5,7 @@ import { IAuthUserController } from '../../Interface/user/IAuthUserController';
 import { inject, injectable } from 'tsyringe';
 import { ValidationError, NotFoundError, ExpiredError } from '../../../utils/errors';
 import { mapUserProfile } from '../../Interface/mappers/userMapper';
+import { messageConstants } from '../../../utils/messageConstants';
 
 
 
@@ -23,7 +24,7 @@ export default class AuthUserController implements IAuthUserController {
       await this.authUserService.register(username, email, password)
       res.status(HttpStatusCode.CREATED).json({ message: 'User registered successfully' })
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred'
+      const errorMessage = err instanceof Error ? err.message : messageConstants.UNEXPECTED_ERROR
       res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: errorMessage })
     }
   }
@@ -47,7 +48,7 @@ export default class AuthUserController implements IAuthUserController {
       await this.authUserService.resendOTP(email);
       return res.json({ message: 'OTP resent successfully' });
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred'
+      const errorMessage = err instanceof Error ? err.message : messageConstants.UNEXPECTED_ERROR
       return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: errorMessage });
     }
   }
@@ -66,7 +67,7 @@ export default class AuthUserController implements IAuthUserController {
       } else if (err instanceof ExpiredError) {
         return res.status(HttpStatusCode.GONE).json({ success: false, message: 'OTP expired.' });
       } else {
-        const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
+        const errorMessage = err instanceof Error ? err.message : messageConstants.UNEXPECTED_ERROR;
         return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: errorMessage });
       }
     }
@@ -95,7 +96,7 @@ export default class AuthUserController implements IAuthUserController {
 
       res.status(HttpStatusCode.OK).json({ message: 'Login successful', user2 });
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
+      const errorMessage = err instanceof Error ? err.message : messageConstants.UNEXPECTED_ERROR;
       res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: errorMessage });
     }
   }
@@ -121,7 +122,7 @@ export default class AuthUserController implements IAuthUserController {
       return res.status(HttpStatusCode.OK).json({ message: "Token set successfully", accessToken: result.accessToken, success: result.success });
     } catch (error) {
       console.error(error);
-      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: "Internal server error" });
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: messageConstants.INTERNAL_ERROR });
     }
   }
 
@@ -132,7 +133,7 @@ export default class AuthUserController implements IAuthUserController {
       await this.authUserService.forgotPassword(email);
       res.json({ message: 'Forgot password OTP sent successfully' });
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
+      const errorMessage = err instanceof Error ? err.message : messageConstants.UNEXPECTED_ERROR;
       res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: errorMessage });
     }
   }
@@ -151,7 +152,7 @@ export default class AuthUserController implements IAuthUserController {
       } else if (err instanceof ExpiredError) {
         res.status(HttpStatusCode.GONE).json({ success: false, message: 'The OTP has expired. Please request a new one.' });
       } else {
-        const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
+        const errorMessage = err instanceof Error ? err.message : messageConstants.UNEXPECTED_ERROR;
         res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: errorMessage });
       }
     }
@@ -166,7 +167,7 @@ export default class AuthUserController implements IAuthUserController {
       res.status(HttpStatusCode.OK).json({ message: 'Password changed successfully' });
     } catch (err) {
       console.error('Error resetting password : ', err)
-      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
+      const errorMessage = err instanceof Error ? err.message : messageConstants.UNEXPECTED_ERROR;
       res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: errorMessage });
     }
   }
@@ -186,7 +187,7 @@ export default class AuthUserController implements IAuthUserController {
 
       res.status(HttpStatusCode.OK).json({ message: 'You authenticated via Google', user })
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred'
+      const errorMessage = err instanceof Error ? err.message : messageConstants.UNEXPECTED_ERROR
       res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: errorMessage })
     }
   }

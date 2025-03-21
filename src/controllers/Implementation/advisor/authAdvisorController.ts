@@ -5,6 +5,7 @@ import { IAuthAdvisorController } from '../../Interface/advisor/IAuthAdvisorCont
 import { IAuthAdvisorService } from '../../../services/Interface/advisor/IAuthAdvisorService';
 import { NotFoundError, ValidationError, ExpiredError } from '../../../utils/errors';
 import { mapUserProfile } from '../../Interface/mappers/userMapper';
+import { messageConstants } from '../../../utils/messageConstants';
 
 @injectable()
 export default class AuthAdvisorController implements IAuthAdvisorController {
@@ -24,7 +25,7 @@ export default class AuthAdvisorController implements IAuthAdvisorController {
       console.log(' ====> =====> ======> success register')
       res.status(HttpStatusCode.CREATED).json({ message: 'User registered successfully' });
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
+      const errorMessage = err instanceof Error ? err.message : messageConstants.UNEXPECTED_ERROR;
       res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: errorMessage });
     }
   }
@@ -46,7 +47,7 @@ export default class AuthAdvisorController implements IAuthAdvisorController {
       await this.authAdvisorService.resendOTP(email)
       return res.json({ message: 'OTP resent successfullt' })
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred'
+      const errorMessage = err instanceof Error ? err.message : messageConstants.UNEXPECTED_ERROR
       return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: errorMessage });
     }
   }
@@ -65,7 +66,7 @@ export default class AuthAdvisorController implements IAuthAdvisorController {
       } else if (err instanceof ExpiredError) {
         return res.status(HttpStatusCode.GONE).json({ success: false, message: 'OTP expired.' });
       } else {
-        const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
+        const errorMessage = err instanceof Error ? err.message : messageConstants.UNEXPECTED_ERROR;
         return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: errorMessage });
       }
     }
@@ -93,7 +94,7 @@ export default class AuthAdvisorController implements IAuthAdvisorController {
       })
       res.status(HttpStatusCode.OK).json({ message: 'Login successfully', user2 });
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
+      const errorMessage = err instanceof Error ? err.message : messageConstants.UNEXPECTED_ERROR;
       res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: errorMessage });
     }
   }
@@ -105,7 +106,7 @@ export default class AuthAdvisorController implements IAuthAdvisorController {
       res.cookie('refreshToken', newTokens.refreshToken);
       res.status(HttpStatusCode.OK).json({ message: 'Access token updated' });
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
+      const errorMessage = err instanceof Error ? err.message : messageConstants.UNEXPECTED_ERROR;
       res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: errorMessage });
     }
   }
@@ -116,7 +117,7 @@ export default class AuthAdvisorController implements IAuthAdvisorController {
       await this.authAdvisorService.forgotPassword(email);
       res.json({ message: 'Forgot password OTP sent successfully' });
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
+      const errorMessage = err instanceof Error ? err.message : messageConstants.UNEXPECTED_ERROR;
       res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: errorMessage });
     }
   }
@@ -134,7 +135,7 @@ export default class AuthAdvisorController implements IAuthAdvisorController {
       } else if (err instanceof ExpiredError) {
         res.status(HttpStatusCode.GONE).json({ success: false, message: 'The OTP has expired. Please request a new one.' });
       } else {
-        const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
+        const errorMessage = err instanceof Error ? err.message : messageConstants.UNEXPECTED_ERROR;
         res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: errorMessage });
       }
     }
@@ -147,7 +148,7 @@ export default class AuthAdvisorController implements IAuthAdvisorController {
       res.status(HttpStatusCode.OK).json({ message: 'Password changed successfully' });
     } catch (err) {
       console.error('Error resetting password : ', err)
-      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
+      const errorMessage = err instanceof Error ? err.message : messageConstants.UNEXPECTED_ERROR;
       res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: errorMessage });
     }
   }
@@ -162,7 +163,7 @@ export default class AuthAdvisorController implements IAuthAdvisorController {
       const user = await this.authAdvisorService.googleAuth(username, email, profilePic);
       res.status(HttpStatusCode.OK).json({ message: 'You authenticated via Google', user });
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
+      const errorMessage = err instanceof Error ? err.message : messageConstants.UNEXPECTED_ERROR;
       res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: errorMessage });
     }
   }

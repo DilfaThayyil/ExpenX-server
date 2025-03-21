@@ -5,6 +5,7 @@ import cloudinary from '../../../config/cloudinaryConfig';
 import { Request, Response } from 'express';
 import { HttpStatusCode } from '../../../utils/httpStatusCode';
 import { GroupMember, IGroupExpense } from '../../../entities/groupEntities';
+import { messageConstants } from '../../../utils/messageConstants';
 
 @injectable()
 export default class UserController implements IUserController {
@@ -82,7 +83,7 @@ export default class UserController implements IUserController {
       return res.status(HttpStatusCode.CREATED).json(newGroup);
     } catch (error) {
       console.error('Error creating group:', error);
-      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: 'Internal server error' });
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: messageConstants.INTERNAL_ERROR });
     }
   }
 
@@ -101,7 +102,7 @@ export default class UserController implements IUserController {
       return res.status(HttpStatusCode.OK).json({ groups });
     } catch (error) {
       console.error('Error fetching groups:', error);
-      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: 'Internal server error' });
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: messageConstants.INTERNAL_ERROR });
     }
   }
 
@@ -156,7 +157,7 @@ export default class UserController implements IUserController {
       res.status(HttpStatusCode.OK).json({ message: "slot booked successfully", slot: bookedSlot })
     } catch (err) {
       console.error(err)
-      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred'
+      const errorMessage = err instanceof Error ? err.message : messageConstants.UNEXPECTED_ERROR
       res.status(HttpStatusCode.NOT_FOUND).json({ message: errorMessage })
     }
   }
@@ -193,7 +194,7 @@ export default class UserController implements IUserController {
       const Advisors = await this.userService.getAdvisors()
       return res.status(HttpStatusCode.OK).json({ Advisors })
     } catch (err) {
-      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: messageConstants.INTERNAL_ERROR });
     }
   }
 
