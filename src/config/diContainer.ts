@@ -1,6 +1,6 @@
 import { container } from 'tsyringe';
 
-//user
+//USER
 import { IAuthUserController } from '../controllers/Interface/user/IAuthUserController';
 import AuthUserController from '../controllers/Implementation/user/authUserController';
 import { IAuthUserService } from '../services/Interface/user/IAuthuserService';
@@ -12,7 +12,7 @@ import UserController from '../controllers/Implementation/user/userController';
 import { IUserService } from '../services/Interface/user/IUserService';
 import UserService from '../services/Implementation/user/userService';
 
-//advisor
+//ADVISOR
 import { IAuthAdvisorController } from '../controllers/Interface/advisor/IAuthAdvisorController';
 import AuthAdvisorController from '../controllers/Implementation/advisor/authAdvisorController';
 import { IAuthAdvisorService } from '../services/Interface/advisor/IAuthAdvisorService';
@@ -23,20 +23,30 @@ import { IAdvisorController } from '../controllers/Interface/advisor/IAdvisorCon
 import AdvisorController from '../controllers/Implementation/advisor/advisorController';
 import { IAdvisorService } from '../services/Interface/advisor/IAdvisorService';
 import AdvisorService from '../services/Implementation/advisor/advisorService';
-import { IAdminController } from '../controllers/Interface/admin/IAdminController';
+import { IAdvDashboardRepo } from '../repositories/Interface/IDashboardRepository';
+import AdvDashboardRepo from '../repositories/Implementation/dashboardRepository';
 
-//admin
+//ADMIN
+import { IAdminController } from '../controllers/Interface/admin/IAdminController';
 import AdminController from '../controllers/Implementation/admin/adminController';
 import { IAdminService } from '../services/Interface/admin/IAdminService';
 import AdminService from '../services/Implementation/admin/adminService';
+import { IAdminRepository } from '../repositories/Interface/IAdminRepository';
+import AdminRepository from '../repositories/Implementation/adminRepository';
+
+//CHAT
 import { IChatRepository } from '../repositories/Interface/IChatRepository';
 import ChatRepository from '../repositories/Implementation/chatRepository';
 import { IChatController } from '../controllers/Interface/chat/IChatController';
 import ChatController from '../controllers/Implementation/chat/chatController';
 import { IChatService } from '../services/Interface/chat/IChatService';
 import ChatService from '../services/Implementation/chat/chatService';
+
+//CATEGORY
 import { ICategoryRepository } from '../repositories/Interface/ICategoryRepository';
 import { CategoryRepository } from '../repositories/Implementation/categoryRepository';
+
+//PAYMENT
 import { IPaymentController } from '../controllers/Interface/user/IPaymentController';
 import PaymentController from '../controllers/Implementation/user/paymentController';
 import PaymentService from '../services/Implementation/user/paymentService';
@@ -44,16 +54,29 @@ import { IPaymentService } from '../services/Interface/user/IPaymentService';
 import { IPaymentRepository } from '../repositories/Interface/IPaymentRepository';
 import PaymentRepository from '../repositories/Implementation/paymentRepository';
 import { STRIPEKEY } from './env';
-import { IAdvDashboardRepo } from '../repositories/Interface/IDashboardRepository';
-import AdvDashboardRepo from '../repositories/Implementation/dashboardRepository';
-import { IAdminRepository } from '../repositories/Interface/IAdminRepository';
-import AdminRepository from '../repositories/Implementation/adminRepository';
+
+//EXPENSE
 import { IExpenseController } from '../controllers/Interface/user/IExpenseController';
 import ExpenseController from '../controllers/Implementation/user/expenseController';
 import { IExpenseService } from '../services/Interface/user/IExpenseService';
 import ExpenseService from '../services/Implementation/user/expenseService';
 import { IExpenseRepository } from '../repositories/Interface/IExpenseRepository';
 import ExpenseRepository from '../repositories/Implementation/expenseRepository';
+
+//GROUP
+import { IGroupRepository } from '../repositories/Interface/IGroupRepository';
+import GroupRepository from '../repositories/Implementation/groupRepository';
+
+//SLOT
+import { ISlotRepository } from '../repositories/Interface/ISlotRepository';
+import SlotRepository from '../repositories/Implementation/slotRepository';
+import { IGoalRepository } from '../repositories/Interface/IGoalRepository';
+import GoalRepository from '../repositories/Implementation/goalRepository';
+import { IReviewRepository } from '../repositories/Interface/IReviewRepository';
+import ReviewRepository from '../repositories/Implementation/reviewRepository';
+import { INotificationRepository } from '../repositories/Interface/INotificationRepository';
+import NotificationRepository from '../repositories/Implementation/notificationRepository';
+
 
 
 //user
@@ -94,3 +117,18 @@ container.register('StripeSecretKey', { useValue: STRIPEKEY });
 container.register<IExpenseController>('IExpenseController',{useClass:ExpenseController})
 container.register<IExpenseService>('IExpenseService',{useClass:ExpenseService})
 container.register<IExpenseRepository>('IExpenseRepository',{useClass:ExpenseRepository})
+
+//group
+container.register<IGroupRepository>('IGroupRepository',{useClass:GroupRepository})
+
+//slot
+container.register<ISlotRepository>('ISlotRepository',{useClass:SlotRepository})
+
+//goal
+container.register<IGoalRepository>('IGoalRepository',{useClass:GoalRepository})
+
+//review 
+container.register<IReviewRepository>('IReviewRepository',{useClass:ReviewRepository})
+
+//notification
+container.register<INotificationRepository>('INotificationRepository',{useClass:NotificationRepository})

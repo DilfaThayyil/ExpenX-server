@@ -72,6 +72,7 @@ export default class AdvisorRepository implements IAdvisorRepository {
     }
 
     async getBookedSlotsForAdvisor(advisorId: string, page: number, limit: number): Promise<{ bookedSlots: Slot[] | Slot; totalSlots: number }> {
+        // eslint-disable-next-line no-useless-catch
         try {
             const skip = (page - 1) * limit
             const [bookedSlots, totalSlots] = await Promise.all([
@@ -90,6 +91,10 @@ export default class AdvisorRepository implements IAdvisorRepository {
         }
     }
 
+    async getAdvisors(): Promise<IAdvisor[]> {
+        const advisors = await advisorSchema.find({ isBlocked: false })
+        return advisors
+    }
 
     async fetchReports(page: number, limit: number): Promise<{ reports: IReport[], totalReports: number }> {
         const skip = (page - 1) * limit;

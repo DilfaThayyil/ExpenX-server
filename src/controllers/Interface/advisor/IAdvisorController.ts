@@ -15,4 +15,5 @@ export interface IAdvisorController {
   fetchClientGoals(req: Request, res: Response): Promise<Response>
   getUpcomingAppointments(req: Request, res: Response): Promise<Response>
   getRecentClients(req: Request,res:Response): Promise<Response>
+  getAdvisors(req: Request, res:Response): Promise<Response>
 }

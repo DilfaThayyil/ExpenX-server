@@ -1,3 +1,4 @@
+import IAdvisor from "../../../entities/advisorEntities";
 import { IReview } from "../../../models/reviewSchema";
 import { Slot } from "../../../models/slotSchema";
 import { IAppointment } from "../../Implementation/advisor/advisorService";
@@ -17,4 +18,5 @@ export interface IAdvisorService {
     getClientGoalProgress(advisorId:string):Promise<{ completed: number; inProgress: number; notStarted: number }>
     getUpcomingAppointments(advisorId:string):Promise<IAppointment[]>
     getRecentClients(advisorId:string):Promise<Slot[]>
+    getAdvisors():Promise<IAdvisor[]>
 }

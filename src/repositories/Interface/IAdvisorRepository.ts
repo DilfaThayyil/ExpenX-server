@@ -2,8 +2,6 @@ import IAdvisor from "../../entities/advisorEntities";
 import { IReport } from "../../models/reportSchema";
 import { IReview } from "../../models/reviewSchema";
 import { Slot } from "../../models/slotSchema";
-import { IAppointment } from "../../services/Implementation/advisor/advisorService";
-import { CategoryData, MonthlyData } from "../Implementation/advisorRepository";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export interface IAdvisorRepository {
@@ -26,5 +24,6 @@ export interface IAdvisorRepository {
     fetchReports(page:number,limit:number):Promise<{reports:IReport[], totalReports:number}>
     fetchReviews(advisorId:string):Promise<IReview[]>
     addReplyToReview(reviewId:string,advisorId:string,text:string):Promise<IReview | null>
+    getAdvisors():Promise<IAdvisor[]>
   }
   

@@ -1,13 +1,9 @@
 import { IUserRepository } from '../Interface/IUserRepository';
 import userSchema from '../../models/userSchema';
-import { IExpense } from '../../entities/expenseEntities';
 import expenseSchema from '../../models/expenseSchema';
-import groupSchema from '../../models/groupSchema';
 import IUser from '../../entities/userEntities';
-import slotSchema, { Slot } from '../../models/slotSchema';
 import { Types } from 'mongoose';
-import { GroupMember, IGroup, IGroupExpense } from '../../entities/groupEntities';
-import reportSchema, { IReport } from '../../models/reportSchema';
+import { IReport } from '../../models/reportSchema';
 import Report from '../../models/reportSchema';
 import advisorSchema from '../../models/advisorSchema';
 import IAdvisor from '../../entities/advisorEntities';
@@ -15,6 +11,7 @@ import reviewSchema, { IReview } from '../../models/reviewSchema';
 import goalsSchema, { IGoal } from '../../models/goalsSchema';
 import categorySchema, { ICategory } from '../../models/categorySchema';
 import paymentSchema from '../../models/paymentSchema';
+import { BaseRepository } from './baseRepository';
 
 export interface DashboardData {
     monthlyExpenses: CategoryData[];
@@ -62,7 +59,11 @@ const CATEGORY_COLORS:Record<string,string> = {
 
 
 
-export default class UserRepository implements IUserRepository {
+export default class UserRepository extends BaseRepository<IUser>implements IUserRepository
+{
+  constructor() {
+    super(userSchema);
+  }
 
     async findUserByEmail(email: string): Promise<any> {
         return await userSchema.findOne({ email });
@@ -75,16 +76,6 @@ export default class UserRepository implements IUserRepository {
         return await userSchema.findOneAndUpdate({ email }, userData, { new: true });
     }
 
-    async getCategories(): Promise<ICategory[]> {
-        return await categorySchema.find()
-    }
-    async createGroup(groupData: IGroup): Promise<IGroup> {
-        return groupSchema.create(groupData)
-    }
-    async getUserGroups(email: string): Promise<IGroup[]> {
-        const groups = await groupSchema.find({ members: { $elemMatch: { email } } });
-        return groups
-    }
     async fetchUsers(page: number, limit: number): Promise<{ users: IUser[]; totalUsers: number }> {
         const skip = (page - 1) * limit;
         const [users, totalUsers] = await Promise.all([
@@ -103,100 +94,24 @@ export default class UserRepository implements IUserRepository {
     async updateUserStatus(email: string, isBlock: boolean): Promise<void> {
         await userSchema.updateOne({ email }, { $set: { isBlocked: isBlock } })
     }
-    async findById(groupId: string): Promise<IGroup | null> {
-        return await groupSchema.findById(groupId).populate("expenses")
-    }
-    async addMember(groupId: string, newMember: GroupMember): Promise<IGroup> {
-        const group = await groupSchema.findByIdAndUpdate(
-            groupId,
-            { $addToSet: { members: newMember } },
-            { new: true }
-        )
-        if (!group) {
-            throw new Error('group not found')
-        }
-        return group
-    }
+    
+
     async findByEmail(email: string): Promise<IUser | null> {
         const user = await userSchema.findOne({ email });
         return user
     }
-    async addExpenseInGroup(groupId: string, expense: IGroupExpense): Promise<IGroup> {
-        const updatedGroup = await groupSchema.findByIdAndUpdate(
-            new Types.ObjectId(groupId),
-            { $push: { expenses: expense } },
-            { new: true }
-        )
-        if (!updatedGroup) {
-            throw new Error('group not found')
-        }
-        return updatedGroup
-    }
-    async findSlot(slotId: string): Promise<Slot | null> {
-        return await slotSchema.findById(slotId)
-    }
+
+
     async findUserById(userId: string): Promise<IUser | null> {
         return await userSchema.findById(userId)
     }
-    async bookSlot(slotId: string, slot: Slot): Promise<Slot | null> {
-        const bookedSlot = await slotSchema.findOneAndUpdate({ _id: slotId }, slot, { new: true })
-        return bookedSlot
-    }
-    async updateSlot(slotId: string): Promise<Slot | null> {
-        return await slotSchema.findOneAndUpdate({ _id: slotId }, { status: "Cancelled" }, { new: true })
-    }
+
+
     async createReport(data: IReport): Promise<IReport> {
         const report = await Report.create(data);
         return report;
     }
-    async fetchSlotsByUser(userId: string, page: number, limit: number): Promise<{ slots: Slot[], totalPages: number }> {
-        try {
-            const userObjectId = new Types.ObjectId(userId);
-            const filter = {
-                $or: [{ "bookedBy._id": userObjectId }, { status: "Available" }],
-            };
-            const totalSlots = await slotSchema.countDocuments(filter);
-            const totalPages = Math.ceil(totalSlots / limit);
-            const slots = await slotSchema.find(filter)
-                .skip((page - 1) * limit)
-                .limit(limit)
-                .sort({ date: 1 })
-                .lean();
-            return { slots, totalPages };
-        } catch (error: any) {
-            throw new Error(`Error fetching slots: ${error.message}`);
-        }
-    }
-    async getAdvisors(): Promise<IAdvisor[]> {
-        const advisors = await advisorSchema.find({ isBlocked: false })
-        return advisors
-    }
-    async createReview(advisorId: string, userId: string, rating: number, review: string): Promise<IReview> {
-        const newReview = await reviewSchema.create({
-            advisorId: new Types.ObjectId(advisorId),
-            userId: new Types.ObjectId(userId),
-            rating,
-            review
-        });
-        return newReview
-    }
-    async createGoal(goalData: Partial<IGoal>): Promise<IGoal> {
-        const goal = await goalsSchema.create(goalData);
-        return goal
-    }
-    async getGoalsById(userId: string): Promise<IGoal[]> {
-        const goals = await goalsSchema.find({ userId }).sort({ deadline: 1 });
-        return goals
-    }
-    async getGoalById(id: string): Promise<IGoal | null> {
-        return await goalsSchema.findById(id)
-    }
-    async updateGoal(id: string, goalData: Partial<IGoal>): Promise<IGoal | null> {
-        return await goalsSchema.findByIdAndUpdate(id, { ...goalData, updatedAt: new Date() }, { new: true })
-    }
-    async deleteGoal(id: string): Promise<boolean | null> {
-        return await goalsSchema.findByIdAndDelete(id)
-    }
+
     async getDashboardData(userId: string): Promise<DashboardData> {
         try {
             const userObjectId = new Types.ObjectId(userId);

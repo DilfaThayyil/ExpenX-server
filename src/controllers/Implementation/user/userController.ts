@@ -4,7 +4,7 @@ import { IUserService } from '../../../services/Interface/user/IUserService';
 import cloudinary from '../../../config/cloudinaryConfig';
 import { Request, Response } from 'express';
 import { HttpStatusCode } from '../../../utils/httpStatusCode';
-import { GroupMember, IGroupExpense } from '../../../entities/groupEntities';
+import { IGroupExpense } from '../../../entities/groupEntities';
 import { messageConstants } from '../../../utils/messageConstants';
 
 @injectable()
@@ -186,15 +186,6 @@ export default class UserController implements IUserController {
       return res.status(HttpStatusCode.OK).json({ success: true, data });
     } catch (error:any) {
       return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: error.message });
-    }
-  }
-
-  async getAdvisors(req: Request, res: Response): Promise<Response> {
-    try {
-      const Advisors = await this.userService.getAdvisors()
-      return res.status(HttpStatusCode.OK).json({ Advisors })
-    } catch (err) {
-      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: messageConstants.INTERNAL_ERROR });
     }
   }
 
