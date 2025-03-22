@@ -1,7 +1,4 @@
-import IAdvisor from "../../../entities/advisorEntities";
-import { IExpense } from "../../../entities/expenseEntities";
-import { IGroup, IGroupExpense } from "../../../entities/groupEntities";
-import { ICategory } from "../../../models/categorySchema";
+import { IGroup } from "../../../entities/groupEntities";
 import { IGoal } from "../../../models/goalsSchema";
 import { IReport } from "../../../models/reportSchema";
 import { IReview } from "../../../models/reviewSchema";
@@ -19,7 +16,6 @@ export interface IUserService {
     bookslot(slotId:string,userId:string):Promise<Slot | null>
     reportAdvisor(slotId:string,userId:string,advisorId:string,reason:string,customReason:string):Promise<IReport>
     fetchSlotsByUser(userId: string, page: number, limit: number): Promise<{ slots: Slot[], totalPages: number }>
-    getAdvisors():Promise<IAdvisor[]>
     createReview(advisorId: string, userId: string, rating: number, review: string): Promise<IReview>;
     createGoal(userId: string, goalData: Partial<IGoal>): Promise<IGoal>
     getGoalsById(userId: string): Promise<IGoal[]>

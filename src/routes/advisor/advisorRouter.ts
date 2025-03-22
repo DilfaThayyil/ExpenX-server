@@ -22,5 +22,7 @@ router.get('/fetchRevenue/:advisorId',AuthMiddleware.authorizeUser,(req,res)=>ad
 router.get('/fetchClientGoals/:advisorId',AuthMiddleware.authorizeUser,(req,res)=>advisorController.fetchClientGoals(req,res))
 router.get('/getUpcomingAppointments/:advisorId',AuthMiddleware.authorizeUser,(req,res)=>advisorController.getUpcomingAppointments(req,res))
 router.get('/getRecentClients/:advisorId',AuthMiddleware.authorizeUser,(req,res)=>advisorController.getRecentClients(req,res))
+router.get('/getAdvisors',AuthMiddleware.authorizeUser,(req,res)=>advisorController.getAdvisors(req,res))
+
 
 export default router

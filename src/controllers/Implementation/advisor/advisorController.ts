@@ -4,7 +4,6 @@ import { IAdvisorService } from '../../../services/Interface/advisor/IAdvisorSer
 import cloudinary from '../../../config/cloudinaryConfig';
 import { Request, Response } from 'express';
 import { HttpStatusCode } from '../../../utils/httpStatusCode';
-import { Types } from 'mongoose';
 import { messageConstants } from '../../../utils/messageConstants';
 
 @injectable()
@@ -203,6 +202,16 @@ export default class AdvisorController implements IAdvisorController {
     }catch(err){
       console.error(err)
       return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({message:'Error fetching recent clients'})
+    }
+  }
+
+  
+  async getAdvisors(req: Request, res: Response): Promise<Response> {
+    try {
+      const Advisors = await this.advisorService.getAdvisors()
+      return res.status(HttpStatusCode.OK).json({ Advisors })
+    } catch (err) {
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: messageConstants.INTERNAL_ERROR });
     }
   }
 

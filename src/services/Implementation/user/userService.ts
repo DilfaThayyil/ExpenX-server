@@ -1,23 +1,43 @@
 import { inject, injectable } from 'tsyringe';
 import { IUserRepository } from '../../../repositories/Interface/IUserRepository';
 import { IUserService } from '../../Interface/user/IUserService';
-import { IExpense } from '../../../entities/expenseEntities';
 import { Slot } from '../../../models/slotSchema';
 import { GroupMember, IGroup, ISplit } from '../../../entities/groupEntities';
 import { Types } from 'mongoose';
 import { IReport } from '../../../models/reportSchema';
-import IAdvisor from '../../../entities/advisorEntities';
 import { IReview } from '../../../models/reviewSchema';
 import { IGoal } from '../../../models/goalsSchema';
 import { ICategory } from '../../../models/categorySchema';
 import { DashboardData } from '../../../repositories/Implementation/userRepository';
+import { IGroupRepository } from '../../../repositories/Interface/IGroupRepository';
+import { ISlotRepository } from '../../../repositories/Interface/ISlotRepository';
+import { ICategoryRepository } from '../../../repositories/Interface/ICategoryRepository';
+import { IGoalRepository } from '../../../repositories/Interface/IGoalRepository';
+import { IReviewRepository } from '../../../repositories/Interface/IReviewRepository';
 
 @injectable()
 export default class UserService implements IUserService {
   private userRepository: IUserRepository;
+  private groupRepository: IGroupRepository;
+  private slotRepository: ISlotRepository;
+  private categoryRepository: ICategoryRepository;
+  private goalRepository: IGoalRepository;
+  private reviewRepository: IReviewRepository
 
-  constructor(@inject('IUserRepository') userRepository: IUserRepository) {
+  constructor(
+    @inject('IUserRepository') userRepository: IUserRepository,
+    @inject('IGroupRepository') groupRepository: IGroupRepository,
+    @inject('ISlotRepository') slotRepository: ISlotRepository,
+    @inject('ICategoryRepository') categoryRepository: ICategoryRepository,
+    @inject('IGoalRepository') goalRepository: IGoalRepository,
+    @inject('IReviewRepository') reviewRepository: IReviewRepository
+  ) {
     this.userRepository = userRepository;
+    this.groupRepository = groupRepository;
+    this.slotRepository = slotRepository;
+    this.categoryRepository = categoryRepository;
+    this.goalRepository = goalRepository;
+    this.reviewRepository = reviewRepository;
   }
 
   async updateUserProfile(userData: { profilePic: string; username: string; email: string; phone: string; country: string; language: string }) {
@@ -30,10 +50,10 @@ export default class UserService implements IUserService {
     }
   }
 
-  
+
 
   async getCategories(): Promise<ICategory[]> {
-    return this.userRepository.getCategories()
+    return this.categoryRepository.getCategories()
   }
 
   async createGroup(userId: string, name: string, members: string[]): Promise<IGroup> {
@@ -52,7 +72,7 @@ export default class UserService implements IUserService {
         members: modifiedMembers,
         expenses: [],
       }
-      return await this.userRepository.createGroup(newGroup)
+      return await this.groupRepository.createGroup(newGroup)
     } catch (err) {
       console.error(err)
       throw err
@@ -64,7 +84,7 @@ export default class UserService implements IUserService {
     if (!user) {
       throw new Error('User not found')
     }
-    const groups = await this.userRepository.getUserGroups(user?.email)
+    const groups = await this.groupRepository.getUserGroups(user?.email)
     // console.log("groups-serv : ", groups)
     return groups
   }
@@ -73,7 +93,7 @@ export default class UserService implements IUserService {
     if (!groupId || !memberEmail) {
       throw new Error('Group ID and member email are required');
     }
-    const group = await this.userRepository.findById(groupId);
+    const group = await this.groupRepository.findById(groupId);
     if (!group) {
       throw new Error('Group not found');
     }
@@ -88,7 +108,7 @@ export default class UserService implements IUserService {
       paid: 0,
       owed: 0
     };
-    return await this.userRepository.addMember(groupId, newMember);
+    return await this.groupRepository.addMember(groupId, newMember);
   }
 
 
@@ -97,7 +117,7 @@ export default class UserService implements IUserService {
       if (!groupId || !expenseData.title || !expenseData.totalAmount || !expenseData.paidBy || !expenseData.splitMethod) {
         throw new Error('Missing required expense information');
       }
-      const group = await this.userRepository.findById(groupId);
+      const group = await this.groupRepository.findById(groupId);
       if (!group) {
         throw new Error('Group not found');
       }
@@ -150,7 +170,7 @@ export default class UserService implements IUserService {
         splitMethod,
         splits
       };
-      return await this.userRepository.addExpenseInGroup(groupId, expense);
+      return await this.groupRepository.addExpenseInGroup(groupId, expense);
     } catch (err) {
       console.error(err);
       throw err;
@@ -159,7 +179,7 @@ export default class UserService implements IUserService {
 
   async bookslot(slotId: string, userId: string): Promise<Slot | null> {
     try {
-      const slot = await this.userRepository.findSlot(slotId);
+      const slot = await this.slotRepository.findSlot(slotId);
       if (!slot) throw new Error("Slot not found");
       if (slot.status === "Booked") throw new Error("Slot is already booked");
 
@@ -174,7 +194,7 @@ export default class UserService implements IUserService {
         profilePic: user.profilePic
       };
 
-      const bookedSlot = await this.userRepository.bookSlot(slotId, slot);
+      const bookedSlot = await this.slotRepository.bookSlot(slotId, slot);
       return bookedSlot;
     } catch (err) {
       console.error(err);
@@ -182,53 +202,50 @@ export default class UserService implements IUserService {
     }
   }
 
-  async reportAdvisor(slotId:string,userId: string, advisorId: string, reason: "Spam" | "Inappropriate Content" | "Harassment" | "Other", customReason?: string): Promise<IReport> {
+  async reportAdvisor(slotId: string, userId: string, advisorId: string, reason: "Spam" | "Inappropriate Content" | "Harassment" | "Other", customReason?: string): Promise<IReport> {
     const data: IReport = { userId: new Types.ObjectId(userId), advisorId: new Types.ObjectId(advisorId), reason, customReason, status: "pending", createdAt: new Date() };
     const report = await this.userRepository.createReport(data);
-    const updateSlot = await this.userRepository.updateSlot(slotId)
+    await this.slotRepository.updateSlot(slotId)
     return report;
   }
   async fetchSlotsByUser(userId: string, page: number, limit: number): Promise<{ slots: Slot[], totalPages: number }> {
-    const result = await this.userRepository.fetchSlotsByUser(userId, page, limit);
+    const result = await this.slotRepository.fetchSlotsByUser(userId, page, limit);
     return result
   }
-  async getAdvisors():Promise<IAdvisor[]>{
-    const advisors = await this.userRepository.getAdvisors()
-    return advisors
-  }
+
   async createReview(advisorId: string, userId: string, rating: number, review: string): Promise<IReview> {
-    const newReview = await this.userRepository.createReview(advisorId, userId, rating, review);
+    const newReview = await this.reviewRepository.createReview(advisorId, userId, rating, review);
     return newReview
   }
   async createGoal(userId: string, goalData: Partial<IGoal>): Promise<IGoal> {
-    const goal = await this.userRepository.createGoal({ ...goalData, userId });
+    const goal = await this.goalRepository.createGoal({ ...goalData, userId });
     return goal
   }
   async getGoalsById(userId: string): Promise<IGoal[]> {
-    const goals = await this.userRepository.getGoalsById(userId);
+    const goals = await this.goalRepository.getGoalsById(userId);
     return goals
   }
-  async getGoalById(id:string):Promise<IGoal | null>{
-    const goal = await this.userRepository.getGoalById(id)
+  async getGoalById(id: string): Promise<IGoal | null> {
+    const goal = await this.goalRepository.getGoalById(id)
     return goal
   }
-  async updateGoal(id:string,goalData:Partial<IGoal>):Promise<IGoal | null>{
-    const updatedGoal = await this.userRepository.updateGoal(id,goalData)
+  async updateGoal(id: string, goalData: Partial<IGoal>): Promise<IGoal | null> {
+    const updatedGoal = await this.goalRepository.updateGoal(id, goalData)
     return updatedGoal
   }
   async deleteGoal(id: string): Promise<boolean | null> {
-    return await this.userRepository.deleteGoal(id);
+    return await this.goalRepository.deleteGoal(id);
   }
 
   async updateGoalProgress(id: string, amount: number): Promise<IGoal | null> {
-    const goal = await this.userRepository.getGoalById(id);
+    const goal = await this.goalRepository.getGoalById(id);
     if (!goal) return null;
     const newAmount = goal.current + amount;
     const current = Math.max(0, Math.min(goal.target, newAmount));
-    return this.userRepository.updateGoal(id, { current });
+    return this.goalRepository.updateGoal(id, { current });
   }
 
-  async getDashboardData(userId:string):Promise<DashboardData>{
+  async getDashboardData(userId: string): Promise<DashboardData> {
     const data = await this.userRepository.getDashboardData(userId)
     return data
   }

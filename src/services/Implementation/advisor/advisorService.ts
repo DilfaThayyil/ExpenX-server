@@ -5,6 +5,7 @@ import { Slot } from '../../../models/slotSchema';
 import { Types } from 'mongoose';
 import { IReview } from '../../../models/reviewSchema';
 import { IAdvDashboardRepo } from '../../../repositories/Interface/IDashboardRepository';
+import IAdvisor from '../../../entities/advisorEntities';
 
 export interface IAppointment {
   _id: string;
@@ -107,6 +108,7 @@ export default class AdvisorService implements IAdvisorService {
 
 
   async fetchSlots(advisorId:string,page:number,limit:number):Promise<{slots:Slot[]|Slot,totalPages:number}>{
+    // eslint-disable-next-line no-useless-catch
     try{
       const {slots,totalSlots} = await this.advisorRepository.fetchSlots(advisorId,page,limit)
       const totalPages = Math.ceil(totalSlots/limit)      
@@ -187,5 +189,10 @@ export default class AdvisorService implements IAdvisorService {
 
   async getRecentClients(advisorId:string):Promise<Slot[]>{
     return await this.advDashboardRepo.getRecentClientActivities(advisorId)
+  }
+
+  async getAdvisors(): Promise<IAdvisor[]> {
+    const advisors = await this.advisorRepository.getAdvisors()
+    return advisors 
   }
 }
