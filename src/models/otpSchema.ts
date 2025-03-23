@@ -1,8 +1,15 @@
-import { model,Schema } from "mongoose";
-const OtpSchema = new Schema({
+import { Document, model,Schema } from "mongoose";
+
+export interface IOtp extends Document{
+  email:string
+  otp:string
+  expiresAt:Date
+}
+
+const OtpSchema = new Schema<IOtp>({
   email: { type: String, required: true },
   otp: { type: String, required: true },
   expiresAt: { type: Date, required: true },
 });
 
-export default model('Otp', OtpSchema);
+export default model<IOtp>('Otp', OtpSchema);

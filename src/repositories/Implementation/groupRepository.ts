@@ -4,10 +4,7 @@ import groupSchema from "../../models/groupSchema";
 import { IGroupRepository } from "../Interface/IGroupRepository";
 import { BaseRepository } from "./baseRepository";
 
-export default class GroupRepository 
-extends BaseRepository<IGroup>
-implements IGroupRepository
-{
+export default class GroupRepository extends BaseRepository<IGroup>implements IGroupRepository{
     constructor(){
         super(groupSchema)
     }

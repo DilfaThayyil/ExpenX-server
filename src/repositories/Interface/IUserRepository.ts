@@ -1,6 +1,4 @@
-import IAdvisor from "../../entities/advisorEntities";
 import IUser from "../../entities/userEntities";
-import { IReport } from "../../models/reportSchema";
 import { DashboardData } from "../Implementation/userRepository";
 
 export interface IUserRepository {
@@ -13,6 +11,5 @@ export interface IUserRepository {
   updateUserStatus(email:string, isBlock:boolean):Promise<void>
   findByEmail(email: string): Promise<IUser | null>
   findUserById(userId:string):Promise<IUser | null>
-  createReport(data:IReport):Promise<IReport>
   getDashboardData(userId:string):Promise<DashboardData>
 }
