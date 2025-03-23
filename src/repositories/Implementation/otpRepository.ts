@@ -1,8 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { IOtpRepository } from '../Interface/IOtpRepository';
-import otpSchema from '../../models/otpSchema';
+import otpSchema, { IOtp } from '../../models/otpSchema';
+import { BaseRepository } from './baseRepository';
 
-export class OtpRepository implements IOtpRepository {
+export class OtpRepository extends BaseRepository<IOtp> implements IOtpRepository {
+
+  constructor(){
+    super(otpSchema)
+  }
 
    async createOrUpdateOtp(userId: string, otp: number, expiresAt: Date): Promise<any> {
     return await otpSchema.findOneAndUpdate(

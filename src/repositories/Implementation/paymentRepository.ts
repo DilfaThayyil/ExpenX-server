@@ -1,8 +1,12 @@
 import { IPaymentRepository } from '../Interface/IPaymentRepository';
 import paymentSchema, { Payment } from '../../models/paymentSchema';
 import { Types } from 'mongoose';
+import { BaseRepository } from './baseRepository';
 
-export default class PaymentRepository implements IPaymentRepository {
+export default class PaymentRepository extends BaseRepository<Payment> implements IPaymentRepository {
+  constructor(){
+    super(paymentSchema)
+  }
 
   async createPayment(paymentData: Partial<Payment>): Promise<Payment> {
     console.log("creating payment...")

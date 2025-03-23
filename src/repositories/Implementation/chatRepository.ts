@@ -9,14 +9,17 @@ import IUser from "../../entities/userEntities";
 import IAdvisor from "../../entities/advisorEntities";
 import advisorSchema from "../../models/advisorSchema";
 import chatSchema from "../../models/chatSchema";
+import { BaseRepository } from "./baseRepository";
 
 const isValidObjectId = (id: string): boolean => {
     return mongoose.Types.ObjectId.isValid(id);
 };
 
 
-export default class ChatRepository implements IChatRepository {
-
+export default class ChatRepository extends BaseRepository<IMessage> implements IChatRepository {
+    constructor(){
+        super(messageSchema)
+    }
 
     async sendMessage(message: IMessage): Promise<IMessage> {
         const newMessage = new messageSchema(message);

@@ -107,11 +107,6 @@ export default class UserRepository extends BaseRepository<IUser>implements IUse
     }
 
 
-    async createReport(data: IReport): Promise<IReport> {
-        const report = await Report.create(data);
-        return report;
-    }
-
     async getDashboardData(userId: string): Promise<DashboardData> {
         try {
             const userObjectId = new Types.ObjectId(userId);

@@ -6,12 +6,17 @@ import Report, { IReport } from "../../models/reportSchema";
 import reviewSchema, { IReview } from '../../models/reviewSchema';
 import slotSchema, { Slot } from '../../models/slotSchema';
 import { IAdvisorRepository } from '../Interface/IAdvisorRepository';
+import { BaseRepository } from './baseRepository';
 
 
 
-export default class AdvisorRepository implements IAdvisorRepository {
+export default class AdvisorRepository extends BaseRepository<IAdvisor> implements IAdvisorRepository {
+    constructor(){
+        super(advisorSchema)
+    }
+
     async findUserByEmail(email: string): Promise<any> {
-        return await advisorSchema.findOne({ email });
+        return this.model.findOne({ email });
     }
 
     async createUser(userData: any): Promise<any> {

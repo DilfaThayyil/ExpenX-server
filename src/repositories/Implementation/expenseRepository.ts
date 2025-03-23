@@ -1,8 +1,14 @@
 import { IExpense } from "../../entities/expenseEntities";
 import expenseSchema from "../../models/expenseSchema";
 import { IExpenseRepository } from "../Interface/IExpenseRepository";
+import { BaseRepository } from "./baseRepository";
 
-export default class ExpenseRepository implements IExpenseRepository {
+export default class ExpenseRepository extends BaseRepository<IExpense> implements IExpenseRepository {
+    
+    constructor(){
+        super(expenseSchema)
+    }
+
     async findExpensesByUserId(userId: string): Promise<IExpense[]> {
         const expense = await expenseSchema.find({ userId });
         return expense
