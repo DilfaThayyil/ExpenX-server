@@ -4,6 +4,7 @@ import { IUserService } from '../../../services/Interface/user/IUserService';
 import cloudinary from '../../../config/cloudinaryConfig';
 import { Request, Response } from 'express';
 import { HttpStatusCode } from '../../../utils/httpStatusCode';
+import { messageConstants } from '../../../utils/messageConstants';
 
 
 @injectable()
@@ -66,5 +67,30 @@ export default class UserController implements IUserController {
     }
   }
 
+  async fetchUsers(req: Request, res: Response): Promise<Response> {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+      const { users, totalPages } = await this.userService.fetchUsers(page, limit);
+      return res.status(HttpStatusCode.OK).json({ success: true, data: { users, totalPages } });
+    } catch (error) {
+      console.error(error)
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: messageConstants.INTERNAL_ERROR    });
+    }
+  }
+
+  async updateUserBlockStatus(req: Request, res: Response): Promise<Response> {
+    try {
+      const { action, email } = req.body;
+      const result = await this.userService.updateUserBlockStatus(action, email);
+      if (result.error) {
+        return res.status(HttpStatusCode.BAD_REQUEST).json({ error: result.error });
+      }
+      return res.status(HttpStatusCode.OK).json({ message: result.message });
+    } catch (error) {
+      console.error(error)
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: messageConstants.INTERNAL_ERROR    });
+    }
+  }
   
 }

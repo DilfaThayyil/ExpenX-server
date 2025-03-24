@@ -6,14 +6,14 @@ import { Types } from "mongoose";
 import { ISlotRepository } from "../../../repositories/Interface/ISlotRepository";
 
 @injectable()
-export default class ComplaintService implements IComplaintService{
+export default class ComplaintService implements IComplaintService {
     private complaintRepository: IComplaintRepository
     private slotRepository: ISlotRepository
 
     constructor(
-        @inject('IComplaintRepository') complaintRepository:IComplaintRepository,
-        @inject('ISlotRepository') slotRepository:ISlotRepository
-    ){
+        @inject('IComplaintRepository') complaintRepository: IComplaintRepository,
+        @inject('ISlotRepository') slotRepository: ISlotRepository
+    ) {
         this.complaintRepository = complaintRepository
         this.slotRepository = slotRepository
     }
@@ -21,7 +21,12 @@ export default class ComplaintService implements IComplaintService{
     async reportAdvisor(slotId: string, userId: string, advisorId: string, reason: "Spam" | "Inappropriate Content" | "Harassment" | "Other", customReason?: string): Promise<IReport> {
         const data: IReport = { userId: new Types.ObjectId(userId), advisorId: new Types.ObjectId(advisorId), reason, customReason, status: "pending", createdAt: new Date() };
         const report = await this.complaintRepository.createReport(data);
-        await this.slotRepository.updateSlot(slotId)
+        await this.slotRepository.updateSlotStatus(slotId)
         return report;
-      }
+    }
+
+    async fetchReports(page: number, limit: number): Promise<{ reports: IReport[], totalReports: number }> {
+        const report = await this.complaintRepository.fetchReports(page, limit);
+        return report
+    }
 }

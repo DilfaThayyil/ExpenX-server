@@ -66,7 +66,7 @@ export default class AdminRepository implements IAdminRepository {
             { $sort: { _id: 1 } },
         ]);
 
-        // Merge all data
+        
         const monthsMap = new Map();
 
         monthlyExpenses.forEach(({ _id, expenses }) => {

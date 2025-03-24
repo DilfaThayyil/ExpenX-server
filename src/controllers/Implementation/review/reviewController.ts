@@ -21,4 +21,26 @@ export default class ReviewController implements IReviewController {
             return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: "Error creating reviews : ", error })
         }
     }
+
+
+    async fetchReviews(req: Request, res: Response): Promise<Response> {
+        try {
+            const { advisorId } = req.params;
+            const reviews = await this.reviewService.fetchReviews(advisorId);
+            return res.status(HttpStatusCode.OK).json({ success: true, data: reviews });
+        } catch (error) {
+            return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: 'Error fetching reviews' })
+        }
+    }
+
+    async addReplyToReview(req: Request, res: Response): Promise<Response> {
+        try {
+            const { reviewId } = req.params
+            const { advisorId, text } = req.body
+            const review = await this.reviewService.addReplyToReview(reviewId, advisorId, text)
+            return res.status(HttpStatusCode.OK).json({ success: true, data: review })
+        } catch (err) {
+            return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: 'Error adding review' })
+        }
+    }
 }
