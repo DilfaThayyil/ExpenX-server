@@ -2,6 +2,7 @@ import { inject, injectable } from 'tsyringe';
 import { IUserRepository } from '../../../repositories/Interface/IUserRepository';
 import { IUserService } from '../../Interface/user/IUserService';
 import { DashboardData } from '../../../repositories/Implementation/userRepository';
+import IUser from '../../../entities/userEntities';
 
 
 @injectable()
@@ -24,12 +25,29 @@ export default class UserService implements IUserService {
     }
   }
 
-
-
+  async fetchUsers(page: number, limit: number): Promise<{ users: IUser[]; totalPages: number }> {
+    console.log("service....")
+    const { users, totalUsers } = await this.userRepository.fetchUsers(page, limit);
+    const totalPages = Math.ceil(totalUsers / limit);
+    console.log()
+    return { users, totalPages };
+  }
 
   async getDashboardData(userId: string): Promise<DashboardData> {
     const data = await this.userRepository.getDashboardData(userId)
     return data
   }
+
+  async updateUserBlockStatus(action: string, email: string): Promise<{ message: string; error?: string }> {
+    try {
+      const isBlocked = action === 'block'
+      await this.userRepository.updateUserStatus(email, isBlocked)
+      return { message: `User ${action}ed successfully` }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred";
+      return { message: 'Failed to update user status ', error: errorMessage }
+    }
+  }
+
 
 }

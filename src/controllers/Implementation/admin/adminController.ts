@@ -3,10 +3,8 @@ import { inject, injectable } from "tsyringe";
 import { IAdminController } from "../../Interface/admin/IAdminController";
 import { IAdminService } from "../../../services/Interface/admin/IAdminService";
 import { HttpStatusCode } from "../../../utils/httpStatusCode";
-import { IUserService } from "../../../services/Interface/user/IUserService";
 import { ACCESSTOKEN_SECRET } from "../../../config/env";
 import jwt from "jsonwebtoken";
-import { messageConstants } from "../../../utils/messageConstants";
 
 
 
@@ -14,14 +12,9 @@ import { messageConstants } from "../../../utils/messageConstants";
 @injectable()
 export default class AdminController implements IAdminController{
   private adminService: IAdminService
-  private userService: IUserService
   
-  constructor(
-    @inject('IAdminService')adminService:IAdminService,
-    @inject('IUserService')userService:IUserService
-  ){
+  constructor(@inject('IAdminService')adminService:IAdminService){
     this.adminService = adminService
-    this.userService = userService
   }
 
 
@@ -46,55 +39,7 @@ export default class AdminController implements IAdminController{
     }
   }
 
-  
-  // async adminLogin(req: Request, res: Response): Promise<Response> {
-  //   try {
-  //     // console.log("req body : ",req.body)
-  //     const {email, password } = req.body;
-  //     const admin = await this.adminService.adminLogin(email, password);
-  //     // console.log("admin-controller : ",admin)
-  //     res.cookie('accessToken', admin.accessToken, {
-  //       httpOnly: true,  
-  //       secure: process.env.NODE_ENV === 'production', 
-  //       maxAge: 15 * 60 * 1000, 
-  //       sameSite: 'lax',
-  //     })
-  //     res.cookie('refreshToken', admin.refreshToken, {
-  //       httpOnly: true,
-  //       secure: process.env.NODE_ENV === 'production',
-  //       maxAge: 30 * 24 * 60 * 60 * 1000, 
-  //       sameSite: 'lax',
-  //     })
-  //     return res.status(HttpStatusCode.OK).json({ message: "Admin logged in successfully", admin });
-  //   } catch (err) {
-  //     const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
-  //     return res.status(HttpStatusCode.UNAUTHORIZED).json({ error: errorMessage });
-  //   }
-  // }
-
-  async fetchUsers(req: Request, res: Response): Promise<Response> {
-    try {
-      const page = parseInt(req.query.page as string) || 1;
-      const limit = parseInt(req.query.limit as string) || 10;
-      const { users, totalPages } = await this.adminService.fetchUsers(page, limit);
-      return res.status(HttpStatusCode.OK).json({ success: true, data: { users, totalPages } });
-    } catch (error) {
-      console.error(error)
-      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: messageConstants.INTERNAL_ERROR    });
-    }
-  }
-  async fetchAdvisors(req: Request, res: Response): Promise<Response> {
-    try {
-      const page = parseInt(req.query.page as string) || 1;
-      const limit = parseInt(req.query.limit as string) || 10;
-      const { users, totalPages } = await this.adminService.fetchAdvisors(page, limit);
-      return res.status(HttpStatusCode.OK).json({ success: true, data: { users, totalPages } });
-    } catch (error) {
-      console.error(error)
-      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: messageConstants.INTERNAL_ERROR    });
-    }
-  }
-
+ 
 
   async updateAdmin(req:Request, res:Response):Promise<void>{
     try{
@@ -109,87 +54,8 @@ export default class AdminController implements IAdminController{
     }
   }
 
+
   
-
-  async updateUserBlockStatus(req: Request, res: Response): Promise<Response> {
-    try {
-      const { action, email } = req.body;
-      const result = await this.adminService.updateUserBlockStatus(action, email);
-      if (result.error) {
-        return res.status(HttpStatusCode.BAD_REQUEST).json({ error: result.error });
-      }
-      return res.status(HttpStatusCode.OK).json({ message: result.message });
-    } catch (error) {
-      console.error(error)
-      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: messageConstants.INTERNAL_ERROR    });
-    }
-  }
-
-  async updateAdvisorBlockStatus(req:Request, res:Response):Promise<Response>{
-    try{
-      const {action,email} = req.body
-      const result = await this.adminService.updateAdvisorBlockStatus(action,email)
-      if(result.error){
-        return res.status(HttpStatusCode.BAD_REQUEST).json({error: result.error})
-      }
-      return res.status(HttpStatusCode.OK).json({message:result.message})
-    }catch(error){
-      console.error(error)
-      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({error: messageConstants.INTERNAL_ERROR   })
-    }
-  }
-
-  async fetchCategories(req: Request, res: Response): Promise<Response> {
-    try {
-      const page = parseInt(req.query.page as string) || 1;
-      const limit = parseInt(req.query.limit as string) || 10;
-      const { categories, totalPages } = await this.adminService.fetchCategories(page, limit);
-      return res.status(HttpStatusCode.OK).json({ success: true, data: { categories, totalPages } });
-    } catch (error) {
-      console.error(error)
-      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: messageConstants.INTERNAL_ERROR    });
-    }
-  }
-
-  async addCategory(req: Request, res: Response): Promise<Response> {
-    try {
-        const { name } = req.body;
-        const category = await this.adminService.addCategory(name);
-        return res.status(HttpStatusCode.CREATED).json({ success: true, data: { category } });
-    } catch (err: any) {
-        console.error(err);
-        if (err.message === "CATEGORY_EXISTS") {
-            return res.status(HttpStatusCode.BAD_REQUEST).json({ success: false, error: "Category already exists" });
-        }
-        return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, error: messageConstants.INTERNAL_ERROR    });
-    }
-}
-
-  async updateCategory(req:Request,res:Response):Promise<Response>{
-    try{
-      const {id} = req.params
-      const {name} = req.body
-      const updatedCategory = await this.adminService.updateCategory(id,name)
-      return res.status(HttpStatusCode.OK).json({success:true,data:{updatedCategory}})
-    }catch(err){
-      console.error(err)
-      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({error: messageConstants.INTERNAL_ERROR   })
-    }
-  }
-
-  async deleteCategory(req:Request, res:Response):Promise<Response>{
-    try{
-      const {id} = req.params
-      const category = await this.adminService.deleteCategory(id)
-      if(!category){
-        return res.status(HttpStatusCode.NOT_FOUND).json({message:"category not found"})
-      }
-      return res.status(HttpStatusCode.OK).json({message:"category deleted successfully"})
-    }catch(err){
-      console.error(err)
-      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({error:"Error deleting category"})
-    }
-  }
 
   async adminLogout(req: Request, res: Response): Promise<Response> {
     try{
@@ -201,18 +67,7 @@ export default class AdminController implements IAdminController{
     }
   }
 
-  async fetchReports(req:Request, res:Response):Promise<Response>{
-    try{
-      const page = parseInt(req.query.page as string) || 1;
-      const limit = parseInt(req.query.limit as string) || 10;
-      console.log("page,limit-controll : ",page,",",limit)
-      const reports = await this.adminService.fetchReports(page,limit)
-      return res.status(HttpStatusCode.OK).json({success:true,data:{reports}})
-    }catch(err){
-      console.error(err)
-      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({error:"Error fetching reports"})
-    }
-  }
+
 
   async getMonthlyTrends(req:Request,res:Response):Promise<Response>{
     try{
