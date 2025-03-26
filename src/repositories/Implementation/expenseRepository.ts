@@ -9,9 +9,13 @@ export default class ExpenseRepository extends BaseRepository<IExpense> implemen
     super(expenseSchema)
   }
 
-  async findExpensesByUserId(userId: string): Promise<IExpense[]> {
-    const expense = await expenseSchema.find({ userId });
-    return expense
+  async findExpensesByUserId(userId: string,page:number,limit:number): Promise<{expenses:IExpense[],totalExpenses:number}> {
+    const skip = (page-1)*limit
+    const [expenses,totalExpenses] = await Promise.all([
+      expenseSchema.find({ userId }).skip(skip).limit(limit),
+      expenseSchema.countDocuments({userId})
+    ])
+    return {expenses,totalExpenses}
   }
   async createExpense(expenseData: IExpense): Promise<IExpense> {
     return expenseSchema.create(expenseData);
@@ -44,5 +48,11 @@ export default class ExpenseRepository extends BaseRepository<IExpense> implemen
 
     const expenses = await expenseSchema.find(query).lean<IExpense[]>();
     return expenses;
+  }
+
+  async createExpenses(expenses:IExpense[]):Promise<IExpense[]>{
+    const createdExpenses = await expenseSchema.insertMany(expenses)
+    console.log("createdexp-repo : ",createdExpenses)
+    return createdExpenses
   }
 }
