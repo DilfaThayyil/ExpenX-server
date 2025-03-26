@@ -256,4 +256,9 @@ export default class UserRepository extends BaseRepository<IUser>implements IUse
             throw error;
         }
     }
+
+    async findUsersByEmails(emails: string[]): Promise<IUser[]> {
+        return await userSchema.find({ email: { $in: emails } });
+      }
+      
 }

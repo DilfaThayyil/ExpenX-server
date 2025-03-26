@@ -12,4 +12,5 @@ export interface IUserRepository {
   findByEmail(email: string): Promise<IUser | null>
   findUserById(userId:string):Promise<IUser | null>
   getDashboardData(userId:string):Promise<DashboardData>
+  findUsersByEmails(emails:string[]):Promise<IUser[]>
 }

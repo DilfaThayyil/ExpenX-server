@@ -15,8 +15,10 @@ export default class ExpenseService implements IExpenseService {
     this.expenseRepository = expenseRepository
   }
 
-  async getExpensesByUserId(userId: string): Promise<IExpense[]> {
-    return this.expenseRepository.findExpensesByUserId(userId);
+  async getExpensesByUserId(userId: string,page:number,limit:number): Promise<{expenses:IExpense[],totalPages:number}> {
+    const {expenses,totalExpenses} = await this.expenseRepository.findExpensesByUserId(userId,page,limit);
+    const totalPages = Math.ceil(totalExpenses/limit)
+    return {expenses,totalPages}
   }
 
   async createExpense(expenseData: IExpense): Promise<IExpense> {

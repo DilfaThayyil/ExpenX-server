@@ -15,8 +15,10 @@ export default class ExpenseController implements IExpenseController {
   async getExpenses(req: Request, res: Response): Promise<void> {
     try {
       const { userId } = req.params;
-      const expenses = await this.expenseService.getExpensesByUserId(userId);
-      res.status(HttpStatusCode.OK).json(expenses);
+      const page = Math.max(1, parseInt(req.query.currentPage as string) || 1);
+      const limit = Math.max(1, parseInt(req.query.limit as string) || 4);
+      const {expenses,totalPages} = await this.expenseService.getExpensesByUserId(userId,page,limit);
+      res.status(HttpStatusCode.OK).json({success:true,data:{expenses,totalPages}});
     } catch (error) {
       console.error('Error fetching expenses:', error);
       res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: 'Error fetching expenses' });
