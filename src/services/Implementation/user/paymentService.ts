@@ -3,6 +3,7 @@ import { IPaymentRepository } from '../../../repositories/Interface/IPaymentRepo
 import { IPaymentService } from '../../Interface/user/IPaymentService';
 import Stripe from 'stripe';
 import mongoose from 'mongoose';
+import { IExpenseRepository } from '../../../repositories/Interface/IExpenseRepository';
 
 interface Payment {
   _id: mongoose.Types.ObjectId;
@@ -18,14 +19,17 @@ interface Payment {
 export default class PaymentService implements IPaymentService {
   private stripe: Stripe; 
   private paymentRepository: IPaymentRepository;
+  private expenseRepository: IExpenseRepository;
 
   constructor(
     @inject('StripeSecretKey') stripeSecretKey: string,
-    @inject('IPaymentRepository') paymentRepository: IPaymentRepository
+    @inject('IPaymentRepository') paymentRepository: IPaymentRepository,
+    @inject('IExpenseRepository') expenseRepository: IExpenseRepository
   ) {
     console.log("Stripe Secret Key:", stripeSecretKey);
     this.stripe = new Stripe(stripeSecretKey, { apiVersion: undefined });
     this.paymentRepository = paymentRepository;
+    this.expenseRepository = expenseRepository;
   }
 
   async initiatePayment(slotId: string, userId: string, advisorId: string, amount: number): Promise<{ clientSecret: string; paymentId: string; }> {
@@ -49,6 +53,13 @@ export default class PaymentService implements IPaymentService {
         stripePaymentIntentId: paymentIntent.id,
         stripeClientSecret: paymentIntent.client_secret,
       }) as Payment;
+      await this.expenseRepository.createExpense({
+        userId:userObjectId.toString(),
+        date:new Date(),
+        amount,
+        category: 'consultation',
+        description: 'Advisor Fee'
+      })
       const returning = {clientSecret: paymentIntent.client_secret,paymentId: payment._id.toString()};
       return returning
 
