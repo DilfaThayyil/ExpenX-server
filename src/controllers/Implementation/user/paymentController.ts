@@ -3,14 +3,20 @@ import { IPaymentService } from '../../../services/Interface/user/IPaymentServic
 import { IPaymentController } from '../../Interface/user/IPaymentController';
 import { inject, injectable } from 'tsyringe';
 import { HttpStatusCode } from '../../../utils/httpStatusCode';
+import { IWalletService } from '../../../services/Interface/wallet/IWalletService';
 
 
 @injectable()
 export default class PaymentController implements IPaymentController {
   private paymentService: IPaymentService
+  private walletService: IWalletService
 
-  constructor(@inject('IPaymentService')paymentService: IPaymentService){
+  constructor(
+    @inject('IPaymentService')paymentService: IPaymentService,
+    @inject('IWalletService')walletService: IWalletService
+  ){
     this.paymentService = paymentService
+    this.walletService = walletService
   }
   
   async initiatePayment(req: Request, res: Response): Promise<Response>{
@@ -23,6 +29,7 @@ export default class PaymentController implements IPaymentController {
         advisorId,
         amount
       );
+      const wallet = await this.walletService.updateWallet(advisorId,amount)
       console.log("result : ",result)
       return res.status(HttpStatusCode.OK).json(result);
     } catch (error) {
@@ -40,4 +47,5 @@ export default class PaymentController implements IPaymentController {
       return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: 'Failed to confirm payment' });
     }
   };
+  
 }

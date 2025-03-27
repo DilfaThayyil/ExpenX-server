@@ -108,6 +108,10 @@ import { IReviewController } from '../controllers/Interface/review/IReviewContro
 import ReviewController from '../controllers/Implementation/review/reviewController';
 import { IReviewService } from '../services/Interface/review/IReviewService';
 import ReviewService from '../services/Implementation/review/reviewService';
+import { IWalletService } from '../services/Interface/wallet/IWalletService';
+import WalletService from '../services/Implementation/wallet/walletService';
+import { IWalletRepository } from '../repositories/Interface/IWalletRepository';
+import WalletRepository from '../repositories/Implementation/walletRepository';
 
 
 //user
@@ -178,3 +182,7 @@ container.register<INotificationRepository>('INotificationRepository',{useClass:
 container.register<IComplaintController>('IComplaintController',{useClass:ComplaintController})
 container.register<IComplaintService>('IComplaintService',{useClass:ComplaintService})
 container.register<IComplaintRepository>('IComplaintRepository',{useClass:ComplaintRepository})
+
+//wallet
+container.register<IWalletService>('IWalletService',{useClass:WalletService})
+container.register<IWalletRepository>('IWalletRepository',{useClass:WalletRepository})
