@@ -10,7 +10,7 @@ export default class WalletRepository extends BaseRepository<IWallet> implements
     }
 
     async updateWallet(userId: string, amount: number): Promise<IWallet | null> {
-        let wallet = await this.model.findOne({ userId });
+        const wallet = await this.model.findOne({ userId });
 
         if (!wallet) {
             return await this.create({ userId, balance: amount });

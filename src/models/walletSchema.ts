@@ -1,4 +1,4 @@
-import { Document, Types } from 'mongoose';
+import { Document } from 'mongoose';
 import { Schema, model} from 'mongoose';
 
 export interface IWallet extends Document{
