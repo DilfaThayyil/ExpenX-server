@@ -112,6 +112,10 @@ import { IWalletService } from '../services/Interface/wallet/IWalletService';
 import WalletService from '../services/Implementation/wallet/walletService';
 import { IWalletRepository } from '../repositories/Interface/IWalletRepository';
 import WalletRepository from '../repositories/Implementation/walletRepository';
+import { ITransactionService } from '../services/Interface/transaction/ITransactionService';
+import TransactionService from '../services/Implementation/transaction/transactionService';
+import { ITransactionRepository } from '../repositories/Interface/ITransactionRepository';
+import TransactionRepository from '../repositories/Implementation/transactionRepository';
 
 
 //user
@@ -186,3 +190,7 @@ container.register<IComplaintRepository>('IComplaintRepository',{useClass:Compla
 //wallet
 container.register<IWalletService>('IWalletService',{useClass:WalletService})
 container.register<IWalletRepository>('IWalletRepository',{useClass:WalletRepository})
+
+//transaction
+container.register<ITransactionService>('ITransactionService',{useClass:TransactionService})
+container.register<ITransactionRepository>('ITransactionRepository',{useClass:TransactionRepository})
