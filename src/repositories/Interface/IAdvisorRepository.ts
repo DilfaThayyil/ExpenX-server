@@ -1,5 +1,4 @@
 import IAdvisor from "../../entities/advisorEntities";
-import { IReport } from "../../models/reportSchema";
 
 
 /* eslint-disable @typescript-eslint/no-explicit-any */

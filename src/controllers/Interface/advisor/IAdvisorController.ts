@@ -11,5 +11,5 @@ export interface IAdvisorController {
   getAdvisors(req: Request, res:Response): Promise<Response>
   fetchAdvisors(req:Request, res:Response):Promise<Response>
   updateAdvisorBlockStatus(req:Request, res:Response):Promise<Response>
-
+  getClientMeetings(req:Request,res:Response):Promise<Response>
 }

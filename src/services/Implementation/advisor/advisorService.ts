@@ -2,11 +2,11 @@ import { inject, injectable } from 'tsyringe';
 import { IAdvisorRepository } from '../../../repositories/Interface/IAdvisorRepository';
 import { IAdvisorService } from '../../Interface/advisor/IAdvisorService';
 import { Slot } from '../../../models/slotSchema';
-import { Types } from 'mongoose';
-import { IReview } from '../../../models/reviewSchema';
 import { IAdvDashboardRepo } from '../../../repositories/Interface/IDashboardRepository';
 import IAdvisor from '../../../entities/advisorEntities';
 import IUser from '../../../entities/userEntities';
+import { messageConstants } from '../../../utils/messageConstants';
+import { ISlotRepository } from '../../../repositories/Interface/ISlotRepository';
 
 export interface IAppointment {
   _id: string;
@@ -50,13 +50,16 @@ export interface IActivity {
 export default class AdvisorService implements IAdvisorService {
   private advisorRepository: IAdvisorRepository;
   private advDashboardRepo: IAdvDashboardRepo;
+  private slotRepository: ISlotRepository;
 
   constructor(
     @inject('IAdvisorRepository') advisorRepository: IAdvisorRepository,
-    @inject('IAdvDashboardRepo') advDashboardRep: IAdvDashboardRepo
+    @inject('IAdvDashboardRepo') advDashboardRep: IAdvDashboardRepo,
+    @inject('ISlotRepository') slotRepository: ISlotRepository
   ) {
     this.advisorRepository = advisorRepository;
-    this.advDashboardRepo = advDashboardRep
+    this.advDashboardRepo = advDashboardRep;
+    this.slotRepository = slotRepository;
   }
 
   async updateUserProfile(userData: { profilePic: string; username: string; email: string; phone: string; country: string; language: string }) {
@@ -114,6 +117,16 @@ export default class AdvisorService implements IAdvisorService {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred";
       return { message: 'Failed to update advisor status ', error: errorMessage }
+    }
+  }
+
+  async getClientMeetings(clientId:string):Promise<Slot[] | string>{
+    try{
+      const getClientMeetings = await this.slotRepository.getClientMeetings(clientId)
+      return getClientMeetings
+    }catch(err){
+      const errorMessage = err instanceof Error ? err.message : messageConstants.UNEXPECTED_ERROR
+      return errorMessage
     }
   }
 }
