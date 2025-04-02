@@ -1,5 +1,4 @@
 import IAdvisor from "../../../entities/advisorEntities";
-import { IReview } from "../../../models/reviewSchema";
 import { Slot } from "../../../models/slotSchema";
 import { IAppointment } from "../../Implementation/advisor/advisorService";
 
@@ -14,5 +13,5 @@ export interface IAdvisorService {
     getAdvisors():Promise<IAdvisor[]>
     fetchAdvisors(page: number, limit: number): Promise<{ users: IAdvisor[]; totalPages: number }>;
     updateAdvisorBlockStatus(action:string,email:string):Promise<{ message: string; error?: string }>
-
+    getClientMeetings(clientId:string):Promise<Slot[] | string>
 }

@@ -3,13 +3,12 @@ import slotSchema, { Slot } from "../../models/slotSchema";
 import { ISlotRepository } from "../Interface/ISlotRepository";
 import { BaseRepository } from "./baseRepository";
 
-export default class SlotRepository extends BaseRepository<Slot>implements ISlotRepository
-{
-    constructor(){
+export default class SlotRepository extends BaseRepository<Slot> implements ISlotRepository {
+    constructor() {
         super(slotSchema)
     }
     async findSlot(slotId: string): Promise<Slot | null> {
-        return await slotSchema.findById(slotId)
+        return await this.findById(slotId)
     }
     async bookSlot(slotId: string, slot: Slot): Promise<Slot | null> {
         const bookedSlot = await slotSchema.findOneAndUpdate({ _id: slotId }, slot, { new: true })
@@ -38,7 +37,7 @@ export default class SlotRepository extends BaseRepository<Slot>implements ISlot
     }
 
     async createSlot(slot: Slot): Promise<Slot> {
-        const result = await slotSchema.create(slot)
+        const result = await this.create(slot)
         return result
     }
 
@@ -47,7 +46,7 @@ export default class SlotRepository extends BaseRepository<Slot>implements ISlot
         return !!result
     }
 
-    async fetchSlots(advisorId:string,page: number, limit: number): Promise<{ slots: Slot[] | Slot; totalSlots: number }> {
+    async fetchSlots(advisorId: string, page: number, limit: number): Promise<{ slots: Slot[] | Slot; totalSlots: number }> {
         const skip = (page - 1) * limit
         const [slots, totalSlots] = await Promise.all([
             slotSchema.find({ "advisorId._id": advisorId }).skip(skip).limit(limit),
@@ -57,7 +56,7 @@ export default class SlotRepository extends BaseRepository<Slot>implements ISlot
     }
 
     async findSlotById(slotId: string): Promise<Slot | null> {
-        return await slotSchema.findById(slotId)
+        return await this.findById(slotId)
     }
 
     async updateSlot(slotId: string, slot: Slot): Promise<Slot | null> {
@@ -88,4 +87,15 @@ export default class SlotRepository extends BaseRepository<Slot>implements ISlot
             throw err
         }
     }
+
+    async getClientMeetings(clientId: string): Promise<Slot[]> {
+        try {
+            const clientMeetings = await this.model.find({ "bookedBy._id": clientId }).exec();
+            return clientMeetings;
+        } catch (error) {
+            console.error("Error fetching client meetings:", error);
+            throw error;
+        }
+    }
+
 }

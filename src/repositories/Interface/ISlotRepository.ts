@@ -12,4 +12,5 @@ export interface ISlotRepository{
     updateSlot(slotId:string,slot:Slot):Promise<Slot | null>
     deleteSlot(slotId:string):Promise<boolean>
     getBookedSlotsForAdvisor(advisorid:string,page:number,limit:number):Promise<{bookedSlots:Slot[] | Slot; totalSlots:number}>
+    getClientMeetings(clientId:string):Promise<Slot[]>
 }

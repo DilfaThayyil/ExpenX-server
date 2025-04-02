@@ -153,6 +153,16 @@ export default class AdvisorController implements IAdvisorController {
     }
   }
 
-
+  async getClientMeetings(req:Request,res:Response):Promise<Response>{
+    try{
+      const {clientId} = req.params
+      const clientMeetings = await this.advisorService.getClientMeetings(clientId)
+      console.log("getClientMeetings-contrll  ==> ",clientMeetings)
+      return res.status(HttpStatusCode.OK).json({success:true,clientMeetings})
+    }catch(err){
+      console.error(err)
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({error:messageConstants.INTERNAL_ERROR})
+    }
+  }
 
 }

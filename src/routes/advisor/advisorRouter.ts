@@ -27,6 +27,7 @@ router.get('/fetchClientGoals/:advisorId',AuthMiddleware.authorizeUser,(req,res)
 router.get('/getUpcomingAppointments/:advisorId',AuthMiddleware.authorizeUser,(req,res)=>advisorController.getUpcomingAppointments(req,res))
 router.get('/getRecentClients/:advisorId',AuthMiddleware.authorizeUser,(req,res)=>advisorController.getRecentClients(req,res))
 router.get('/getAdvisors',AuthMiddleware.authorizeUser,(req,res)=>advisorController.getAdvisors(req,res))
+router.get('/getClientMeetings/:clientId',AuthMiddleware.authorizeUser,(req,res)=>advisorController.getClientMeetings(req,res))
 
 
 export default router
