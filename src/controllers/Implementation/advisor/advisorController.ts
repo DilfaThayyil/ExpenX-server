@@ -5,13 +5,19 @@ import cloudinary from '../../../config/cloudinaryConfig';
 import { Request, Response } from 'express';
 import { HttpStatusCode } from '../../../utils/httpStatusCode';
 import { messageConstants } from '../../../utils/messageConstants';
+import { IUserService } from '../../../services/Interface/user/IUserService';
 
 @injectable()
 export default class AdvisorController implements IAdvisorController {
   private advisorService: IAdvisorService;
+  private userService: IUserService;
 
-  constructor(@inject('IAdvisorService') advisorService: IAdvisorService) {
+  constructor(
+    @inject('IAdvisorService') advisorService: IAdvisorService,
+    @inject('IUserService') userService: IUserService,
+  ) {
     this.advisorService = advisorService;
+    this.userService = userService;
   }
 
 
@@ -159,6 +165,18 @@ export default class AdvisorController implements IAdvisorController {
       const clientMeetings = await this.advisorService.getClientMeetings(clientId)
       console.log("getClientMeetings-contrll  ==> ",clientMeetings)
       return res.status(HttpStatusCode.OK).json({success:true,clientMeetings})
+    }catch(err){
+      console.error(err)
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({error:messageConstants.INTERNAL_ERROR})
+    }
+  }
+
+  async getClient(req:Request,res:Response):Promise<Response>{
+    try{
+      const {clientId} = req.params
+      const client = await this.userService.fetchUser(clientId)
+      console.log("getClient-contrll ==>> ",client)
+      return res.status(HttpStatusCode.OK).json({success:true,client})
     }catch(err){
       console.error(err)
       return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({error:messageConstants.INTERNAL_ERROR})
