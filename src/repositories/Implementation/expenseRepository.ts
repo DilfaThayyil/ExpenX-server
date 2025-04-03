@@ -9,13 +9,13 @@ export default class ExpenseRepository extends BaseRepository<IExpense> implemen
     super(expenseSchema)
   }
 
-  async findExpensesByUserId(userId: string,page:number,limit:number): Promise<{expenses:IExpense[],totalExpenses:number}> {
-    const skip = (page-1)*limit
-    const [expenses,totalExpenses] = await Promise.all([
+  async findExpensesByUserId(userId: string, page: number, limit: number): Promise<{ expenses: IExpense[], totalExpenses: number }> {
+    const skip = (page - 1) * limit
+    const [expenses, totalExpenses] = await Promise.all([
       expenseSchema.find({ userId }).skip(skip).limit(limit),
-      expenseSchema.countDocuments({userId})
+      expenseSchema.countDocuments({ userId })
     ])
-    return {expenses,totalExpenses}
+    return { expenses, totalExpenses }
   }
   async createExpense(expenseData: IExpense): Promise<IExpense> {
     return expenseSchema.create(expenseData);
@@ -50,9 +50,25 @@ export default class ExpenseRepository extends BaseRepository<IExpense> implemen
     return expenses;
   }
 
-  async createExpenses(expenses:IExpense[]):Promise<IExpense[]>{
+  async createExpenses(expenses: IExpense[]): Promise<IExpense[]> {
     const createdExpenses = await expenseSchema.insertMany(expenses)
-    console.log("createdexp-repo : ",createdExpenses)
+    console.log("createdexp-repo : ", createdExpenses)
     return createdExpenses
   }
+
+  async getExpenseByCategory(clientId: string, startDate: Date | null, endDate: Date | null): Promise<IExpense[]> {
+    const filter: any = { userId: clientId };
+    if (startDate && endDate) {
+      filter.date = { $gte: startDate, $lte: endDate };
+    } else if (startDate) {
+      filter.date = { $gte: startDate };
+    }
+    const expenses = await expenseSchema.aggregate([
+      { $match: filter },{$group: {_id: "$category",totalAmount: { $sum: "$amount" }}},
+      {$project: {category: "$_id",totalAmount: 1,_id: 0}}
+    ]);
+    console.log("expense-repo:", expenses);
+    return expenses;
+  }
+
 }

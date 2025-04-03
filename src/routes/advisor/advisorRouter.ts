@@ -5,10 +5,12 @@ import { IAdvisorController } from '../../controllers/Interface/advisor/IAdvisor
 import { AuthMiddleware } from '../../middleware/authMiddleware';
 import { ISlotController } from '../../controllers/Interface/slot/ISlotController';
 import { IReviewController } from '../../controllers/Interface/review/IReviewController';
+import { IExpenseController } from '../../controllers/Interface/user/IExpenseController';
 
 const advisorController = container.resolve<IAdvisorController>('IAdvisorController');
 const slotController = container.resolve<ISlotController>('ISlotController')
 const reviewController = container.resolve<IReviewController>('IReviewController')
+const expenseController = container.resolve<IExpenseController>('IExpenseController')
 const router = Router()
 
 
@@ -29,5 +31,6 @@ router.get('/getRecentClients/:advisorId',AuthMiddleware.authorizeUser,(req,res)
 router.get('/getAdvisors',AuthMiddleware.authorizeUser,(req,res)=>advisorController.getAdvisors(req,res))
 router.get('/getClientMeetings/:clientId',AuthMiddleware.authorizeUser,(req,res)=>advisorController.getClientMeetings(req,res))
 router.get('/getClient/:clientId',AuthMiddleware.authorizeUser,(req,res)=>advisorController.getClient(req,res))
+router.get('/getExpenseByCategory',AuthMiddleware.authorizeUser,(req,res)=>expenseController.getExpenseByCategory(req,res))
 
 export default router

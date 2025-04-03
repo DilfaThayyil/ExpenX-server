@@ -1,5 +1,4 @@
 import { IExpense } from "../../../entities/expenseEntities"
-import { IGroup } from "../../../entities/groupEntities";
 
 export interface IExpenseService {
     getExpensesByUserId(userId:string,page:number,limit:number):Promise<{expenses:IExpense[],totalPages:number}>
@@ -8,4 +7,5 @@ export interface IExpenseService {
     exportExpensesAsPDF(userId: string,startDate?: string, endDate?: string): Promise<NodeJS.ReadableStream>
     exportExpensesAsCSV(userId: string,startDate?: string, endDate?: string): Promise<string>
     exportExpensesAsExcel(userId:string,startDate?: string, endDate?: string):Promise<Buffer>
+    getExpenseByCategory(clientId:string,expenseTimeframe:string,customStartDate?:string,customEndDate?:string):Promise<IExpense[]>
 }
