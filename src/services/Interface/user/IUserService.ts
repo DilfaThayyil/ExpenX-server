@@ -7,5 +7,5 @@ export interface IUserService {
     getDashboardData(userId:string):Promise<DashboardData>
     fetchUsers(page: number, limit: number): Promise<{ users: IUser[]; totalPages: number }>;
     updateUserBlockStatus(action:string,email:string):Promise<{ message: string; error?: string }>
-
+    fetchUser(userId:string):Promise<IUser | null>
 }

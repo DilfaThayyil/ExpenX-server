@@ -3,6 +3,7 @@ import { IUserRepository } from '../../../repositories/Interface/IUserRepository
 import { IUserService } from '../../Interface/user/IUserService';
 import { DashboardData } from '../../../repositories/Implementation/userRepository';
 import IUser from '../../../entities/userEntities';
+import { messageConstants } from '../../../utils/messageConstants';
 
 
 @injectable()
@@ -49,5 +50,9 @@ export default class UserService implements IUserService {
     }
   }
 
+  async fetchUser(userId:string):Promise<IUser|null>{
+    const user = await this.userRepository.findUserById(userId)
+    return user
+  }
 
 }
