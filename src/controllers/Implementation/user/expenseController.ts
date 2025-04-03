@@ -97,7 +97,19 @@ export default class ExpenseController implements IExpenseController {
     }
   }
 
-
+  async getExpenseByCategory(req:Request,res:Response):Promise<Response>{
+    try{
+      const { clientId, expenseTimeframe,customStartDate,customEndDate } = req.query;
+      const expenses = await this.expenseService.getExpenseByCategory(
+        clientId as string,expenseTimeframe as string,
+        customStartDate as string|undefined,customEndDate as string|undefined)
+      console.log("expenses-contrll : ",expenses)
+      return res.status(HttpStatusCode.OK).json({success:true,expenses});
+    }catch(err){
+      console.error('Error fetching expenses:', err);
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: 'Error fetching expenses' });
+    }
+  }
 
   // async exportExpense(req: Request, res: Response): Promise<void> {
   //   try {

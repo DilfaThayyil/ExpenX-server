@@ -6,6 +6,7 @@ import PDFDocument from 'pdfkit';
 import { Parser as JsonToCsvParser } from 'json2csv';
 import ExcelJS from 'exceljs';
 import { Buffer } from 'node:buffer';
+import { subDays, startOfDay } from "date-fns";
 
 
 @injectable()
@@ -15,10 +16,10 @@ export default class ExpenseService implements IExpenseService {
     this.expenseRepository = expenseRepository
   }
 
-  async getExpensesByUserId(userId: string,page:number,limit:number): Promise<{expenses:IExpense[],totalPages:number}> {
-    const {expenses,totalExpenses} = await this.expenseRepository.findExpensesByUserId(userId,page,limit);
-    const totalPages = Math.ceil(totalExpenses/limit)
-    return {expenses,totalPages}
+  async getExpensesByUserId(userId: string, page: number, limit: number): Promise<{ expenses: IExpense[], totalPages: number }> {
+    const { expenses, totalExpenses } = await this.expenseRepository.findExpensesByUserId(userId, page, limit);
+    const totalPages = Math.ceil(totalExpenses / limit)
+    return { expenses, totalPages }
   }
 
   async createExpense(expenseData: IExpense): Promise<IExpense> {
@@ -28,9 +29,9 @@ export default class ExpenseService implements IExpenseService {
 
   async hasExpenses(userId: string, startDate?: string, endDate?: string): Promise<boolean> {
     const expenses = await this.expenseRepository.findByUserId(userId, startDate, endDate);
-    console.log("hasExpense-service : ",expenses)
+    console.log("hasExpense-service : ", expenses)
     return expenses.length > 0;
-}
+  }
 
 
   async exportExpensesAsPDF(userId: string, startDate?: string, endDate?: string): Promise<NodeJS.ReadableStream> {
@@ -139,5 +140,24 @@ export default class ExpenseService implements IExpenseService {
       throw err;
     }
   }
+
+  async getExpenseByCategory(clientId: string,expenseTimeframe: string,customStartDate?: string,customEndDate?: string):Promise<IExpense[]> {
+    let startDate: Date | null = null;
+    let endDate: Date | null = null;
+    if (expenseTimeframe === "30days") {
+        startDate = subDays(new Date(), 30);
+    } else if (expenseTimeframe === "7days") {
+        startDate = subDays(new Date(), 7);
+    } else if (expenseTimeframe === "today") {
+        startDate = startOfDay(new Date());
+    } else if (expenseTimeframe === "custom" && customStartDate && customEndDate) {
+        startDate = new Date(customStartDate);
+        endDate = new Date(customEndDate);
+    }
+    const expense = await this.expenseRepository.getExpenseByCategory(clientId, startDate, endDate);
+    console.log("expenses-serv : ", expense);
+    return expense;
+}
+
 
 }

@@ -163,7 +163,6 @@ export default class AdvisorController implements IAdvisorController {
     try{
       const {clientId} = req.params
       const clientMeetings = await this.advisorService.getClientMeetings(clientId)
-      console.log("getClientMeetings-contrll  ==> ",clientMeetings)
       return res.status(HttpStatusCode.OK).json({success:true,clientMeetings})
     }catch(err){
       console.error(err)
@@ -175,7 +174,6 @@ export default class AdvisorController implements IAdvisorController {
     try{
       const {clientId} = req.params
       const client = await this.userService.fetchUser(clientId)
-      console.log("getClient-contrll ==>> ",client)
       return res.status(HttpStatusCode.OK).json({success:true,client})
     }catch(err){
       console.error(err)

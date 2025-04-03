@@ -6,4 +6,5 @@ export interface IExpenseRepository{
     findByUserId(userId:string,startDate?: string, endDate?: string):Promise<IExpense[]>
     getExpensesByUserAndDateRange(userId: string,startDate?: Date,endDate?: Date): Promise<IExpense[]>;
     createExpenses(expenses:IExpense[]):Promise<IExpense[]>
+    getExpenseByCategory(clientId: string, startDate: Date | null, endDate: Date | null):Promise<IExpense[]>
 }
