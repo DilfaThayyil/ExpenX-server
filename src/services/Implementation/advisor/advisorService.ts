@@ -7,6 +7,8 @@ import IAdvisor from '../../../entities/advisorEntities';
 import IUser from '../../../entities/userEntities';
 import { messageConstants } from '../../../utils/messageConstants';
 import { ISlotRepository } from '../../../repositories/Interface/ISlotRepository';
+import { IDocument } from '../../../models/documentSchema';
+import { IDocumentRepository } from '../../../repositories/Interface/IDocumentRepository';
 
 export interface IAppointment {
   _id: string;
@@ -51,15 +53,18 @@ export default class AdvisorService implements IAdvisorService {
   private advisorRepository: IAdvisorRepository;
   private advDashboardRepo: IAdvDashboardRepo;
   private slotRepository: ISlotRepository;
+  private documentRepository: IDocumentRepository;
 
   constructor(
     @inject('IAdvisorRepository') advisorRepository: IAdvisorRepository,
     @inject('IAdvDashboardRepo') advDashboardRep: IAdvDashboardRepo,
-    @inject('ISlotRepository') slotRepository: ISlotRepository
+    @inject('ISlotRepository') slotRepository: ISlotRepository,
+    @inject('IDocumentRepository') documentRepository: IDocumentRepository
   ) {
     this.advisorRepository = advisorRepository;
     this.advDashboardRepo = advDashboardRep;
     this.slotRepository = slotRepository;
+    this.documentRepository = documentRepository;
   }
 
   async updateUserProfile(userData: { profilePic: string; username: string; email: string; phone: string; country: string; language: string }) {
@@ -120,13 +125,47 @@ export default class AdvisorService implements IAdvisorService {
     }
   }
 
-  async getClientMeetings(clientId:string):Promise<Slot[] | string>{
-    try{
-      const getClientMeetings = await this.slotRepository.getClientMeetings(clientId)
+  async getClientMeetings(clientId: string,advisorId:string): Promise<Slot[] | string> {
+    try {
+      const getClientMeetings = await this.slotRepository.getClientMeetings(clientId,advisorId)
       return getClientMeetings
-    }catch(err){
+    } catch (err) {
       const errorMessage = err instanceof Error ? err.message : messageConstants.UNEXPECTED_ERROR
       return errorMessage
     }
+  }
+
+  async uploadDocument(userId: string, advisorId: string, file: Express.Multer.File): Promise<IDocument> {
+    try {
+      const mimeMap: Record<string, IDocument["type"]> = {
+        "application/pdf": "PDF",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "XLSX",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "DOCX",
+        "text/csv": "CSV"
+      }
+      const type = mimeMap[file.mimetype] || "PDF";
+      if (!mimeMap[file.mimetype]) {
+        throw new Error(`Unsupported file type: ${file.mimetype}`);
+      }
+      const doc = {
+        userId,
+        advisorId,
+        name: file.originalname,
+        type: type,
+        url: file.path,
+        uploadedAt: new Date()
+      }
+      const document = await this.documentRepository.uploadDocument(doc)
+      console.log("docuemt-serice ; ", document)
+      return document
+    } catch (err) {
+      console.error("🚨 Upload Error:", err);
+      throw new Error("Failed to upload document");
+    }
+  }
+
+  async getDocuments(clientId: string, advisorId: string): Promise<IDocument[]> {
+    const documents = await this.documentRepository.getDocuments(clientId, advisorId)
+    return documents
   }
 }

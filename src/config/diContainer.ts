@@ -116,6 +116,8 @@ import { ITransactionService } from '../services/Interface/transaction/ITransact
 import TransactionService from '../services/Implementation/transaction/transactionService';
 import { ITransactionRepository } from '../repositories/Interface/ITransactionRepository';
 import TransactionRepository from '../repositories/Implementation/transactionRepository';
+import { IDocumentRepository } from '../repositories/Interface/IDocumentRepository';
+import DocumentRepository from '../repositories/Implementation/documentRepository';
 
 
 //user
@@ -194,3 +196,6 @@ container.register<IWalletRepository>('IWalletRepository',{useClass:WalletReposi
 //transaction
 container.register<ITransactionService>('ITransactionService',{useClass:TransactionService})
 container.register<ITransactionRepository>('ITransactionRepository',{useClass:TransactionRepository})
+
+//document
+container.register<IDocumentRepository>('IDocumentRepository',{useClass:DocumentRepository})

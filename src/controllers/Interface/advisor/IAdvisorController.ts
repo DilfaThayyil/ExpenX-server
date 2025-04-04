@@ -13,4 +13,7 @@ export interface IAdvisorController {
   updateAdvisorBlockStatus(req:Request, res:Response):Promise<Response>
   getClientMeetings(req:Request,res:Response):Promise<Response>
   getClient(req:Request,res:Response):Promise<Response>
+  uploadDocument(req:Request,res:Response):Promise<Response>
+  getDocuments(req:Request,res:Response):Promise<Response>
+  getTransactions(req:Request,res:Response):Promise<Response>
 }

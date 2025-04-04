@@ -88,9 +88,13 @@ export default class SlotRepository extends BaseRepository<Slot> implements ISlo
         }
     }
 
-    async getClientMeetings(clientId: string): Promise<Slot[]> {
+    async getClientMeetings(clientId: string, advisorId: string): Promise<Slot[]> {
         try {
-            const clientMeetings = await this.model.find({ "bookedBy._id": clientId }).exec();
+            const clientMeetings = await this.model.find({
+                "bookedBy._id": clientId,
+                "advisorId._id": advisorId
+            }).exec();
+            console.log("meetings-repo : ",clientMeetings)
             return clientMeetings;
         } catch (error) {
             console.error("Error fetching client meetings:", error);

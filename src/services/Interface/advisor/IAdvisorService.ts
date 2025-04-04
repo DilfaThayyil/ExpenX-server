@@ -1,4 +1,5 @@
 import IAdvisor from "../../../entities/advisorEntities";
+import { IDocument } from "../../../models/documentSchema";
 import { Slot } from "../../../models/slotSchema";
 import { IAppointment } from "../../Implementation/advisor/advisorService";
 
@@ -13,5 +14,7 @@ export interface IAdvisorService {
     getAdvisors():Promise<IAdvisor[]>
     fetchAdvisors(page: number, limit: number): Promise<{ users: IAdvisor[]; totalPages: number }>;
     updateAdvisorBlockStatus(action:string,email:string):Promise<{ message: string; error?: string }>
-    getClientMeetings(clientId:string):Promise<Slot[] | string>
+    getClientMeetings(clientId:string,advisorId:string):Promise<Slot[] | string>
+    uploadDocument(userId:string,advisorId:string,file:Express.Multer.File):Promise<IDocument>
+    getDocuments(clientId:string,advisorId:string):Promise<IDocument[]>
 }

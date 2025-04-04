@@ -57,4 +57,6 @@ export default class AdvisorRepository extends BaseRepository<IAdvisor> implemen
         return await advisorSchema.findOneAndUpdate({ email }, { refreshToken: null }, { new: true });
     }
 
+
+
 }
