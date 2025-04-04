@@ -15,9 +15,10 @@ export default class ReviewService implements IReviewService {
     const newReview = await this.reviewRepository.createReview(advisorId, userId, rating, review);
     return newReview
   }
-  async fetchReviews(advisorId: string): Promise<IReview[]> {
-    const reviews = await this.reviewRepository.fetchReviews(advisorId);
-    return reviews
+  async fetchReviews(advisorId: string,page:number,limit:number): Promise<{reviews:IReview[] | IReview,totalPages:number}> {
+    const {reviews,totalReviews} = await this.reviewRepository.fetchReviews(advisorId,page,limit);
+    const totalPages = Math.ceil(totalReviews / limit)
+    return {reviews,totalPages}
   }
 
   async addReplyToReview(reviewId: string, advisorId: string, text: string): Promise<IReview | null> {
