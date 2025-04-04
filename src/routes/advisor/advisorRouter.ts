@@ -34,6 +34,6 @@ router.get('/getClient/:clientId',AuthMiddleware.authorizeUser,(req,res)=>adviso
 router.get('/getExpenseByCategory',AuthMiddleware.authorizeUser,(req,res)=>expenseController.getExpenseByCategory(req,res))
 router.post('/uploadDocument',AuthMiddleware.authorizeUser,uploadDocument.single('document'),(req,res)=>{advisorController.uploadDocument(req,res)})
 router.get('/getDocuments',AuthMiddleware.authorizeUser,(req,res)=>advisorController.getDocuments(req,res))
-router.get('/getTransactions/:clientId',AuthMiddleware.authorizeUser,(req,res)=>advisorController.getTransactions(req,res))
+router.get('/getTransactions/:userId',AuthMiddleware.authorizeUser,(req,res)=>advisorController.getTransactions(req,res))
 
 export default router

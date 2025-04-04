@@ -215,8 +215,8 @@ export default class AdvisorController implements IAdvisorController {
 
   async getTransactions(req:Request,res:Response):Promise<Response>{
     try{
-      const {clientId} = req.params
-      const transactions = await this.transactionService.getTransactions(clientId)
+      const {userId} = req.params
+      const transactions = await this.transactionService.getTransactions(userId)
       return res.status(HttpStatusCode.OK).json({success:true,transactions})
     }catch(err){
       console.error(err)

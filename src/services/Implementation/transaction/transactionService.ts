@@ -16,7 +16,7 @@ export default class TransactionService implements ITransactionService {
         return await this.transactionRepository.createTransaction(transaction)
     }
 
-    async getTransactions(clientId:string):Promise<ITransaction[]>{
-        return await this.transactionRepository.getTransactions(clientId)
+    async getTransactions(userId:string):Promise<ITransaction[]>{
+        return await this.transactionRepository.getTransactions(userId)
     }
 }

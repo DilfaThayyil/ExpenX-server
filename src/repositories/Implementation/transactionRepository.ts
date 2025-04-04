@@ -11,8 +11,8 @@ export default class TransactionRepository extends BaseRepository<ITransaction> 
         return await this.create(transaction)
     }
 
-    async getTransactions(clientId: string): Promise<ITransaction[]> {
-        const transactions = await this.model.find({ userId: clientId }).exec();
+    async getTransactions(userId: string): Promise<ITransaction[]> {
+        const transactions = await this.model.find({ userId: userId }).exec();
         console.log("transctions-repo ; ",transactions)
         return transactions
     }
