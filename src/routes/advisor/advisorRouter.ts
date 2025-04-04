@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import {uploadProfile} from '../../middleware/multer';
+import {uploadDocument, uploadProfile} from '../../middleware/multer';
 import { container } from 'tsyringe';
 import { IAdvisorController } from '../../controllers/Interface/advisor/IAdvisorController';
 import { AuthMiddleware } from '../../middleware/authMiddleware';
@@ -29,8 +29,11 @@ router.get('/fetchClientGoals/:advisorId',AuthMiddleware.authorizeUser,(req,res)
 router.get('/getUpcomingAppointments/:advisorId',AuthMiddleware.authorizeUser,(req,res)=>advisorController.getUpcomingAppointments(req,res))
 router.get('/getRecentClients/:advisorId',AuthMiddleware.authorizeUser,(req,res)=>advisorController.getRecentClients(req,res))
 router.get('/getAdvisors',AuthMiddleware.authorizeUser,(req,res)=>advisorController.getAdvisors(req,res))
-router.get('/getClientMeetings/:clientId',AuthMiddleware.authorizeUser,(req,res)=>advisorController.getClientMeetings(req,res))
+router.get('/getClientMeetings',AuthMiddleware.authorizeUser,(req,res)=>advisorController.getClientMeetings(req,res))
 router.get('/getClient/:clientId',AuthMiddleware.authorizeUser,(req,res)=>advisorController.getClient(req,res))
 router.get('/getExpenseByCategory',AuthMiddleware.authorizeUser,(req,res)=>expenseController.getExpenseByCategory(req,res))
+router.post('/uploadDocument',AuthMiddleware.authorizeUser,uploadDocument.single('document'),(req,res)=>{advisorController.uploadDocument(req,res)})
+router.get('/getDocuments',AuthMiddleware.authorizeUser,(req,res)=>advisorController.getDocuments(req,res))
+router.get('/getTransactions/:clientId',AuthMiddleware.authorizeUser,(req,res)=>advisorController.getTransactions(req,res))
 
 export default router

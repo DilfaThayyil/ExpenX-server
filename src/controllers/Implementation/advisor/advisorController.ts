@@ -6,18 +6,22 @@ import { Request, Response } from 'express';
 import { HttpStatusCode } from '../../../utils/httpStatusCode';
 import { messageConstants } from '../../../utils/messageConstants';
 import { IUserService } from '../../../services/Interface/user/IUserService';
+import { ITransactionService } from '../../../services/Interface/transaction/ITransactionService';
 
 @injectable()
 export default class AdvisorController implements IAdvisorController {
   private advisorService: IAdvisorService;
   private userService: IUserService;
+  private transactionService: ITransactionService;
 
   constructor(
     @inject('IAdvisorService') advisorService: IAdvisorService,
     @inject('IUserService') userService: IUserService,
+    @inject('ITransactionService') transactionService: ITransactionService
   ) {
     this.advisorService = advisorService;
     this.userService = userService;
+    this.transactionService = transactionService;
   }
 
 
@@ -161,8 +165,8 @@ export default class AdvisorController implements IAdvisorController {
 
   async getClientMeetings(req:Request,res:Response):Promise<Response>{
     try{
-      const {clientId} = req.params
-      const clientMeetings = await this.advisorService.getClientMeetings(clientId)
+      const {clientId,advisorId} = req.query as {clientId:string,advisorId:string}
+      const clientMeetings = await this.advisorService.getClientMeetings(clientId,advisorId)
       return res.status(HttpStatusCode.OK).json({success:true,clientMeetings})
     }catch(err){
       console.error(err)
@@ -181,4 +185,42 @@ export default class AdvisorController implements IAdvisorController {
     }
   }
 
+  async uploadDocument(req:Request,res:Response):Promise<Response>{
+    try{
+      const file = req.file
+      const {userId,advisorId} = req.body
+      console.log("file-contrll #### : ",req.file)
+      if (!file || !userId || !advisorId) {
+        return res.status(HttpStatusCode.BAD_REQUEST).json({ error: 'Missing file or required fields' });
+      }      
+      const document = await this.advisorService.uploadDocument(userId,advisorId,file)
+      console.log("doc-contrlll : ",document)
+      return res.status(HttpStatusCode.OK).json({message : 'File uploaded successfully',document})
+    }catch(err){
+      console.error(err)
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({error:'Error uploading document'})
+    }
+  }
+
+  async getDocuments(req:Request,res:Response):Promise<Response>{
+    try{
+      const { clientId, advisorId } = req.query as { clientId: string; advisorId: string };
+      const documents = await this.advisorService.getDocuments(clientId,advisorId)
+      return res.status(HttpStatusCode.OK).json({success:true,documents})
+    }catch(err){
+      console.error(err)
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({error:messageConstants.INTERNAL_ERROR})
+    }
+  }
+
+  async getTransactions(req:Request,res:Response):Promise<Response>{
+    try{
+      const {clientId} = req.params
+      const transactions = await this.transactionService.getTransactions(clientId)
+      return res.status(HttpStatusCode.OK).json({success:true,transactions})
+    }catch(err){
+      console.error(err)
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({error:messageConstants.INTERNAL_ERROR})
+    }
+  }
 }
