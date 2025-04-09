@@ -11,7 +11,7 @@ Robust and scalable backend for the **Expense Tracker Web App** — powering use
 - 📊 **Expense tracking & category filtering**
 - 📅 **Advisor slot creation, updates, and booking**
 - 💬 **Real-time chat** with Socket.IO
-- 📹 **Video/Audio calls** powered by ZegoCloud (frontend integration)
+- 📹 **Video calls** powered by ZegoCloud (frontend integration)
 - ☁️ **File uploads** with Cloudinary & AWS S3 using Multer
 - 💳 **Stripe Integration** for secure payments
 - 📩 **Email service** with Nodemailer
@@ -34,7 +34,6 @@ Robust and scalable backend for the **Expense Tracker Web App** — powering use
 - [ZegoCloud UIKit](https://www.zegocloud.com/)
 - [Multer](https://github.com/expressjs/multer)
 - [Cloudinary](https://cloudinary.com/)
-- [AWS S3](https://aws.amazon.com/s3/)
 - [Nodemailer](https://nodemailer.com/)
 
 ### 🧱 Architecture
@@ -49,7 +48,7 @@ Robust and scalable backend for the **Expense Tracker Web App** — powering use
 
 - Node.js ≥ 18
 - MongoDB (local or Atlas)
-- AWS S3 credentials or Cloudinary keys
+- Cloudinary keys
 - Stripe secret key
 - Google OAuth client ID & secret
 
@@ -59,9 +58,9 @@ Robust and scalable backend for the **Expense Tracker Web App** — powering use
 
 ```bash
 # Clone the repo
-git clone https://github.com/your-username/expense-tracker-api.git
+git clone https://github.com/DilfaThayyil/ExpenX-server.git
 
-cd expense-tracker-api
+cd ExpenX-server
 
 # Install dependencies
 npm install
