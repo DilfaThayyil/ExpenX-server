@@ -107,4 +107,15 @@ export default class SlotController implements ISlotController {
       return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: "Error fetching booked slots" });
     }
   }
+
+  async cancelBookedSlot(req: Request, res: Response): Promise<Response>{
+    try {
+      const { slotId } = req.params;
+      const {advisorId,userId} = req.body
+      const updatedSlot = await this.slotService.cancelBookedSlot(slotId,advisorId,userId);
+      return res.status(200).json({ message: "Slot cancelled, amount refunded", updatedSlot });
+    } catch (error: any) {
+      return res.status(400).json({ message: error.message });
+    }
+  }
 }

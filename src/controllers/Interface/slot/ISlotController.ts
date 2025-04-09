@@ -8,5 +8,5 @@ export interface ISlotController{
     updateSlot(req:Request,res:Response): Promise<void>
     deleteSlot(req:Request,res:Response): Promise<void>
     getBookedSlotsForAdvisor(req: Request, res: Response): Promise<Response>
-  
+    cancelBookedSlot(req: Request, res: Response): Promise<Response>
 }

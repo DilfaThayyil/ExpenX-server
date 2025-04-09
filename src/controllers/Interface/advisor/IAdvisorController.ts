@@ -16,4 +16,5 @@ export interface IAdvisorController {
   uploadDocument(req:Request,res:Response):Promise<Response>
   getDocuments(req:Request,res:Response):Promise<Response>
   getTransactions(req:Request,res:Response):Promise<Response>
+  getWallet(req:Request,res:Response):Promise<Response>
 }
