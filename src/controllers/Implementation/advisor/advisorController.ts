@@ -7,21 +7,25 @@ import { HttpStatusCode } from '../../../utils/httpStatusCode';
 import { messageConstants } from '../../../utils/messageConstants';
 import { IUserService } from '../../../services/Interface/user/IUserService';
 import { ITransactionService } from '../../../services/Interface/transaction/ITransactionService';
+import { IWalletService } from '../../../services/Interface/wallet/IWalletService';
 
 @injectable()
 export default class AdvisorController implements IAdvisorController {
   private advisorService: IAdvisorService;
   private userService: IUserService;
   private transactionService: ITransactionService;
+  private walletService: IWalletService;
 
   constructor(
     @inject('IAdvisorService') advisorService: IAdvisorService,
     @inject('IUserService') userService: IUserService,
-    @inject('ITransactionService') transactionService: ITransactionService
+    @inject('ITransactionService') transactionService: ITransactionService,
+    @inject('IWalletService') walletService: IWalletService
   ) {
     this.advisorService = advisorService;
     this.userService = userService;
     this.transactionService = transactionService;
+    this.walletService = walletService;
   }
 
 
@@ -220,6 +224,16 @@ export default class AdvisorController implements IAdvisorController {
       return res.status(HttpStatusCode.OK).json({success:true,transactions})
     }catch(err){
       console.error(err)
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({error:messageConstants.INTERNAL_ERROR})
+    }
+  }
+
+  async getWallet(req:Request,res:Response):Promise<Response>{
+    try{
+      const {userId} = req.params
+      const wallet = await this.walletService.getWallet(userId)
+      return res.status(HttpStatusCode.OK).json(wallet)
+    }catch(err){
       return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({error:messageConstants.INTERNAL_ERROR})
     }
   }

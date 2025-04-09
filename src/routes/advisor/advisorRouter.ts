@@ -35,5 +35,7 @@ router.get('/getExpenseByCategory',AuthMiddleware.authorizeUser,(req,res)=>expen
 router.post('/uploadDocument',AuthMiddleware.authorizeUser,uploadDocument.single('document'),(req,res)=>{advisorController.uploadDocument(req,res)})
 router.get('/getDocuments',AuthMiddleware.authorizeUser,(req,res)=>advisorController.getDocuments(req,res))
 router.get('/getTransactions/:userId',AuthMiddleware.authorizeUser,(req,res)=>advisorController.getTransactions(req,res))
+router.patch('/cancelSlot/:slotId',AuthMiddleware.authorizeUser,(req,res)=>slotController.cancelBookedSlot(req,res))
+router.get('/getWallet/:userId',AuthMiddleware.authorizeUser,(req,res)=>advisorController.getWallet(req,res))
 
 export default router

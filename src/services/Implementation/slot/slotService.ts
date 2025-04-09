@@ -5,21 +5,25 @@ import { Slot } from "../../../models/slotSchema";
 import { IUserRepository } from "../../../repositories/Interface/IUserRepository";
 import { Types } from "mongoose";
 import { IAdvisorRepository } from "../../../repositories/Interface/IAdvisorRepository";
+import { IWalletRepository } from "../../../repositories/Interface/IWalletRepository";
 
 @injectable()
 export default class SlotService implements ISlotService {
   private slotRepository: ISlotRepository
   private userRepository: IUserRepository
   private advisorRepository: IAdvisorRepository
+  private walletRepository: IWalletRepository
 
   constructor(
     @inject('ISlotRepository') slotRepository: ISlotRepository,
     @inject('IUserRepository') userRepository: IUserRepository,
-    @inject('IAdvisorRepository') advisorRepository: IAdvisorRepository
+    @inject('IAdvisorRepository') advisorRepository: IAdvisorRepository,
+    @inject('IWalletRepository') walletRepository: IWalletRepository
   ) {
     this.slotRepository = slotRepository
     this.userRepository = userRepository
     this.advisorRepository = advisorRepository
+    this.walletRepository = walletRepository
   }
 
   async bookslot(slotId: string, userId: string): Promise<Slot | null> {
@@ -138,5 +142,14 @@ export default class SlotService implements ISlotService {
       console.error(err)
       throw err
     }
+  }
+
+  async cancelBookedSlot(slotId: string,advisorId:string,userId:string): Promise<Slot | null> {
+    const slot = await this.slotRepository.findSlotById(slotId);
+    if (!slot) throw new Error("Slot not found");
+    const slotAmount = slot.fee;
+    await this.walletRepository.updateWallet(userId, slotAmount);
+    await this.walletRepository.updateWallet(advisorId, -slotAmount);
+    return await this.slotRepository.updateSlotStatus(slotId);
   }
 }

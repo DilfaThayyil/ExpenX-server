@@ -16,4 +16,9 @@ export default class WalletService implements IWalletService{
         const updatedWallet = await this.walletRepository.updateWallet(userId,amount)
         return updatedWallet
     }
+
+    async getWallet(userId: string): Promise<IWallet | null> {
+        const wallet = await this.walletRepository.getWallet(userId)
+        return wallet
+    }
 }
