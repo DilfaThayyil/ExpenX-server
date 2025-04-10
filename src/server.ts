@@ -10,6 +10,7 @@ import { CLIENTURL, PORT } from "./config/env";
 import router from "./routes";
 import initializeSocket from "./utils/socket";
 import cookieParser from "cookie-parser";
+import loggers from "./utils/logger";
 
 dotenv.config();
 
@@ -24,7 +25,8 @@ app.use(cors({
   credentials: true,
 }));
 
-app.use(morgan("dev"));
+// app.use(morgan('dev'))
+loggers.forEach((logger) => app.use(logger));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
