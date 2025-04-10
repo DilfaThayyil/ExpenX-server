@@ -1,4 +1,4 @@
-import { CategoryData, DashboardStats, MonthlyData, UserGrowthData } from "../Implementation/adminRepository";
+import { MonthlyData, DashboardStats, UserGrowthData, CategoryData } from "../../dto/adminDTO"
 
 export interface IAdminRepository{
     getMonthlyTrends(startDate?:Date,endDate?:Date):Promise<MonthlyData[]>

@@ -1,4 +1,4 @@
-import { CategoryData, DashboardStats, MonthlyData, UserGrowthData } from "../../../repositories/Implementation/adminRepository";
+import { CategoryData, DashboardStats, MonthlyData, UserGrowthData } from "../../../dto/adminDTO"
 
 export interface IAdminService {
   validateCredentials(email:string,password:string):boolean

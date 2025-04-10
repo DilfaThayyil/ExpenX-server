@@ -9,42 +9,7 @@ import { messageConstants } from '../../../utils/messageConstants';
 import { ISlotRepository } from '../../../repositories/Interface/ISlotRepository';
 import { IDocument } from '../../../models/documentSchema';
 import { IDocumentRepository } from '../../../repositories/Interface/IDocumentRepository';
-
-export interface IAppointment {
-  _id: string;
-  advisorId: {
-    _id: string;
-    username: string;
-    email: string;
-    profilePic: string;
-  };
-  date: string;
-  startTime: string;
-  fee: number;
-  duration: number;
-  maxBookings: number;
-  status: "Available" | "Booked" | "Cancelled";
-  bookedBy?: {
-    _id: string;
-    username: string;
-    email: string;
-    profilePic: string;
-  };
-  location: "Virtual" | "Physical";
-  locationDetails: string;
-  description: string;
-}
-
-export interface IActivity {
-  _id: string;
-  advisorId: string;
-  clientId: string;
-  clientName: string;
-  action: string;
-  amount: number;
-  time: string;
-}
-
+import { IAppointment } from '../../../dto/advisorDTO';
 
 
 

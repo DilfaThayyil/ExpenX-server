@@ -3,8 +3,8 @@ import { Types } from 'mongoose';
 import Payment from "../../models/paymentSchema";
 import goalsSchema from '../../models/goalsSchema';
 import SlotModel from "../../models/slotSchema";
-import { IAppointment } from '../../services/Implementation/advisor/advisorService';
 import slotSchema, { Slot } from '../../models/slotSchema';
+import { IAppointment } from "../../dto/advisorDTO";
 
 export default class AdvDashboardRepo implements IAdvDashboardRepo {
     async getDashboardData(advisorId: string): Promise<{

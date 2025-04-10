@@ -1,5 +1,6 @@
+import { DashboardData } from "../../../dto/userDTO";
 import IUser from "../../../entities/userEntities";
-import { DashboardData } from "../../../repositories/Implementation/userRepository";
+
 
 export interface IUserService {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

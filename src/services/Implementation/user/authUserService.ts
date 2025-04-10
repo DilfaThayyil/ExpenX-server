@@ -4,7 +4,6 @@ import bcrypt from 'bcrypt';
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../../../utils/jwt';
 import Otp from '../../../models/otpSchema';
 import { sendOtpEmail } from '../../../utils/sendOtp';
-import { validateEmail } from '../../validator';
 // import { googleVerify } from '../../utils/googleOAuth';
 import { injectable,inject } from 'tsyringe';
 import redisClient from '../../../utils/redisClient';

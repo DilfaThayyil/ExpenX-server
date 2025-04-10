@@ -1,12 +1,7 @@
 import { Types } from "mongoose";
+import { Split } from "../dto/expenseDTO";
 
-export interface Split {
-    userId: Types.ObjectId;
-    amountOwed: number;
-    percentage?: number;
-    customAmount?: number;
-    status: "pending" | "paid";
-}
+
 export const calculateSplits = (
     totalAmount: number,
     splitMethod: "equal" | "percentage" | "custom",

@@ -4,9 +4,8 @@ import { IUserRepository } from "../../../repositories/Interface/IUserRepository
 import { IAdvisorRepository } from "../../../repositories/Interface/IAdvisorRepository";
 import bcrypt from 'bcrypt';
 import { ADMINEMAIL, ADMINPASSWORD } from "../../../config/env";
-import { IReport } from "../../../models/reportSchema";
 import { IAdminRepository } from "../../../repositories/Interface/IAdminRepository";
-import { CategoryData, DashboardStats, MonthlyData, UserGrowthData } from "../../../repositories/Implementation/adminRepository";
+import { MonthlyData, DashboardStats, UserGrowthData, CategoryData } from "../../../dto/adminDTO";
 
 
 

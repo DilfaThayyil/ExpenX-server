@@ -1,4 +1,3 @@
-import { Model, Document, Types } from 'mongoose'
 
 export interface IBaseRepository<T>{
     create(data:Partial<T>):Promise<T>

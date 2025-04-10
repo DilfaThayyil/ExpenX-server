@@ -4,16 +4,9 @@ import { IPaymentService } from '../../Interface/user/IPaymentService';
 import Stripe from 'stripe';
 import mongoose from 'mongoose';
 import { IExpenseRepository } from '../../../repositories/Interface/IExpenseRepository';
+import { Payment } from '../../../dto/paymentDTO';
 
-interface Payment {
-  _id: mongoose.Types.ObjectId;
-  slotId: mongoose.Types.ObjectId;
-  userId: mongoose.Types.ObjectId;
-  advisorId: mongoose.Types.ObjectId;
-  amount: number;
-  stripePaymentIntentId: string;
-  stripeClientSecret: string;
-}
+
 
 @injectable()
 export default class PaymentService implements IPaymentService {
