@@ -1,31 +1,10 @@
+import { MonthlyData, CategoryData, DashboardStats, UserGrowthData } from "../../dto/adminDTO";
 import expenseSchema from "../../models/expenseSchema";
 import paymentSchema from "../../models/paymentSchema";
 import userSchema from "../../models/userSchema";
 import { IAdminRepository } from "../Interface/IAdminRepository";
 
-export interface MonthlyData {
-    month: string;
-    expenses: number;
-    income: number;
-    users: number;
-}
 
-export interface CategoryData {
-    category: string;
-    amount: number;
-}
-
-export interface DashboardStats {
-    totalUsers: number;
-    totalPayments: number;
-    averageExpense: number;
-    totalRevenue: number;
-}
-
-export interface UserGrowthData {
-    month: string;
-    count: number;
-}
 
 export default class AdminRepository implements IAdminRepository {
     async getMonthlyTrends(startDate?: Date, endDate?: Date): Promise<MonthlyData[]> {

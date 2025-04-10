@@ -1,7 +1,7 @@
+import { IAppointment } from "../../../dto/advisorDTO";
 import IAdvisor from "../../../entities/advisorEntities";
 import { IDocument } from "../../../models/documentSchema";
 import { Slot } from "../../../models/slotSchema";
-import { IAppointment } from "../../Implementation/advisor/advisorService";
 
 export interface IAdvisorService {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

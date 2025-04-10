@@ -3,59 +3,9 @@ import userSchema from '../../models/userSchema';
 import expenseSchema from '../../models/expenseSchema';
 import IUser from '../../entities/userEntities';
 import { Types } from 'mongoose';
-import { IReport } from '../../models/reportSchema';
-import Report from '../../models/reportSchema';
-import advisorSchema from '../../models/advisorSchema';
-import IAdvisor from '../../entities/advisorEntities';
-import reviewSchema, { IReview } from '../../models/reviewSchema';
-import goalsSchema, { IGoal } from '../../models/goalsSchema';
-import categorySchema, { ICategory } from '../../models/categorySchema';
 import paymentSchema from '../../models/paymentSchema';
 import { BaseRepository } from './baseRepository';
-
-export interface DashboardData {
-    monthlyExpenses: CategoryData[];
-    trendData: TrendData[];
-    recentActivity: Activity[];
-    budgetInfo: {
-        totalSpent: number;
-        // budget: number;
-        // progress: number;
-    };
-}
-interface CategoryData {
-    category: string;
-    amount: number;
-    count: number;
-    // color: string;
-}
-interface TrendData {
-    date: string;
-    expenses: number;
-    payments: number;
-}
-interface Activity {
-    id: string;
-    date: Date;
-    amount: number;
-    description: string;
-    category: string;
-    type: 'expense' | 'payment';
-}
-const CATEGORY_COLORS:Record<string,string> = {
-    food: '#4CAF50',
-    transport: '#2196F3',
-    entertainment: '#9C27B0',
-    shopping: '#F44336',
-    housing: '#FF9800',
-    utilities: '#607D8B',
-    healthcare: '#00BCD4',
-    education: '#795548',
-    travel: '#FFEB3B',
-    other: '#9E9E9E',
-    payment: '#3F51B5',
-    default: '#9E9E9E'
-};
+import { CATEGORY_COLORS, DashboardData } from '../../dto/userDTO';
 
 
 

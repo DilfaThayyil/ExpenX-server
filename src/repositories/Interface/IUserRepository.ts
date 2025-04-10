@@ -1,5 +1,5 @@
+import { DashboardData } from "../../dto/userDTO";
 import IUser from "../../entities/userEntities";
-import { DashboardData } from "../Implementation/userRepository";
 
 export interface IUserRepository {
   findUserByEmail(email: string): Promise<any>;

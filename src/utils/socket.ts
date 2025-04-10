@@ -3,11 +3,9 @@ import { Server, Socket } from "socket.io";
 import { CLIENTURL } from "../config/env";
 import messageSchema from "../models/messageSchema";
 import notificationSchema from "../models/notificationSchema";
+import { IUser } from "../dto/userDTO";
 
-interface IUser {
-  userId: string;
-  socketId: string;
-}
+
 
 let users: IUser[] = [];
 

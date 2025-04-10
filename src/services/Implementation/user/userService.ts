@@ -1,9 +1,8 @@
 import { inject, injectable } from 'tsyringe';
 import { IUserRepository } from '../../../repositories/Interface/IUserRepository';
 import { IUserService } from '../../Interface/user/IUserService';
-import { DashboardData } from '../../../repositories/Implementation/userRepository';
 import IUser from '../../../entities/userEntities';
-import { messageConstants } from '../../../utils/messageConstants';
+import { DashboardData } from '../../../dto/userDTO';
 
 
 @injectable()

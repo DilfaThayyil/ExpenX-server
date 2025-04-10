@@ -1,5 +1,5 @@
+import { IAppointment } from "../../dto/advisorDTO";
 import { Slot } from "../../models/slotSchema";
-import { IAppointment } from "../../services/Implementation/advisor/advisorService";
 
 export interface IAdvDashboardRepo{
     getDashboardData(advisorId:string):Promise<{totalRevenue:number,activeClients:number,completedGoals:number,slotUtilization:number}>
