@@ -9,11 +9,10 @@ import { CATEGORY_COLORS, DashboardData } from '../../dto/userDTO';
 
 
 
-export default class UserRepository extends BaseRepository<IUser>implements IUserRepository
-{
-  constructor() {
-    super(userSchema);
-  }
+export default class UserRepository extends BaseRepository<IUser> implements IUserRepository {
+    constructor() {
+        super(userSchema);
+    }
 
     async findUserByEmail(email: string): Promise<any> {
         return await userSchema.findOne({ email });
@@ -44,7 +43,7 @@ export default class UserRepository extends BaseRepository<IUser>implements IUse
     async updateUserStatus(email: string, isBlock: boolean): Promise<void> {
         await userSchema.updateOne({ email }, { $set: { isBlocked: isBlock } })
     }
-    
+
 
     async findByEmail(email: string): Promise<IUser | null> {
         const user = await userSchema.findOne({ email });
@@ -180,15 +179,15 @@ export default class UserRepository extends BaseRepository<IUser>implements IUse
                 }))
             ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
                 .slice(0, 5);
-                const monthlyExpenses = categoryData.map(category => {
-                    const categoryKey = String(category._id).toLowerCase();
-                    return {
-                        category: categoryKey,
-                        amount: category.amount,
-                        count: category.count,
-                        color: CATEGORY_COLORS[categoryKey] || CATEGORY_COLORS.default
-                    };
-                })
+            const monthlyExpenses = categoryData.map(category => {
+                const categoryKey = String(category._id).toLowerCase();
+                return {
+                    category: categoryKey,
+                    amount: category.amount,
+                    count: category.count,
+                    color: CATEGORY_COLORS[categoryKey] || CATEGORY_COLORS.default
+                };
+            })
             // const sampleBudget = 2000; // This should come from a user's settings in the future
             // const budgetProgress = Math.min(Math.round((totalSpent / sampleBudget) * 100), 100);
             return {
@@ -209,6 +208,6 @@ export default class UserRepository extends BaseRepository<IUser>implements IUse
 
     async findUsersByEmails(emails: string[]): Promise<IUser[]> {
         return await userSchema.find({ email: { $in: emails } });
-      }
-      
+    }
+
 }

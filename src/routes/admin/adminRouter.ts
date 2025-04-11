@@ -15,6 +15,8 @@ const complaintController = container.resolve<IComplaintController>('IComplaintC
 const router = Router()
 
 router.post("/login",(req,res)=>adminController.adminLogin(req,res))
+router.post("/refresh-token",(req,res)=>adminController.setNewAccessToken(req,res))
+router.post("/logout",(req,res)=>adminController.adminLogout(req,res))
 router.get("/users",AdminAuthMiddleware.authorizeAdmin, (req,res)=>userController.fetchUsers(req,res))
 router.get("/advisors",AdminAuthMiddleware.authorizeAdmin, (req,res)=>advisorController.fetchAdvisors(req,res))
 router.post("/updateAdmin",AdminAuthMiddleware.authorizeAdmin, (req,res)=>adminController.updateAdmin(req,res))
@@ -24,7 +26,6 @@ router.get("/categories",AdminAuthMiddleware.authorizeAdmin,(req,res)=>categoryC
 router.post("/addCategory",AdminAuthMiddleware.authorizeAdmin, (req,res)=>categoryController.addCategory(req,res))
 router.patch("/updateCategory/:id",AdminAuthMiddleware.authorizeAdmin, (req,res)=>categoryController.updateCategory(req,res))
 router.delete("/deleteCategory/:id",AdminAuthMiddleware.authorizeAdmin, (req,res)=>categoryController.deleteCategory(req,res))
-router.post("/logout",(req,res)=>adminController.adminLogout(req,res))
 router.get("/reports",AdminAuthMiddleware.authorizeAdmin, (req,res)=>complaintController.fetchReports(req,res))
 router.get("/getMonthlyTrends",AdminAuthMiddleware.authorizeAdmin,(req,res)=>adminController.getMonthlyTrends(req,res))
 router.get("/getExpenseCategories",AdminAuthMiddleware.authorizeAdmin,(req,res)=>adminController.getExpenseCategories(req,res))

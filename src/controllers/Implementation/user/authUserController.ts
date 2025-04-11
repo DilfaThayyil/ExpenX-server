@@ -77,9 +77,6 @@ export default class AuthUserController implements IAuthUserController {
     try {
       const { email, password } = req.body;
       const {userData,accessToken,refreshToken} = await this.authUserService.loginUser(email, password);
-      console.log("LoginUser-controller : ", userData);
-      console.log("accessToken-user------------------ : ",accessToken)
-      console.log("refreshToken-user================== : ",refreshToken)
       const user2 = mapUserProfile(userData)
       res.cookie('accessToken', accessToken, {
         httpOnly: true,
@@ -93,8 +90,7 @@ export default class AuthUserController implements IAuthUserController {
         maxAge: 30 * 24 * 60 * 60 * 1000,
         sameSite: 'strict',
       })
-
-      res.status(HttpStatusCode.OK).json({ message: 'Login successful', user2 });
+      res.status(HttpStatusCode.OK).json({ message: messageConstants.LOGIN_SUCCESS, user2 });
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : messageConstants.UNEXPECTED_ERROR;
       res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: errorMessage });
@@ -176,16 +172,30 @@ export default class AuthUserController implements IAuthUserController {
 
   async googleAuth(req: Request, res: Response): Promise<void> {
     try {
-      // console.log('recieved body : ',req.body)
       const { userCredential } = req.body
       const username = userCredential.name
       const email = userCredential.email
       const password = userCredential.sub
       const profilePic = userCredential.picture
-      const user = await this.authUserService.googleAuth(username, email, password, profilePic)
-      // console.log("user in controllr: ",user)
 
-      res.status(HttpStatusCode.OK).json({ message: 'You authenticated via Google', user })
+      const {existingUser,accessToken,refreshToken} = await this.authUserService.googleAuth(username, email, password, profilePic)
+      console.log("existingUser-googleAuth-contrll : ",existingUser)
+      console.log("accessToken-googleAuth : ",accessToken)
+      console.log("refreshToken-googleAuth : ",refreshToken)
+      const user2 = mapUserProfile(existingUser)
+      res.cookie('accessToken', accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 60 * 60 * 1000,
+        sameSite: 'strict',
+      })
+      res.cookie('refreshToken', refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 30 * 24 * 60 * 60 * 1000,
+        sameSite: 'strict',
+      })
+      res.status(HttpStatusCode.OK).json({ message: messageConstants.LOGIN_SUCCESS, user2 })
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : messageConstants.UNEXPECTED_ERROR
       res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: errorMessage })

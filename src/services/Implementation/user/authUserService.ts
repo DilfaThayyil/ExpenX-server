@@ -5,9 +5,9 @@ import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '.
 import Otp from '../../../models/otpSchema';
 import { sendOtpEmail } from '../../../utils/sendOtp';
 // import { googleVerify } from '../../utils/googleOAuth';
-import { injectable,inject } from 'tsyringe';
+import { injectable, inject } from 'tsyringe';
 import redisClient from '../../../utils/redisClient';
-import { NotFoundError,ValidationError,ExpiredError } from '../../../utils/errors';
+import { NotFoundError, ValidationError, ExpiredError } from '../../../utils/errors';
 
 
 
@@ -22,7 +22,7 @@ export default class AuthUserService implements IAuthUserService {
   async register(username: string, email: string, password: string): Promise<void> {
     const existingUser = await this.userRepository.findUserByEmail(email);
     if (existingUser) throw new Error('Email is already in use')
-    await redisClient.setEx(`email:${email}`, 3600, JSON.stringify({ username, email, password }))    
+    await redisClient.setEx(`email:${email}`, 3600, JSON.stringify({ username, email, password }))
   }
 
 
@@ -50,11 +50,11 @@ export default class AuthUserService implements IAuthUserService {
     );
     await sendOtpEmail(email, otp);
   }
-  
+
 
   async verifyOTP(email: string, otp: string): Promise<void> {
     const otpRecord = await Otp.findOne({ email });
-    console.log("otp : ",otpRecord)
+    console.log("otp : ", otpRecord)
     if (!otpRecord) {
       throw new NotFoundError('OTP not found.');
     }
@@ -72,7 +72,7 @@ export default class AuthUserService implements IAuthUserService {
     userData.password = await bcrypt.hash(userData.password, 10);
     await this.userRepository.createUser(userData);
   }
-  
+
 
   async loginUser(email: string, password: string): Promise<any> {
     const userData = await this.userRepository.findUserByEmail(email);
@@ -87,11 +87,11 @@ export default class AuthUserService implements IAuthUserService {
     };
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
-    return {userData,accessToken,refreshToken}
-  }  
+    return { userData, accessToken, refreshToken }
+  }
 
 
-  async  setNewAccessToken(refreshToken:string):Promise<any> {
+  async setNewAccessToken(refreshToken: string): Promise<any> {
     try {
       const decoded = verifyRefreshToken(refreshToken);
       const accessToken = generateAccessToken(decoded);
@@ -99,12 +99,12 @@ export default class AuthUserService implements IAuthUserService {
         accessToken,
         message: "Access token set successfully from service ",
         success: true,
-        user:decoded
+        user: decoded
       }
-    } catch (error:any) {
+    } catch (error: any) {
       throw new Error("Error generating new access token: " + error.message);
     }
-  } 
+  }
 
 
   async forgotPassword(email: string): Promise<void> {
@@ -138,8 +138,8 @@ export default class AuthUserService implements IAuthUserService {
 
   async resetPassword(email: string, newPassword: string): Promise<void> {
     const user = await this.userRepository.findUserByEmail(email);
-    if(!user){
-      console.error('User not found : ',email)
+    if (!user) {
+      console.error('User not found : ', email)
       throw new Error("User Not Found")
     }
     const hashedPassword = await bcrypt.hash(newPassword, 10);
@@ -147,7 +147,7 @@ export default class AuthUserService implements IAuthUserService {
   }
 
 
-  async googleAuth(username:string,email: string,password: string,profilePic:string): Promise<any> {
+  async googleAuth(username: string, email: string, password: string, profilePic: string): Promise<any> {
     const userCredentials = {
       username,
       email,
@@ -155,10 +155,18 @@ export default class AuthUserService implements IAuthUserService {
       profilePic
     }
     let existingUser
-     existingUser = await this.userRepository.findUserByEmail(userCredentials?.email);
+    existingUser = await this.userRepository.findUserByEmail(userCredentials?.email);
     if (!existingUser) {
       existingUser = await this.userRepository.createUser(userCredentials);
     }
-    return existingUser;
+    const user = {
+      id:existingUser._id,
+      name:existingUser.name,
+      admin:existingUser.isAdmin,
+      role:existingUser.role
+    }
+    const accessToken = generateAccessToken(user)
+    const refreshToken = generateRefreshToken(user)
+    return {existingUser,accessToken,refreshToken};
   }
 }

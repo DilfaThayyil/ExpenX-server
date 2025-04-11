@@ -6,6 +6,8 @@ import bcrypt from 'bcrypt';
 import { ADMINEMAIL, ADMINPASSWORD } from "../../../config/env";
 import { IAdminRepository } from "../../../repositories/Interface/IAdminRepository";
 import { MonthlyData, DashboardStats, UserGrowthData, CategoryData } from "../../../dto/adminDTO";
+import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from "../../../utils/jwt";
+import { messageConstants } from "../../../utils/messageConstants";
 
 
 
@@ -25,8 +27,41 @@ export default class AdminService implements IAdminService {
     this.adminRepository = adminRepository
   }
 
-  validateCredentials(email: string, password: string): boolean {
-    return email === ADMINEMAIL && password === ADMINPASSWORD;
+  adminLogin(email: string, password: string): {
+    admin: {
+      id: string; email: string; admin: boolean; role: string;
+    }; accessToken: string; refreshToken: string;
+  } {
+    if (!ADMINEMAIL || !ADMINPASSWORD) {
+      throw new Error("Admin credentials are not set in environment variables");
+    }
+    if (email !== ADMINEMAIL || password !== ADMINPASSWORD) {
+      throw new Error('Invalid admin credentials')
+    }
+    const admin = {
+      id: 'admin-001',
+      email,
+      admin: true,
+      role: 'admin'
+    }
+    const accessToken = generateAccessToken(admin)
+    const refreshToken = generateRefreshToken(admin)
+    return { admin, accessToken, refreshToken }
+  }
+
+  async setNewAccessToken(refreshToken:string):Promise<any>{
+    try{
+      const decoded = verifyRefreshToken(refreshToken)
+      const accessToken = generateAccessToken(decoded)
+      return {
+        accessToken,
+        message: messageConstants.TOKEN_SUCCESS,
+        success: true,
+        user: decoded
+      }
+    }catch(err:any){
+      throw new Error("Error generating new access token : "+err.message)
+    }
   }
 
   async updateAdmin(name: string, email: string, password: string): Promise<any> {

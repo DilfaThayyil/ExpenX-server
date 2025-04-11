@@ -2,6 +2,7 @@ import { Request, Response } from "express"
 
 export interface IAdminController{
     adminLogin(req:Request, res:Response):Promise<Response>
+    setNewAccessToken(req:Request, res:Response):Promise<Response>
     updateAdmin(req:Request, res:Response):Promise<void>
     adminLogout(req:Request, res:Response): Promise<Response>
     getMonthlyTrends(req:Request, res:Response): Promise<Response>
