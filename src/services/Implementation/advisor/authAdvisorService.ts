@@ -147,32 +147,26 @@ export default class AuthAdvisorService implements IAuthAdvisorService {
     await this.advisorRepository.updateUser({ password: hashedPassword }, email);
   }
 
-  async googleAuth(username:string,email: string,profilePic:string): Promise<any> {
+  async googleAuth(username:string,email: string,password:string,profilePic:string): Promise<any> {
     const userCredentials = {
       username,
       email,
+      password,
       profilePic
     }
-    console.log("usercredentials in services ; ",userCredentials)
-    // const googleUser = await googleVerify(userCredentials);
-    // if(!googleUser?.email){
-    //     throw new Error('Invalid Google credentials');
-    // }
     let existingUser
      existingUser = await this.advisorRepository.findUserByEmail(userCredentials?.email);
     if (!existingUser) {
       existingUser = await this.advisorRepository.createUser(userCredentials);
-      console.log(existingUser,"userrrrrrrrrrrrr");
-      
-      if(existingUser){
-        console.log("difaa");
-        
-      }else{
-        console.log("dfghnjm");
-        
-      }
     }
-    console.log("existingUser : ",existingUser)
-    return existingUser;
+    const user = {
+      id:existingUser._id,
+      name:existingUser.name,
+      admin:existingUser.isAdmin,
+      role:existingUser.role
+    }
+    const accessToken = generateAccessToken(user)
+    const refreshToken = generateRefreshToken(user)
+    return {existingUser,accessToken,refreshToken};
   }
 }
