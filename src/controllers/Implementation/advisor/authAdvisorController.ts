@@ -6,6 +6,10 @@ import { IAuthAdvisorService } from '../../../services/Interface/advisor/IAuthAd
 import { NotFoundError, ValidationError, ExpiredError } from '../../../utils/errors';
 import { mapUserProfile } from '../../Interface/mappers/userMapper';
 import { messageConstants } from '../../../utils/messageConstants';
+import redisClient from '../../../utils/redisClient';
+import jwt from "jsonwebtoken";
+
+
 
 @injectable()
 export default class AuthAdvisorController implements IAuthAdvisorController {
@@ -99,15 +103,30 @@ export default class AuthAdvisorController implements IAuthAdvisorController {
     }
   }
 
-  async refreshAccessTokenController(req: Request, res: Response): Promise<void> {
+  async setNewAccessToken(req: Request, res: Response): Promise<Response> {
     try {
-      const newTokens = await this.authAdvisorService.refreshAccessToken(req.cookies.refreshToken);
-      res.cookie('accessToken', newTokens.accessToken);
-      res.cookie('refreshToken', newTokens.refreshToken);
-      res.status(HttpStatusCode.OK).json({ message: 'Access token updated' });
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : messageConstants.UNEXPECTED_ERROR;
-      res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: errorMessage });
+      console.log("starting... setNewAccessToken--------------------RETIU74")
+      const refreshToken = req.cookies?.refreshToken;
+      console.log("refreshToken : ", refreshToken)
+      const isBlacklisted = await redisClient.get(`bl:${refreshToken}`);
+      if (isBlacklisted) {
+        return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: "Refresh token is blacklisted." });
+      }
+      if (!refreshToken) return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: "No refresh token provided" });
+      const result = await this.authAdvisorService.setNewAccessToken(refreshToken);
+      console.log("-----result--- : ", result)
+      if (!result.accessToken) return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: 'Failed to generate token' });
+      // res.cookie('accessToken', result.accessToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production', maxAge: 60*60*1000, sameSite: 'strict' });
+      res.cookie('accessToken', result.accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 60 * 60 * 1000,
+        sameSite: 'strict',
+      })
+      return res.status(HttpStatusCode.OK).json({ message: "Token set successfully", accessToken: result.accessToken, success: result.success });
+    } catch (error) {
+      console.error(error);
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: messageConstants.INTERNAL_ERROR });
     }
   }
 
@@ -187,6 +206,20 @@ export default class AuthAdvisorController implements IAuthAdvisorController {
   async logout(req: Request, res: Response): Promise<Response> {
     console.log("advisor logging out.....")
     try {
+      const refreshToken = req.cookies.refreshToken;
+      if (refreshToken) {
+        const decoded = jwt.decode(refreshToken) as jwt.JwtPayload;
+        const expiry = decoded.exp;
+
+        if (expiry) {
+          const currentTime = Math.floor(Date.now() / 1000);
+          const ttl = expiry - currentTime;
+
+          await redisClient.set(`bl:${refreshToken}`, "1", {
+            EX: ttl, // expire same time as token
+          });
+        }
+      }
       res.clearCookie('refreshToken').clearCookie('accessToken');
       return res.status(HttpStatusCode.OK).json({ message: 'Logged out successfully' });
     } catch (error) {

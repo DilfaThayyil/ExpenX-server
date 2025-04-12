@@ -45,10 +45,6 @@ export default class AdvisorRepository extends BaseRepository<IAdvisor> implemen
         return advisors
     }
 
-    async findUserByRefreshToken(refreshToken: string): Promise<any> {
-        return await advisorSchema.findOne({ refreshToken });
-    }
-
     async updateRefreshToken(refreshToken: string, email: string): Promise<any> {
         return await advisorSchema.findOneAndUpdate({ email }, { refreshToken }, { new: true });
     }

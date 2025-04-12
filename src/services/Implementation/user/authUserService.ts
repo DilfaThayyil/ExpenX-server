@@ -93,6 +93,8 @@ export default class AuthUserService implements IAuthUserService {
 
   async setNewAccessToken(refreshToken: string): Promise<any> {
     try {
+      const isBlacklisted = await redisClient.get(`bl:${refreshToken}`);
+      if (isBlacklisted) throw new Error("Refresh token expired or blacklisted");
       const decoded = verifyRefreshToken(refreshToken);
       const accessToken = generateAccessToken(decoded);
       return {
@@ -160,13 +162,13 @@ export default class AuthUserService implements IAuthUserService {
       existingUser = await this.userRepository.createUser(userCredentials);
     }
     const user = {
-      id:existingUser._id,
-      name:existingUser.name,
-      admin:existingUser.isAdmin,
-      role:existingUser.role
+      id: existingUser._id,
+      name: existingUser.name,
+      admin: existingUser.isAdmin,
+      role: existingUser.role
     }
     const accessToken = generateAccessToken(user)
     const refreshToken = generateRefreshToken(user)
-    return {existingUser,accessToken,refreshToken};
+    return { existingUser, accessToken, refreshToken };
   }
 }

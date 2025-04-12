@@ -8,6 +8,7 @@ import { IAdminRepository } from "../../../repositories/Interface/IAdminReposito
 import { MonthlyData, DashboardStats, UserGrowthData, CategoryData } from "../../../dto/adminDTO";
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from "../../../utils/jwt";
 import { messageConstants } from "../../../utils/messageConstants";
+import redisClient from "../../../utils/redisClient";
 
 
 
@@ -51,6 +52,8 @@ export default class AdminService implements IAdminService {
 
   async setNewAccessToken(refreshToken:string):Promise<any>{
     try{
+      const isBlacklisted = await redisClient.get(`bl:${refreshToken}`);
+      if (isBlacklisted) throw new Error("Refresh token expired or blacklisted");
       const decoded = verifyRefreshToken(refreshToken)
       const accessToken = generateAccessToken(decoded)
       return {

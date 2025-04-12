@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import { generateAccessToken, generateRefreshToken } from '../../../utils/jwt';
+import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../../../utils/jwt';
 import Otp from '../../../models/otpSchema';
 import { sendOtpEmail } from '../../../utils/sendOtp';
 // import { googleVerify } from '../../utils/googleOAuth';
@@ -98,12 +98,21 @@ export default class AuthAdvisorService implements IAuthAdvisorService {
     return user
   }
 
-  async refreshAccessToken(refreshToken: string): Promise<any> {
-    const user = await this.advisorRepository.findUserByRefreshToken(refreshToken);
-    if (!user) throw new Error('User not found');
-    const accessToken = generateAccessToken(user);
-    const newRefreshToken = generateRefreshToken(user);
-    return { accessToken, refreshToken: newRefreshToken };
+  async setNewAccessToken(refreshToken: string): Promise<any> {
+    try {
+      const isBlacklisted = await redisClient.get(`bl:${refreshToken}`);
+      if (isBlacklisted) throw new Error("Refresh token expired or blacklisted");
+      const decoded = verifyRefreshToken(refreshToken);
+      const accessToken = generateAccessToken(decoded);
+      return {
+        accessToken,
+        message: "Access token set successfully from service ",
+        success: true,
+        user: decoded
+      }
+    } catch (error: any) {
+      throw new Error("Error generating new access token: " + error.message);
+    }
   }
 
   async forgotPassword(email: string): Promise<void> {

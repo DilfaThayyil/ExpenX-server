@@ -6,7 +6,7 @@ export interface IAuthAdvisorController {
   verifyOTP(req: Request, res: Response): Promise<Response>;
   resendOTP(req:Request,res:Response):Promise<Response>
   loginUser(req: Request, res: Response): Promise<void>;
-  refreshAccessTokenController(req: Request, res: Response): Promise<void>;
+  setNewAccessToken(req: Request, res: Response): Promise<Response>;
   forgotPassword(req: Request, res: Response): Promise<void>;
   verifyForgotPasswordOtp(req: Request, res: Response): Promise<void>;
   resetPassword(req: Request, res: Response): Promise<void>;
