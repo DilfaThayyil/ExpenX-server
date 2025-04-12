@@ -4,7 +4,7 @@ export const messageConstants = {
     LOGIN_FAILED: 'Login failed. Please check your credentials.',
     LOGOUT_SUCCESS: 'Logout successful!',
     UNAUTHORIZED: 'You are not authorized to perform this action.',
-    REFRESH_TOKEN: 'No refresh token provided',
+    REFRESH_TOKEN: 'Refresh token expired',
     TOKEN_FAILED: 'Failed to generate token',
     TOKEN_SUCCESS: 'Token set successfully',
 
