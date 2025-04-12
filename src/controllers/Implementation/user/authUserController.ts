@@ -6,6 +6,8 @@ import { inject, injectable } from 'tsyringe';
 import { ValidationError, NotFoundError, ExpiredError } from '../../../utils/errors';
 import { mapUserProfile } from '../../Interface/mappers/userMapper';
 import { messageConstants } from '../../../utils/messageConstants';
+import jwt from "jsonwebtoken";
+import redisClient from "../../../utils/redisClient";
 
 
 
@@ -76,7 +78,7 @@ export default class AuthUserController implements IAuthUserController {
   async loginUser(req: Request, res: Response): Promise<void> {
     try {
       const { email, password } = req.body;
-      const {userData,accessToken,refreshToken} = await this.authUserService.loginUser(email, password);
+      const { userData, accessToken, refreshToken } = await this.authUserService.loginUser(email, password);
       const user2 = mapUserProfile(userData)
       res.cookie('accessToken', accessToken, {
         httpOnly: true,
@@ -104,6 +106,10 @@ export default class AuthUserController implements IAuthUserController {
       console.log("starting... setNewAccessToken--------------------RETIU74")
       const refreshToken = req.cookies?.refreshToken;
       console.log("refreshToken : ", refreshToken)
+      const isBlacklisted = await redisClient.get(`bl:${refreshToken}`);
+      if (isBlacklisted) {
+        return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: "Refresh token is blacklisted." });
+      }
       if (!refreshToken) return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: "No refresh token provided" });
       const result = await this.authUserService.setNewAccessToken(refreshToken);
       console.log("-----result--- : ", result)
@@ -178,10 +184,10 @@ export default class AuthUserController implements IAuthUserController {
       const password = userCredential.sub
       const profilePic = userCredential.picture
 
-      const {existingUser,accessToken,refreshToken} = await this.authUserService.googleAuth(username, email, password, profilePic)
-      console.log("existingUser-googleAuth-contrll : ",existingUser)
-      console.log("accessToken-googleAuth : ",accessToken)
-      console.log("refreshToken-googleAuth : ",refreshToken)
+      const { existingUser, accessToken, refreshToken } = await this.authUserService.googleAuth(username, email, password, profilePic)
+      console.log("existingUser-googleAuth-contrll : ", existingUser)
+      console.log("accessToken-googleAuth : ", accessToken)
+      console.log("refreshToken-googleAuth : ", refreshToken)
       const user2 = mapUserProfile(existingUser)
       res.cookie('accessToken', accessToken, {
         httpOnly: true,
@@ -207,6 +213,20 @@ export default class AuthUserController implements IAuthUserController {
   async logout(req: Request, res: Response): Promise<Response> {
     console.log('calling logout ..................6666666666555555')
     try {
+      const refreshToken = req.cookies.refreshToken;
+      if (refreshToken) {
+        const decoded = jwt.decode(refreshToken) as jwt.JwtPayload;
+        const expiry = decoded.exp;
+
+        if (expiry) {
+          const currentTime = Math.floor(Date.now() / 1000);
+          const ttl = expiry - currentTime;
+
+          await redisClient.set(`bl:${refreshToken}`, "1", {
+            EX: ttl, // expire same time as token
+          });
+        }
+      }
       res.clearCookie('refreshToken').clearCookie('accessToken');
       return res.status(HttpStatusCode.OK).json({ message: 'Logged out successfully' });
     } catch (error) {

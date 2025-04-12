@@ -6,6 +6,7 @@ import { HttpStatusCode } from "../../../utils/httpStatusCode";
 import { ACCESSTOKEN_SECRET } from "../../../config/env";
 import jwt from "jsonwebtoken";
 import { messageConstants } from "../../../utils/messageConstants";
+import redisClient from "../../../utils/redisClient";
 
 
 
@@ -48,6 +49,10 @@ export default class AdminController implements IAdminController {
     try {
       console.log("$$$$$$$$$$ admin accessToken refreshing started......")
       const refreshToken = req.cookies?.refreshToken
+      const isBlacklisted = await redisClient.get(`bl:${refreshToken}`);
+      if (isBlacklisted) {
+        return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: "Refresh token is blacklisted." });
+      }
       if (!refreshToken) return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: messageConstants.REFRESH_TOKEN })
       const result = await this.adminService.setNewAccessToken(refreshToken)
       console.log("$$$$$$$$$$$ result $$$$$$ : ", result)
@@ -123,6 +128,20 @@ export default class AdminController implements IAdminController {
 
   async adminLogout(req: Request, res: Response): Promise<Response> {
     try {
+      const refreshToken = req.cookies.refreshToken;
+      if (refreshToken) {
+        const decoded = jwt.decode(refreshToken) as jwt.JwtPayload;
+        const expiry = decoded.exp;
+
+        if (expiry) {
+          const currentTime = Math.floor(Date.now() / 1000);
+          const ttl = expiry - currentTime;
+
+          await redisClient.set(`bl:${refreshToken}`, "1", {
+            EX: ttl, // expire same time as token
+          });
+        }
+      }
       res.clearCookie('refreshToken').clearCookie('accessToken');
       return res.status(HttpStatusCode.OK).json({ message: messageConstants.LOGOUT_SUCCESS });
     } catch (err) {
