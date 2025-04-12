@@ -26,15 +26,13 @@ export default class AdminController implements IAdminController {
       res.cookie('accessToken', accessToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        // maxAge: 60 * 60 * 1000, //1 hour
-        maxAge: 2 * 60 * 1000, // 2 minutes
+        maxAge: 60 * 60 * 1000, //1 hour
         sameSite: 'strict',
       })
       res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        // maxAge: 30 * 24 * 60 * 60 * 1000, //30 days
-        maxAge: 6 * 60 * 1000, // 6 minutes
+        maxAge: 30 * 24 * 60 * 60 * 1000, //30 days
         sameSite: 'strict',
       })
       return res.status(HttpStatusCode.OK).json({ message: messageConstants.LOGIN_SUCCESS, accessToken });
@@ -57,7 +55,7 @@ export default class AdminController implements IAdminController {
       res.cookie('accessToken', result.accessToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        maxAge: 2 * 60 * 1000,
+        maxAge: 60 * 60 * 1000,
         sameSite: 'strict',
       })
       return res.status(HttpStatusCode.OK).json({ message: messageConstants.TOKEN_SUCCESS, accessToken: result.accessToken, success: result.success });
