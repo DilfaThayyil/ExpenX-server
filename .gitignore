@@ -1,4 +1,27 @@
 .env
 node_modules
-src/logs/*
-!src/logs/.gitkeep
+
+# log-files
+logs/*
+!logs/.gitkeep
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# IDEs/editors
+.vscode/
+.idea/
+
+# Build output
+dist/
+build/
+
+# Testing / coverage
+coverage/
+
+# Optional: Local environment files (if you use these)
+.env.local
+.env.development
+.env.production
+.env.test
