@@ -16,7 +16,7 @@ export default class AdminController implements IAdminController {
   private _adminService: IAdminService
 
   constructor(@inject('IAdminService') adminService: IAdminService) {
-    this._adminService = adminService
+    this._adminService = adminService;
   }
 
 
