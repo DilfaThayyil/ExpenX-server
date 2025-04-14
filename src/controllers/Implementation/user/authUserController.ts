@@ -13,17 +13,17 @@ import redisClient from "../../../utils/redisClient";
 
 @injectable()
 export default class AuthUserController implements IAuthUserController {
-  private authUserService: IAuthUserService;
+  private _authUserService: IAuthUserService;
 
   constructor(@inject('IAuthUserService') authUserService: IAuthUserService) {
-    this.authUserService = authUserService;
+    this._authUserService = authUserService;
   }
 
 
   async register(req: Request, res: Response): Promise<void> {
     try {
       const { username, email, password } = req.body
-      await this.authUserService.register(username, email, password)
+      await this._authUserService.register(username, email, password)
       res.status(HttpStatusCode.CREATED).json({ message: 'User registered successfully' })
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : messageConstants.UNEXPECTED_ERROR
@@ -36,7 +36,7 @@ export default class AuthUserController implements IAuthUserController {
     try {
       // console.log('body in generateOTP ; ',req.body)
       const { email } = req.body
-      await this.authUserService.generateOTP(email);
+      await this._authUserService.generateOTP(email);
       res.json({ message: 'OTP sent successfully' });
     } catch (err) {
       res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: 'Error sending OTP email' });
@@ -47,7 +47,7 @@ export default class AuthUserController implements IAuthUserController {
     try {
       const { email } = req.body;
       // console.log('Resend OTP request for email:', email);
-      await this.authUserService.resendOTP(email);
+      await this._authUserService.resendOTP(email);
       return res.json({ message: 'OTP resent successfully' });
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : messageConstants.UNEXPECTED_ERROR
@@ -59,7 +59,7 @@ export default class AuthUserController implements IAuthUserController {
   async verifyOTP(req: Request, res: Response): Promise<Response> {
     try {
       const { email, otp } = req.body;
-      await this.authUserService.verifyOTP(email, otp);
+      await this._authUserService.verifyOTP(email, otp);
       return res.status(HttpStatusCode.OK).json({ success: true, message: 'User registered successfully' });
     } catch (err) {
       if (err instanceof NotFoundError) {
@@ -78,7 +78,7 @@ export default class AuthUserController implements IAuthUserController {
   async loginUser(req: Request, res: Response): Promise<void> {
     try {
       const { email, password } = req.body;
-      const { userData, accessToken, refreshToken } = await this.authUserService.loginUser(email, password);
+      const { userData, accessToken, refreshToken } = await this._authUserService.loginUser(email, password);
       const user2 = mapUserProfile(userData)
       res.cookie('accessToken', accessToken, {
         httpOnly: true,
@@ -111,7 +111,7 @@ export default class AuthUserController implements IAuthUserController {
         return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: "Refresh token is blacklisted." });
       }
       if (!refreshToken) return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: "No refresh token provided" });
-      const result = await this.authUserService.setNewAccessToken(refreshToken);
+      const result = await this._authUserService.setNewAccessToken(refreshToken);
       console.log("-----result--- : ", result)
       if (!result.accessToken) return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: 'Failed to generate token' });
       // res.cookie('accessToken', result.accessToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production', maxAge: 60*60*1000, sameSite: 'strict' });
@@ -132,7 +132,7 @@ export default class AuthUserController implements IAuthUserController {
   async forgotPassword(req: Request, res: Response): Promise<void> {
     try {
       const { email } = req.body;
-      await this.authUserService.forgotPassword(email);
+      await this._authUserService.forgotPassword(email);
       res.json({ message: 'Forgot password OTP sent successfully' });
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : messageConstants.UNEXPECTED_ERROR;
@@ -144,11 +144,11 @@ export default class AuthUserController implements IAuthUserController {
   async verifyForgotPasswordOtp(req: Request, res: Response): Promise<void> {
     try {
       const { email, otp } = req.body;
-      await this.authUserService.verifyForgotPasswordOtp(email, otp);
+      await this._authUserService.verifyForgotPasswordOtp(email, otp);
       res.status(HttpStatusCode.OK).json({ success: true, message: 'OTP verified successfully' });
     } catch (err) {
       if (err instanceof NotFoundError) {
-        res.status(HttpStatusCode.NOT_FOUND).json({ success: false, message: 'No OTP record found for this email.' });
+        res.status(HttpStatusCode.NOT_FOUND).json({ success: false, message: 'No OTP record found for this _email.' });
       } else if (err instanceof ValidationError) {
         res.status(HttpStatusCode.BAD_REQUEST).json({ success: false, message: 'The OTP you entered is incorrect.' });
       } else if (err instanceof ExpiredError) {
@@ -165,7 +165,7 @@ export default class AuthUserController implements IAuthUserController {
   async resetPassword(req: Request, res: Response): Promise<void> {
     try {
       const { email, password } = req.body;
-      await this.authUserService.resetPassword(email, password);
+      await this._authUserService.resetPassword(email, password);
       res.status(HttpStatusCode.OK).json({ message: 'Password changed successfully' });
     } catch (err) {
       console.error('Error resetting password : ', err)
@@ -184,7 +184,7 @@ export default class AuthUserController implements IAuthUserController {
       const password = userCredential.sub
       const profilePic = userCredential.picture
 
-      const { existingUser, accessToken, refreshToken } = await this.authUserService.googleAuth(username, email, password, profilePic)
+      const { existingUser, accessToken, refreshToken } = await this._authUserService.googleAuth(username, email, password, profilePic)
       console.log("existingUser-googleAuth-contrll : ", existingUser)
       console.log("accessToken-googleAuth : ", accessToken)
       console.log("refreshToken-googleAuth : ", refreshToken)

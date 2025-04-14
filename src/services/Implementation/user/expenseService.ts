@@ -11,24 +11,24 @@ import { subDays, startOfDay } from "date-fns";
 
 @injectable()
 export default class ExpenseService implements IExpenseService {
-  private expenseRepository: IExpenseRepository
+  private _expenseRepository: IExpenseRepository
   constructor(@inject('IExpenseRepository') expenseRepository: IExpenseRepository) {
-    this.expenseRepository = expenseRepository
+    this._expenseRepository = expenseRepository
   }
 
   async getExpensesByUserId(userId: string, page: number, limit: number): Promise<{ expenses: IExpense[], totalPages: number }> {
-    const { expenses, totalExpenses } = await this.expenseRepository.findExpensesByUserId(userId, page, limit);
+    const { expenses, totalExpenses } = await this._expenseRepository.findExpensesByUserId(userId, page, limit);
     const totalPages = Math.ceil(totalExpenses / limit)
     return { expenses, totalPages }
   }
 
   async createExpense(expenseData: IExpense): Promise<IExpense> {
-    return this.expenseRepository.createExpense(expenseData);
+    return this._expenseRepository.createExpense(expenseData);
   }
 
 
   async hasExpenses(userId: string, startDate?: string, endDate?: string): Promise<boolean> {
-    const expenses = await this.expenseRepository.findByUserId(userId, startDate, endDate);
+    const expenses = await this._expenseRepository.findByUserId(userId, startDate, endDate);
     console.log("hasExpense-service : ", expenses)
     return expenses.length > 0;
   }
@@ -36,7 +36,7 @@ export default class ExpenseService implements IExpenseService {
 
   async exportExpensesAsPDF(userId: string, startDate?: string, endDate?: string): Promise<NodeJS.ReadableStream> {
     try {
-      const expenses = await this.expenseRepository.findByUserId(userId, startDate, endDate);
+      const expenses = await this._expenseRepository.findByUserId(userId, startDate, endDate);
       const doc = new PDFDocument();
       doc.fontSize(25).text('Expense Report', { align: 'center' });
       doc.moveDown();
@@ -84,7 +84,7 @@ export default class ExpenseService implements IExpenseService {
 
   async exportExpensesAsCSV(userId: string, startDate?: string, endDate?: string): Promise<string> {
     try {
-      const expenses = await this.expenseRepository.findByUserId(userId, startDate, endDate);
+      const expenses = await this._expenseRepository.findByUserId(userId, startDate, endDate);
       const formattedExpenses = expenses.map((expense: IExpense) => ({
         Date: new Date(expense.date).toLocaleDateString(),
         Description: expense.description || '',
@@ -103,7 +103,7 @@ export default class ExpenseService implements IExpenseService {
 
   async exportExpensesAsExcel(userId: string, startDate?: string, endDate?: string): Promise<Buffer> {
     try {
-      const expenses = await this.expenseRepository.findByUserId(userId, startDate, endDate); // Pass filters
+      const expenses = await this._expenseRepository.findByUserId(userId, startDate, endDate); // Pass filters
       console.log("Filtered Expenses for Excel:", expenses);
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet('Expenses');
@@ -154,7 +154,7 @@ export default class ExpenseService implements IExpenseService {
         startDate = new Date(customStartDate);
         endDate = new Date(customEndDate);
     }
-    const expense = await this.expenseRepository.getExpenseByCategory(clientId, startDate, endDate);
+    const expense = await this._expenseRepository.getExpenseByCategory(clientId, startDate, endDate);
     console.log("expenses-serv : ", expense);
     return expense;
 }

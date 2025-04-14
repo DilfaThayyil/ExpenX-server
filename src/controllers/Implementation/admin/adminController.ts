@@ -13,17 +13,17 @@ import redisClient from "../../../utils/redisClient";
 
 @injectable()
 export default class AdminController implements IAdminController {
-  private adminService: IAdminService
+  private _adminService: IAdminService
 
   constructor(@inject('IAdminService') adminService: IAdminService) {
-    this.adminService = adminService
+    this._adminService = adminService
   }
 
 
   async adminLogin(req: Request, res: Response): Promise<Response> {
     try {
       const { email, password } = req.body;
-      const { admin, accessToken, refreshToken } = await this.adminService.adminLogin(email, password);
+      const { admin, accessToken, refreshToken } = await this._adminService.adminLogin(email, password);
       res.cookie('accessToken', accessToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
@@ -54,7 +54,7 @@ export default class AdminController implements IAdminController {
         return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: "Refresh token is blacklisted." });
       }
       if (!refreshToken) return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: messageConstants.REFRESH_TOKEN })
-      const result = await this.adminService.setNewAccessToken(refreshToken)
+      const result = await this._adminService.setNewAccessToken(refreshToken)
       console.log("$$$$$$$$$$$ result $$$$$$ : ", result)
       if (!result.accessToken) return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: messageConstants.TOKEN_FAILED })
       res.cookie('accessToken', result.accessToken, {
@@ -77,7 +77,7 @@ export default class AdminController implements IAdminController {
       if (!email || !password) {
         res.status(HttpStatusCode.BAD_REQUEST).json({ error: 'Email and password are required.' })
       }
-      const updatedAdmin = await this.adminService.updateAdmin(name, email, password)
+      const updatedAdmin = await this._adminService.updateAdmin(name, email, password)
       res.status(HttpStatusCode.OK).json(updatedAdmin)
     } catch (err) {
       console.error(err)
@@ -87,7 +87,7 @@ export default class AdminController implements IAdminController {
   async getMonthlyTrends(req: Request, res: Response): Promise<Response> {
     try {
       const months = req.query.months ? parseInt(req.query.months as string) : 6
-      const data = await this.adminService.getMonthlyTrends(months)
+      const data = await this._adminService.getMonthlyTrends(months)
       return res.status(HttpStatusCode.OK).json(data)
     } catch (err) {
       console.error(err)
@@ -97,7 +97,7 @@ export default class AdminController implements IAdminController {
 
   async getExpenseCategories(req: Request, res: Response): Promise<Response> {
     try {
-      const data = await this.adminService.getExpenseCategories()
+      const data = await this._adminService.getExpenseCategories()
       return res.status(HttpStatusCode.OK).json(data)
     } catch (err) {
       console.error(err)
@@ -107,7 +107,7 @@ export default class AdminController implements IAdminController {
 
   async getDashboardStats(req: Request, res: Response): Promise<Response> {
     try {
-      const data = await this.adminService.getDashboardStats()
+      const data = await this._adminService.getDashboardStats()
       return res.status(HttpStatusCode.OK).json(data)
     } catch (err) {
       console.error(err)
@@ -117,7 +117,7 @@ export default class AdminController implements IAdminController {
 
   async getUserGrowth(req: Request, res: Response): Promise<Response> {
     try {
-      const data = await this.adminService.getUserGrowth()
+      const data = await this._adminService.getUserGrowth()
       return res.status(HttpStatusCode.OK).json(data)
     } catch (err) {
       console.error(err)

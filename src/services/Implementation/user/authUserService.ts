@@ -13,21 +13,21 @@ import { NotFoundError, ValidationError, ExpiredError } from '../../../utils/err
 
 @injectable()
 export default class AuthUserService implements IAuthUserService {
-  private userRepository: IUserRepository;
+  private _userRepository: IUserRepository;
 
   constructor(@inject('IUserRepository') userRepository: IUserRepository) {
-    this.userRepository = userRepository;
+    this._userRepository = userRepository;
   }
 
   async register(username: string, email: string, password: string): Promise<void> {
-    const existingUser = await this.userRepository.findUserByEmail(email);
+    const existingUser = await this._userRepository.findUserByEmail(email);
     if (existingUser) throw new Error('Email is already in use')
     await redisClient.setEx(`email:${email}`, 3600, JSON.stringify({ username, email, password }))
   }
 
 
   async generateOTP(email: string): Promise<void> {
-    const user = await this.userRepository.findUserByEmail(email);
+    const user = await this._userRepository.findUserByEmail(email);
     if (user) throw new Error('Email already verified');
     const otp = (Math.floor(Math.random() * 10000)).toString().padStart(4, '0');
     const expiresAt = new Date(Date.now() + 1 * 60 * 1000);
@@ -70,12 +70,12 @@ export default class AuthUserService implements IAuthUserService {
     }
     const userData = JSON.parse(userDataString) as { username: string; email: string; password: string };
     userData.password = await bcrypt.hash(userData.password, 10);
-    await this.userRepository.createUser(userData);
+    await this._userRepository.createUser(userData);
   }
 
 
   async loginUser(email: string, password: string): Promise<any> {
-    const userData = await this.userRepository.findUserByEmail(email);
+    const userData = await this._userRepository.findUserByEmail(email);
     if (!userData) throw new Error('Invalid credentials');
     const validPassword = await bcrypt.compare(password, userData.password);
     if (!validPassword) throw new Error('Invalid credentials');
@@ -110,7 +110,7 @@ export default class AuthUserService implements IAuthUserService {
 
 
   async forgotPassword(email: string): Promise<void> {
-    const user = await this.userRepository.findUserByEmail(email);
+    const user = await this._userRepository.findUserByEmail(email);
     if (!user) throw new Error('Email not found');
     const otp = (Math.floor(Math.random() * 10000)).toString().padStart(4, '0');
     const expiresAt = new Date(Date.now() + 1 * 60 * 1000);
@@ -127,7 +127,7 @@ export default class AuthUserService implements IAuthUserService {
   async verifyForgotPasswordOtp(email: string, otp: string): Promise<void> {
     const otpRecord = await Otp.findOne({ email });
     if (!otpRecord) {
-      throw new NotFoundError('No OTP record found for this email.');
+      throw new NotFoundError('No OTP record found for this _email.');
     }
     if (otpRecord.otp !== otp) {
       throw new ValidationError('The OTP you entered is incorrect.');
@@ -139,13 +139,13 @@ export default class AuthUserService implements IAuthUserService {
 
 
   async resetPassword(email: string, newPassword: string): Promise<void> {
-    const user = await this.userRepository.findUserByEmail(email);
+    const user = await this._userRepository.findUserByEmail(email);
     if (!user) {
       console.error('User not found : ', email)
       throw new Error("User Not Found")
     }
     const hashedPassword = await bcrypt.hash(newPassword, 10);
-    await this.userRepository.updateUser({ password: hashedPassword }, email);
+    await this._userRepository.updateUser({ password: hashedPassword }, email);
   }
 
 
@@ -157,9 +157,9 @@ export default class AuthUserService implements IAuthUserService {
       profilePic
     }
     let existingUser
-    existingUser = await this.userRepository.findUserByEmail(userCredentials?.email);
+    existingUser = await this._userRepository.findUserByEmail(userCredentials?.email);
     if (!existingUser) {
-      existingUser = await this.userRepository.createUser(userCredentials);
+      existingUser = await this._userRepository.createUser(userCredentials);
     }
     const user = {
       id: existingUser._id,

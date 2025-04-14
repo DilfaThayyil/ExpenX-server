@@ -14,18 +14,18 @@ import redisClient from "../../../utils/redisClient";
 
 @injectable()
 export default class AdminService implements IAdminService {
-  private userRepository: IUserRepository
-  private advisorRepository: IAdvisorRepository;
-  private adminRepository: IAdminRepository
+  private _userRepository: IUserRepository
+  private _advisorRepository: IAdvisorRepository;
+  private _adminRepository: IAdminRepository
 
   constructor(
     @inject('IUserRepository') userRepository: IUserRepository,
     @inject('IAdvisorRepository') advisorRepository: IAdvisorRepository,
     @inject('IAdminRepository') adminRepository: IAdminRepository
   ) {
-    this.userRepository = userRepository
-    this.advisorRepository = advisorRepository
-    this.adminRepository = adminRepository
+    this._userRepository = userRepository
+    this._advisorRepository = advisorRepository
+    this._adminRepository = adminRepository
   }
 
   adminLogin(email: string, password: string): {
@@ -72,7 +72,7 @@ export default class AdminService implements IAdminService {
       const hashedPassword = await bcrypt.hash(password, 10)
       const admin = { username: name, email, password: hashedPassword }
       console.log("admin-service : ", admin)
-      const updatedAdmin = await this.userRepository.updateAdmin(admin)
+      const updatedAdmin = await this._userRepository.updateAdmin(admin)
       console.log('updatedAdmin-service : ', updatedAdmin)
       return updatedAdmin
     } catch (err) {
@@ -85,7 +85,7 @@ export default class AdminService implements IAdminService {
     const endDate = new Date();
     const startDate = new Date();
     startDate.setMonth(startDate.getMonth() - months);
-    const data = await this.adminRepository.getMonthlyTrends(startDate, endDate);
+    const data = await this._adminRepository.getMonthlyTrends(startDate, endDate);
     const result: MonthlyData[] = [];
     for (let i = 0; i < months; i++) {
       const date = new Date();
@@ -107,15 +107,15 @@ export default class AdminService implements IAdminService {
   }
 
   async getExpenseCategories(): Promise<CategoryData[]> {
-    const data = await this.adminRepository.getExpenseCategories();
+    const data = await this._adminRepository.getExpenseCategories();
     return data
   }
 
   async getDashboardStats(): Promise<DashboardStats> {
-    return this.adminRepository.getDashboardStats();
+    return this._adminRepository.getDashboardStats();
   }
 
   async getUserGrowth(): Promise<UserGrowthData[]> {
-    return this.adminRepository.getUserGrowth();
+    return this._adminRepository.getUserGrowth();
   }
 }

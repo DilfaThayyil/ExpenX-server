@@ -8,10 +8,10 @@ import { IGroupExpense } from '../../../entities/groupEntities';
 
 @injectable()
 export default class GroupController implements IGroupController{
-    private groupService: IGroupService
+    private _groupService: IGroupService
 
     constructor(@inject('IGroupService') groupService: IGroupService){
-        this.groupService = groupService
+        this._groupService = groupService
     }
 
     async createGroup(req: Request, res: Response): Promise<Response> {
@@ -21,7 +21,7 @@ export default class GroupController implements IGroupController{
           if (!userId || !name || !members) {
             return res.status(HttpStatusCode.BAD_REQUEST).json({ error: 'All fields are required!' })
           }
-          const newGroup = await this.groupService.createGroup(userId, name, members)
+          const newGroup = await this._groupService.createGroup(userId, name, members)
           console.log("newGroup in contrllr : ", newGroup)
           return res.status(HttpStatusCode.CREATED).json(newGroup);
         } catch (error) {
@@ -37,9 +37,9 @@ export default class GroupController implements IGroupController{
           if (!userId) {
             return res.status(HttpStatusCode.BAD_REQUEST).json({ error: 'userId is required' });
           }
-          const groups = await this.groupService.getUserGroups(userId);
+          const groups = await this._groupService.getUserGroups(userId);
           if (groups.length === 0) {
-            return res.status(HttpStatusCode.NOT_FOUND).json({ message: 'No groups found for this user' });
+            return res.status(HttpStatusCode.NOT_FOUND).json({ message: 'No groups found for this _user' });
           }
           return res.status(HttpStatusCode.OK).json({ groups });
         } catch (error) {
@@ -52,7 +52,7 @@ export default class GroupController implements IGroupController{
         try {
           const { groupId } = req.params;
           const { memberEmail } = req.body;
-          const updatedGroup = await this.groupService.addMember(groupId, memberEmail);
+          const updatedGroup = await this._groupService.addMember(groupId, memberEmail);
           res.status(HttpStatusCode.OK).json({
             success: true,
             message: 'Member added successfully',
@@ -74,7 +74,7 @@ export default class GroupController implements IGroupController{
           if (!expenseData.title || !expenseData.totalAmount || !expenseData.paidBy) {
             return res.status(HttpStatusCode.BAD_REQUEST).json({ success: false, error: 'Missing required fields' });
           }
-          const updatedGroup = await this.groupService.addExpenseInGroup(groupId, expenseData);
+          const updatedGroup = await this._groupService.addExpenseInGroup(groupId, expenseData);
           return res.status(HttpStatusCode.OK).json({
             success: true,
             message: 'Expense added successfully',

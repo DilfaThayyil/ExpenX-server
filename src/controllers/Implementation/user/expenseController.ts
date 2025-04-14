@@ -6,10 +6,10 @@ import { HttpStatusCode } from "../../../utils/httpStatusCode";
 
 @injectable()
 export default class ExpenseController implements IExpenseController {
-  private expenseService: IExpenseService
+  private _expenseService: IExpenseService
 
   constructor(@inject('IExpenseService') expenseService: IExpenseService) {
-    this.expenseService = expenseService
+    this._expenseService = expenseService
   }
 
   async getExpenses(req: Request, res: Response): Promise<void> {
@@ -17,7 +17,7 @@ export default class ExpenseController implements IExpenseController {
       const { userId } = req.params;
       const page = Math.max(1, parseInt(req.query.currentPage as string) || 1);
       const limit = Math.max(1, parseInt(req.query.limit as string) || 4);
-      const {expenses,totalPages} = await this.expenseService.getExpensesByUserId(userId,page,limit);
+      const {expenses,totalPages} = await this._expenseService.getExpensesByUserId(userId,page,limit);
       res.status(HttpStatusCode.OK).json({success:true,data:{expenses,totalPages}});
     } catch (error) {
       console.error('Error fetching expenses:', error);
@@ -34,7 +34,7 @@ export default class ExpenseController implements IExpenseController {
         res.status(HttpStatusCode.BAD_REQUEST).json({ error: 'All fields are required' });
         return;
       }
-      const newExpense = await this.expenseService.createExpense({
+      const newExpense = await this._expenseService.createExpense({
         userId: userId,
         date,
         amount,
@@ -55,7 +55,7 @@ export default class ExpenseController implements IExpenseController {
       const { userId, format, startDate, endDate } = req.query;
       console.log(`Export request received for user ${userId} in ${format} format with date range: ${startDate} - ${endDate}`);
 
-      const hasExpenses = await this.expenseService.hasExpenses(userId as string, startDate as string, endDate as string);
+      const hasExpenses = await this._expenseService.hasExpenses(userId as string, startDate as string, endDate as string);
       if (!hasExpenses) {
         return res.status(HttpStatusCode.NOT_FOUND).json({ message: "No expenses found in the selected date range." });
       }
@@ -63,7 +63,7 @@ export default class ExpenseController implements IExpenseController {
       switch (format) {
         case 'pdf':
           console.log("Beginning PDF export");
-          const pdfStream = await this.expenseService.exportExpensesAsPDF(userId as string, startDate as string, endDate as string);
+          const pdfStream = await this._expenseService.exportExpensesAsPDF(userId as string, startDate as string, endDate as string);
           res.setHeader('Content-Type', 'application/pdf');
           res.setHeader('Content-Disposition', 'attachment; filename=expense-report.pdf');
           pdfStream.pipe(res);
@@ -75,14 +75,14 @@ export default class ExpenseController implements IExpenseController {
           return;
         case 'csv':
           console.log("Beginning CSV export");
-          const csv = await this.expenseService.exportExpensesAsCSV(userId as string, startDate as string, endDate as string);
+          const csv = await this._expenseService.exportExpensesAsCSV(userId as string, startDate as string, endDate as string);
           res.setHeader('Content-Type', 'text/csv');
           res.setHeader('Content-Disposition', 'attachment; filename=expense-report.csv');
           return res.send(csv);
 
         case 'excel':
           console.log("Beginning Excel export");
-          const excelBuffer = await this.expenseService.exportExpensesAsExcel(userId as string, startDate as string, endDate as string);
+          const excelBuffer = await this._expenseService.exportExpensesAsExcel(userId as string, startDate as string, endDate as string);
           res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
           res.setHeader('Content-Disposition', 'attachment; filename=expense-report.xlsx');
           res.setHeader('Content-Length', excelBuffer.length);
@@ -100,7 +100,7 @@ export default class ExpenseController implements IExpenseController {
   async getExpenseByCategory(req:Request,res:Response):Promise<Response>{
     try{
       const { clientId, expenseTimeframe,customStartDate,customEndDate } = req.query;
-      const expenses = await this.expenseService.getExpenseByCategory(
+      const expenses = await this._expenseService.getExpenseByCategory(
         clientId as string,expenseTimeframe as string,
         customStartDate as string|undefined,customEndDate as string|undefined)
       console.log("expenses-contrll : ",expenses)
@@ -120,7 +120,7 @@ export default class ExpenseController implements IExpenseController {
   //       return;
   //     }
 
-  //     const exportBuffer = await this.expenseService.exportExpense(
+  //     const exportBuffer = await this._expenseService.exportExpense(
   //       userId as string,
   //       format as 'pdf'|'excel',
   //       startDate as string | undefined,

@@ -8,18 +8,18 @@ import { IExpenseRepository } from "../../../repositories/Interface/IExpenseRepo
 
 @injectable()
 export default class GroupService implements IGroupService {
-  private groupRepository: IGroupRepository
-  private userRepository: IUserRepository
-  private expenseRepository: IExpenseRepository
+  private _groupRepository: IGroupRepository
+  private _userRepository: IUserRepository
+  private _expenseRepository: IExpenseRepository
 
   constructor(
     @inject('IGroupRepository') groupRepository: IGroupRepository,
     @inject('IUserRepository') userRepository: IUserRepository,
     @inject('IExpenseRepository') expenseRepository: IExpenseRepository
   ) {
-    this.groupRepository = groupRepository
-    this.userRepository = userRepository
-    this.expenseRepository = expenseRepository
+    this._groupRepository = groupRepository
+    this._userRepository = userRepository
+    this._expenseRepository = expenseRepository
   }
 
   async createGroup(userId: string, name: string, members: string[]): Promise<IGroup> {
@@ -38,7 +38,7 @@ export default class GroupService implements IGroupService {
         members: modifiedMembers,
         expenses: [],
       }
-      return await this.groupRepository.createGroup(newGroup)
+      return await this._groupRepository.createGroup(newGroup)
     } catch (err) {
       console.error(err)
       throw err
@@ -46,11 +46,11 @@ export default class GroupService implements IGroupService {
   }
 
   async getUserGroups(userId: string): Promise<IGroup[]> {
-    const user = await this.userRepository.findUserById(userId)
+    const user = await this._userRepository.findUserById(userId)
     if (!user) {
       throw new Error('User not found')
     }
-    const groups = await this.groupRepository.getUserGroups(user?.email)
+    const groups = await this._groupRepository.getUserGroups(user?.email)
     return groups
   }
 
@@ -58,7 +58,7 @@ export default class GroupService implements IGroupService {
     if (!groupId || !memberEmail) {
       throw new Error('Group ID and member email are required');
     }
-    const group = await this.groupRepository.findById(groupId);
+    const group = await this._groupRepository.findById(groupId);
     if (!group) {
       throw new Error('Group not found');
     }
@@ -73,7 +73,7 @@ export default class GroupService implements IGroupService {
       paid: 0,
       owed: 0
     };
-    return await this.groupRepository.addMember(groupId, newMember);
+    return await this._groupRepository.addMember(groupId, newMember);
   }
 
 
@@ -82,7 +82,7 @@ export default class GroupService implements IGroupService {
       if (!groupId || !expenseData.title || !expenseData.totalAmount || !expenseData.paidBy || !expenseData.splitMethod) {
         throw new Error('Missing required expense information');
       }
-      const group = await this.groupRepository.findById(groupId);
+      const group = await this._groupRepository.findById(groupId);
       if (!group) {
         throw new Error('Group not found');
       }
@@ -127,7 +127,7 @@ export default class GroupService implements IGroupService {
         }));
       }
       const userEmails = Object.keys(shares);
-      const users = await this.userRepository.findUsersByEmails(userEmails);
+      const users = await this._userRepository.findUsersByEmails(userEmails);
       const userMap = new Map(users.map(user => [user.email, user._id]));
       const individualExpenses = splits.map(split => {
         const userId = userMap.get((split.user).toString());
@@ -151,8 +151,8 @@ export default class GroupService implements IGroupService {
         splitMethod,
         splits
       };
-      const updatedGroup = await this.groupRepository.addExpenseInGroup(groupId, expense);
-      await this.expenseRepository.createExpenses(individualExpenses);
+      const updatedGroup = await this._groupRepository.addExpenseInGroup(groupId, expense);
+      await this._expenseRepository.createExpenses(individualExpenses);
       return updatedGroup
     } catch (err) {
       console.error(err);
