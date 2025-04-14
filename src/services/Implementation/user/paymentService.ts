@@ -10,9 +10,9 @@ import { Payment } from '../../../dto/paymentDTO';
 
 @injectable()
 export default class PaymentService implements IPaymentService {
-  private stripe: Stripe; 
-  private paymentRepository: IPaymentRepository;
-  private expenseRepository: IExpenseRepository;
+  private _stripe: Stripe; 
+  private _paymentRepository: IPaymentRepository;
+  private _expenseRepository: IExpenseRepository;
 
   constructor(
     @inject('StripeSecretKey') stripeSecretKey: string,
@@ -20,9 +20,9 @@ export default class PaymentService implements IPaymentService {
     @inject('IExpenseRepository') expenseRepository: IExpenseRepository
   ) {
     console.log("Stripe Secret Key:", stripeSecretKey);
-    this.stripe = new Stripe(stripeSecretKey, { apiVersion: undefined });
-    this.paymentRepository = paymentRepository;
-    this.expenseRepository = expenseRepository;
+    this._stripe = new Stripe(stripeSecretKey, { apiVersion: undefined });
+    this._paymentRepository = paymentRepository;
+    this._expenseRepository = expenseRepository;
   }
 
   async initiatePayment(slotId: string, userId: string, advisorId: string, amount: number): Promise<{ clientSecret: string; paymentId: string; }> {
@@ -30,7 +30,7 @@ export default class PaymentService implements IPaymentService {
       const slotObjectId = new mongoose.Types.ObjectId(slotId);
       const userObjectId = new mongoose.Types.ObjectId(userId);
       const advisorObjectId = new mongoose.Types.ObjectId(advisorId);
-      const paymentIntent = await this.stripe.paymentIntents.create({
+      const paymentIntent = await this._stripe.paymentIntents.create({
         amount: amount * 100,
         currency: 'usd',
         metadata: { slotId, userId, advisorId }
@@ -38,7 +38,7 @@ export default class PaymentService implements IPaymentService {
       if (!paymentIntent.client_secret) {
         throw new Error("Failed to generate payment client secret");
       }
-      const payment = await this.paymentRepository.createPayment({
+      const payment = await this._paymentRepository.createPayment({
         slotId: slotObjectId,
         userId: userObjectId,
         advisorId: advisorObjectId,
@@ -46,7 +46,7 @@ export default class PaymentService implements IPaymentService {
         stripePaymentIntentId: paymentIntent.id,
         stripeClientSecret: paymentIntent.client_secret,
       }) as Payment;
-      await this.expenseRepository.createExpense({
+      await this._expenseRepository.createExpense({
         userId:userObjectId.toString(),
         date:new Date(),
         amount,
@@ -67,9 +67,9 @@ export default class PaymentService implements IPaymentService {
 
   async confirmPayment(paymentIntentId: string) {
     try {
-      const paymentIntent = await this.stripe.paymentIntents.retrieve(paymentIntentId);
+      const paymentIntent = await this._stripe.paymentIntents.retrieve(paymentIntentId);
       if (paymentIntent.status === 'succeeded') {
-        const payment = await this.paymentRepository.updatePaymentStatus(paymentIntentId, 'completed');
+        const payment = await this._paymentRepository.updatePaymentStatus(paymentIntentId, 'completed');
         return payment!;
       }
       throw new Error('Payment not successful');

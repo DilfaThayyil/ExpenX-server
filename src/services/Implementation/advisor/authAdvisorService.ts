@@ -13,15 +13,15 @@ import { NotFoundError, ValidationError, ExpiredError } from '../../../utils/err
 
 @injectable()
 export default class AuthAdvisorService implements IAuthAdvisorService {
-  private advisorRepository: IAdvisorRepository;
+  private _advisorRepository: IAdvisorRepository;
 
   constructor(@inject('IAdvisorRepository') advisorRepository: IAdvisorRepository) {
-    this.advisorRepository = advisorRepository;
+    this._advisorRepository = advisorRepository;
   }
 
   async register(username: string, email: string, password: string): Promise<void> {
     console.log("  register-service -advisor ----------fksdj83457")
-    const existingUser = await this.advisorRepository.findUserByEmail(email);
+    const existingUser = await this._advisorRepository.findUserByEmail(email);
     console.log("existing user : ",existingUser)
     if (existingUser) throw new Error('Email is already in use')
       console.log("^^^ next is redisclient ^^^^^")
@@ -31,7 +31,7 @@ export default class AuthAdvisorService implements IAuthAdvisorService {
 
   async generateOTP(email: string): Promise<void> {
     console.log("generte-otp-advisor : email: ",email)
-    const user = await this.advisorRepository.findUserByEmail(email);
+    const user = await this._advisorRepository.findUserByEmail(email);
     console.log("user ---> ",user)
     if (user) throw new Error('Email already verified');
 
@@ -79,12 +79,12 @@ export default class AuthAdvisorService implements IAuthAdvisorService {
     }
     const userData = JSON.parse(userDataString) as { username: string; email: string; password: string };
     userData.password = await bcrypt.hash(userData.password, 10);
-    await this.advisorRepository.createUser(userData);
+    await this._advisorRepository.createUser(userData);
   }
   
 
   async loginUser(email: string, password: string): Promise<any> {
-    const user = await this.advisorRepository.findUserByEmail(email);
+    const user = await this._advisorRepository.findUserByEmail(email);
     if (!user) throw new Error('Invalid credentials');
     console.log('loginUser : ',user)
     const validPassword = await bcrypt.compare(password, user.password);
@@ -116,7 +116,7 @@ export default class AuthAdvisorService implements IAuthAdvisorService {
   }
 
   async forgotPassword(email: string): Promise<void> {
-    const user = await this.advisorRepository.findUserByEmail(email);
+    const user = await this._advisorRepository.findUserByEmail(email);
     if (!user) throw new Error('Email not found');
     console.log("user in forgotPass : ",user)
     const otp = (Math.floor(Math.random() * 10000)).toString().padStart(4, '0');
@@ -134,7 +134,7 @@ export default class AuthAdvisorService implements IAuthAdvisorService {
   async verifyForgotPasswordOtp(email: string, otp: string): Promise<void> {
     const otpRecord = await Otp.findOne({ email });
     if(!otpRecord){
-      throw new Error("No OTP record found for this email")
+      throw new Error("No OTP record found for this _email")
      }
      if(otpRecord.otp!==otp){
       throw new Error("The OTP you entered is incorrect")
@@ -146,14 +146,14 @@ export default class AuthAdvisorService implements IAuthAdvisorService {
 
   async resetPassword(email: string, newPassword: string): Promise<void> {
     console.log('Resetting password for email : ',email)
-    const user = await this.advisorRepository.findUserByEmail(email);
+    const user = await this._advisorRepository.findUserByEmail(email);
     if(!user){
       console.error('User not found : ',email)
       throw new Error("User Not Found")
     }
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     console.log('Hashed password : ',hashedPassword)
-    await this.advisorRepository.updateUser({ password: hashedPassword }, email);
+    await this._advisorRepository.updateUser({ password: hashedPassword }, email);
   }
 
   async googleAuth(username:string,email: string,password:string,profilePic:string): Promise<any> {
@@ -164,9 +164,9 @@ export default class AuthAdvisorService implements IAuthAdvisorService {
       profilePic
     }
     let existingUser
-     existingUser = await this.advisorRepository.findUserByEmail(userCredentials?.email);
+     existingUser = await this._advisorRepository.findUserByEmail(userCredentials?.email);
     if (!existingUser) {
-      existingUser = await this.advisorRepository.createUser(userCredentials);
+      existingUser = await this._advisorRepository.createUser(userCredentials);
     }
     const user = {
       id:existingUser._id,

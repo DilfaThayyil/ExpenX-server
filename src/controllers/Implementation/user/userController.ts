@@ -9,10 +9,10 @@ import { messageConstants } from '../../../utils/messageConstants';
 
 @injectable()
 export default class UserController implements IUserController {
-  private userService: IUserService;
+  private _userService: IUserService;
 
   constructor(@inject('IUserService') userService: IUserService) {
-    this.userService = userService;
+    this._userService = userService;
   }
 
 
@@ -41,7 +41,7 @@ export default class UserController implements IUserController {
       if (!email || !username) {
         res.status(HttpStatusCode.BAD_REQUEST).json({ error: 'Email and username are required' });
       }
-      const updatedUser = await this.userService.updateUserProfile({
+      const updatedUser = await this._userService.updateUserProfile({
         profilePic,
         username,
         email,
@@ -59,7 +59,7 @@ export default class UserController implements IUserController {
   async getDashboardData(req:Request,res:Response):Promise<Response>{
     try{
       const userId = req.params.userId
-      const data = await this.userService.getDashboardData(userId)
+      const data = await this._userService.getDashboardData(userId)
       return res.status(HttpStatusCode.OK).json(data)
     }catch(err){
       console.error(err)
@@ -71,7 +71,7 @@ export default class UserController implements IUserController {
     try {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
-      const { users, totalPages } = await this.userService.fetchUsers(page, limit);
+      const { users, totalPages } = await this._userService.fetchUsers(page, limit);
       return res.status(HttpStatusCode.OK).json({ success: true, data: { users, totalPages } });
     } catch (error) {
       console.error(error)
@@ -82,7 +82,7 @@ export default class UserController implements IUserController {
   async updateUserBlockStatus(req: Request, res: Response): Promise<Response> {
     try {
       const { action, email } = req.body;
-      const result = await this.userService.updateUserBlockStatus(action, email);
+      const result = await this._userService.updateUserBlockStatus(action, email);
       if (result.error) {
         return res.status(HttpStatusCode.BAD_REQUEST).json({ error: result.error });
       }

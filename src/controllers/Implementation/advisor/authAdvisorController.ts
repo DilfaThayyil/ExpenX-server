@@ -13,10 +13,10 @@ import jwt from "jsonwebtoken";
 
 @injectable()
 export default class AuthAdvisorController implements IAuthAdvisorController {
-  private authAdvisorService: IAuthAdvisorService;
+  private _authAdvisorService: IAuthAdvisorService;
 
   constructor(@inject('IAuthAdvisorService') authAdvisorService: IAuthAdvisorService) {
-    this.authAdvisorService = authAdvisorService;
+    this._authAdvisorService = authAdvisorService;
   }
 
   async register(req: Request, res: Response): Promise<void> {
@@ -24,7 +24,7 @@ export default class AuthAdvisorController implements IAuthAdvisorController {
       console.log('register-contrll-advisor ----sdkjfksdjf')
       const { username, email, password } = req.body;
       console.log("req.body : ", req.body)
-      const regi = await this.authAdvisorService.register(username, email, password);
+      const regi = await this._authAdvisorService.register(username, email, password);
       console.log("regi ===> , ", regi)
       console.log(' ====> =====> ======> success register')
       res.status(HttpStatusCode.CREATED).json({ message: 'User registered successfully' });
@@ -37,7 +37,7 @@ export default class AuthAdvisorController implements IAuthAdvisorController {
   async generateOTP(req: Request, res: Response): Promise<void> {
     try {
       const { email } = req.body;
-      await this.authAdvisorService.generateOTP(email);
+      await this._authAdvisorService.generateOTP(email);
       res.json({ message: 'OTP sent successfully' });
     } catch (err) {
       console.error("Error sending otp email : ", err)
@@ -48,7 +48,7 @@ export default class AuthAdvisorController implements IAuthAdvisorController {
   async resendOTP(req: Request, res: Response): Promise<Response> {
     try {
       const { email } = req.body
-      await this.authAdvisorService.resendOTP(email)
+      await this._authAdvisorService.resendOTP(email)
       return res.json({ message: 'OTP resent successfullt' })
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : messageConstants.UNEXPECTED_ERROR
@@ -60,7 +60,7 @@ export default class AuthAdvisorController implements IAuthAdvisorController {
     try {
       // console.log('req body in controllr : ',req.body)
       const { email, otp } = req.body;
-      await this.authAdvisorService.verifyOTP(email, otp);
+      await this._authAdvisorService.verifyOTP(email, otp);
       return res.status(HttpStatusCode.OK).json({ success: true, message: 'User registered successfully' });
     } catch (err) {
       if (err instanceof NotFoundError) {
@@ -79,7 +79,7 @@ export default class AuthAdvisorController implements IAuthAdvisorController {
   async loginUser(req: Request, res: Response): Promise<void> {
     try {
       const { email, password } = req.body;
-      const user = await this.authAdvisorService.loginUser(email, password);
+      const user = await this._authAdvisorService.loginUser(email, password);
       console.log("advisor-controller : ",user)
       const user2 = mapUserProfile(user)
       console.log("user2 : ",user2)
@@ -113,7 +113,7 @@ export default class AuthAdvisorController implements IAuthAdvisorController {
         return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: "Refresh token is blacklisted." });
       }
       if (!refreshToken) return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: "No refresh token provided" });
-      const result = await this.authAdvisorService.setNewAccessToken(refreshToken);
+      const result = await this._authAdvisorService.setNewAccessToken(refreshToken);
       console.log("-----result--- : ", result)
       if (!result.accessToken) return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: 'Failed to generate token' });
       // res.cookie('accessToken', result.accessToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production', maxAge: 60*60*1000, sameSite: 'strict' });
@@ -133,7 +133,7 @@ export default class AuthAdvisorController implements IAuthAdvisorController {
   async forgotPassword(req: Request, res: Response): Promise<void> {
     try {
       const { email } = req.body;
-      await this.authAdvisorService.forgotPassword(email);
+      await this._authAdvisorService.forgotPassword(email);
       res.json({ message: 'Forgot password OTP sent successfully' });
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : messageConstants.UNEXPECTED_ERROR;
@@ -144,11 +144,11 @@ export default class AuthAdvisorController implements IAuthAdvisorController {
   async verifyForgotPasswordOtp(req: Request, res: Response): Promise<void> {
     try {
       const { email, otp } = req.body;
-      await this.authAdvisorService.verifyForgotPasswordOtp(email, otp);
+      await this._authAdvisorService.verifyForgotPasswordOtp(email, otp);
       res.status(HttpStatusCode.OK).json({ success: true, message: 'OTP verified successfully' });
     } catch (err) {
       if (err instanceof NotFoundError) {
-        res.status(HttpStatusCode.NOT_FOUND).json({ success: false, message: 'No OTP record found for this email.' });
+        res.status(HttpStatusCode.NOT_FOUND).json({ success: false, message: 'No OTP record found for this _email.' });
       } else if (err instanceof ValidationError) {
         res.status(HttpStatusCode.BAD_REQUEST).json({ success: false, message: 'The OTP you entered is incorrect.' });
       } else if (err instanceof ExpiredError) {
@@ -163,7 +163,7 @@ export default class AuthAdvisorController implements IAuthAdvisorController {
   async resetPassword(req: Request, res: Response): Promise<void> {
     try {
       const { email, password } = req.body;
-      await this.authAdvisorService.resetPassword(email, password);
+      await this._authAdvisorService.resetPassword(email, password);
       res.status(HttpStatusCode.OK).json({ message: 'Password changed successfully' });
     } catch (err) {
       console.error('Error resetting password : ', err)
@@ -179,7 +179,7 @@ export default class AuthAdvisorController implements IAuthAdvisorController {
       const email = userCredential.email;
       const password = userCredential.sub
       const profilePic = userCredential.picture
-      const {existingUser,accessToken,refreshToken} = await this.authAdvisorService.googleAuth(username, email,password, profilePic);
+      const {existingUser,accessToken,refreshToken} = await this._authAdvisorService.googleAuth(username, email,password, profilePic);
       console.log("existingAdvisor-googleAuth : ",existingUser)
       console.log("accessToken-googleAuth : ",accessToken)
       console.log("refreshToken-googleAuth : ",refreshToken)

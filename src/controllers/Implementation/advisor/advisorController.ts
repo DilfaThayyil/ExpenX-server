@@ -11,10 +11,10 @@ import { IWalletService } from '../../../services/Interface/wallet/IWalletServic
 
 @injectable()
 export default class AdvisorController implements IAdvisorController {
-  private advisorService: IAdvisorService;
-  private userService: IUserService;
-  private transactionService: ITransactionService;
-  private walletService: IWalletService;
+  private _advisorService: IAdvisorService;
+  private _userService: IUserService;
+  private _transactionService: ITransactionService;
+  private _walletService: IWalletService;
 
   constructor(
     @inject('IAdvisorService') advisorService: IAdvisorService,
@@ -22,10 +22,10 @@ export default class AdvisorController implements IAdvisorController {
     @inject('ITransactionService') transactionService: ITransactionService,
     @inject('IWalletService') walletService: IWalletService
   ) {
-    this.advisorService = advisorService;
-    this.userService = userService;
-    this.transactionService = transactionService;
-    this.walletService = walletService;
+    this._advisorService = advisorService;
+    this._userService = userService;
+    this._transactionService = transactionService;
+    this._walletService = walletService;
   }
 
 
@@ -54,7 +54,7 @@ export default class AdvisorController implements IAdvisorController {
       if (!email || !username) {
         res.status(HttpStatusCode.BAD_REQUEST).json({ error: 'Email and username are required' });
       }
-      const updatedUser = await this.advisorService.updateUserProfile({
+      const updatedUser = await this._advisorService.updateUserProfile({
         profilePic,
         username,
         email,
@@ -73,7 +73,7 @@ export default class AdvisorController implements IAdvisorController {
   async fetchDashboard(req: Request, res: Response): Promise<Response> {
     try {
       const { advisorId } = req.params
-      const stats = await this.advisorService.fetchDashboard(advisorId)
+      const stats = await this._advisorService.fetchDashboard(advisorId)
       return res.status(HttpStatusCode.OK).json(stats)
     } catch (err) {
       console.error(err)
@@ -89,7 +89,7 @@ export default class AdvisorController implements IAdvisorController {
       if (!advisorId || !timeframe) {
         return res.status(HttpStatusCode.BAD_REQUEST).json({ message: "Missing required parameters" })
       }
-      const revenue = await this.advisorService.fetchRevenue(advisorId, timeframe)
+      const revenue = await this._advisorService.fetchRevenue(advisorId, timeframe)
       console.log("revenue-contrll : ", revenue)
       return res.status(HttpStatusCode.OK).json({ revenue })
     } catch (error) {
@@ -101,7 +101,7 @@ export default class AdvisorController implements IAdvisorController {
   async fetchClientGoals(req: Request, res: Response): Promise<Response> {
     try {
       const advisorId = req.params.advisorId
-      const clientGoalProgress = await this.advisorService.getClientGoalProgress(advisorId)
+      const clientGoalProgress = await this._advisorService.getClientGoalProgress(advisorId)
       return res.status(HttpStatusCode.OK).json({clientGoalProgress})
     } catch (err) {
       console.error(err)
@@ -112,7 +112,7 @@ export default class AdvisorController implements IAdvisorController {
   async getUpcomingAppointments(req:Request,res:Response):Promise<Response>{
     try{
       const {advisorId} = req.params
-      const upComingAppointments = await this.advisorService.getUpcomingAppointments(advisorId)
+      const upComingAppointments = await this._advisorService.getUpcomingAppointments(advisorId)
       return res.status(HttpStatusCode.OK).json({upComingAppointments})
     }catch(err){
       console.error(err)
@@ -123,7 +123,7 @@ export default class AdvisorController implements IAdvisorController {
   async getRecentClients(req:Request,res:Response):Promise<Response>{
     try{
       const {advisorId} = req.params
-      const recentClientActivities = await this.advisorService.getRecentClients(advisorId)
+      const recentClientActivities = await this._advisorService.getRecentClients(advisorId)
       return res.status(HttpStatusCode.OK).json({recentClientActivities})
     }catch(err){
       console.error(err)
@@ -134,7 +134,7 @@ export default class AdvisorController implements IAdvisorController {
   
   async getAdvisors(req: Request, res: Response): Promise<Response> {
     try {
-      const Advisors = await this.advisorService.getAdvisors()
+      const Advisors = await this._advisorService.getAdvisors()
       return res.status(HttpStatusCode.OK).json({ Advisors })
     } catch (err) {
       return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: messageConstants.INTERNAL_ERROR });
@@ -145,7 +145,7 @@ export default class AdvisorController implements IAdvisorController {
     try {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
-      const { users, totalPages } = await this.advisorService.fetchAdvisors(page, limit);
+      const { users, totalPages } = await this._advisorService.fetchAdvisors(page, limit);
       return res.status(HttpStatusCode.OK).json({ success: true, data: { users, totalPages } });
     } catch (error) {
       console.error(error)
@@ -156,7 +156,7 @@ export default class AdvisorController implements IAdvisorController {
   async updateAdvisorBlockStatus(req:Request, res:Response):Promise<Response>{
     try{
       const {action,email} = req.body
-      const result = await this.advisorService.updateAdvisorBlockStatus(action,email)
+      const result = await this._advisorService.updateAdvisorBlockStatus(action,email)
       if(result.error){
         return res.status(HttpStatusCode.BAD_REQUEST).json({error: result.error})
       }
@@ -170,7 +170,7 @@ export default class AdvisorController implements IAdvisorController {
   async getClientMeetings(req:Request,res:Response):Promise<Response>{
     try{
       const {clientId,advisorId} = req.query as {clientId:string,advisorId:string}
-      const clientMeetings = await this.advisorService.getClientMeetings(clientId,advisorId)
+      const clientMeetings = await this._advisorService.getClientMeetings(clientId,advisorId)
       return res.status(HttpStatusCode.OK).json({success:true,clientMeetings})
     }catch(err){
       console.error(err)
@@ -181,7 +181,7 @@ export default class AdvisorController implements IAdvisorController {
   async getClient(req:Request,res:Response):Promise<Response>{
     try{
       const {clientId} = req.params
-      const client = await this.userService.fetchUser(clientId)
+      const client = await this._userService.fetchUser(clientId)
       return res.status(HttpStatusCode.OK).json({success:true,client})
     }catch(err){
       console.error(err)
@@ -197,7 +197,7 @@ export default class AdvisorController implements IAdvisorController {
       if (!file || !userId || !advisorId) {
         return res.status(HttpStatusCode.BAD_REQUEST).json({ error: 'Missing file or required fields' });
       }      
-      const document = await this.advisorService.uploadDocument(userId,advisorId,file)
+      const document = await this._advisorService.uploadDocument(userId,advisorId,file)
       console.log("doc-contrlll : ",document)
       return res.status(HttpStatusCode.OK).json({message : 'File uploaded successfully',document})
     }catch(err){
@@ -209,7 +209,7 @@ export default class AdvisorController implements IAdvisorController {
   async getDocuments(req:Request,res:Response):Promise<Response>{
     try{
       const { clientId, advisorId } = req.query as { clientId: string; advisorId: string };
-      const documents = await this.advisorService.getDocuments(clientId,advisorId)
+      const documents = await this._advisorService.getDocuments(clientId,advisorId)
       return res.status(HttpStatusCode.OK).json({success:true,documents})
     }catch(err){
       console.error(err)
@@ -220,7 +220,7 @@ export default class AdvisorController implements IAdvisorController {
   async getTransactions(req:Request,res:Response):Promise<Response>{
     try{
       const {userId} = req.params
-      const transactions = await this.transactionService.getTransactions(userId)
+      const transactions = await this._transactionService.getTransactions(userId)
       return res.status(HttpStatusCode.OK).json({success:true,transactions})
     }catch(err){
       console.error(err)
@@ -231,7 +231,7 @@ export default class AdvisorController implements IAdvisorController {
   async getWallet(req:Request,res:Response):Promise<Response>{
     try{
       const {userId} = req.params
-      const wallet = await this.walletService.getWallet(userId)
+      const wallet = await this._walletService.getWallet(userId)
       return res.status(HttpStatusCode.OK).json(wallet)
     }catch(err){
       return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({error:messageConstants.INTERNAL_ERROR})
