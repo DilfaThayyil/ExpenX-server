@@ -16,7 +16,8 @@ export default class AdminController implements IAdminController {
   private adminService: IAdminService
 
   constructor(@inject('IAdminService') adminService: IAdminService) {
-    this.adminService = adminService
+    console.log('conflict')
+    this.adminService = adminService;
   }
 
 
