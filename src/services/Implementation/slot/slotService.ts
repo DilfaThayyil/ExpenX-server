@@ -9,10 +9,10 @@ import { IWalletRepository } from "../../../repositories/Interface/IWalletReposi
 
 @injectable()
 export default class SlotService implements ISlotService {
-  private slotRepository: ISlotRepository
-  private userRepository: IUserRepository
-  private advisorRepository: IAdvisorRepository
-  private walletRepository: IWalletRepository
+  private _slotRepository: ISlotRepository
+  private _userRepository: IUserRepository
+  private _advisorRepository: IAdvisorRepository
+  private _walletRepository: IWalletRepository
 
   constructor(
     @inject('ISlotRepository') slotRepository: ISlotRepository,
@@ -20,19 +20,19 @@ export default class SlotService implements ISlotService {
     @inject('IAdvisorRepository') advisorRepository: IAdvisorRepository,
     @inject('IWalletRepository') walletRepository: IWalletRepository
   ) {
-    this.slotRepository = slotRepository
-    this.userRepository = userRepository
-    this.advisorRepository = advisorRepository
-    this.walletRepository = walletRepository
+    this._slotRepository = slotRepository
+    this._userRepository = userRepository
+    this._advisorRepository = advisorRepository
+    this._walletRepository = walletRepository
   }
 
   async bookslot(slotId: string, userId: string): Promise<Slot | null> {
     try {
-      const slot = await this.slotRepository.findSlot(slotId);
+      const slot = await this._slotRepository.findSlot(slotId);
       if (!slot) throw new Error("Slot not found");
       if (slot.status === "Booked") throw new Error("Slot is already booked");
 
-      const user = await this.userRepository.findUserById(userId);
+      const user = await this._userRepository.findUserById(userId);
       if (!user) throw new Error("User not found");
 
       slot.status = "Booked";
@@ -43,7 +43,7 @@ export default class SlotService implements ISlotService {
         profilePic: user.profilePic
       };
 
-      const bookedSlot = await this.slotRepository.bookSlot(slotId, slot);
+      const bookedSlot = await this._slotRepository.bookSlot(slotId, slot);
       return bookedSlot;
     } catch (err) {
       console.error(err);
@@ -51,17 +51,17 @@ export default class SlotService implements ISlotService {
     }
   }
   async fetchSlotsByUser(userId: string, page: number, limit: number): Promise<{ slots: Slot[], totalPages: number }> {
-    const result = await this.slotRepository.fetchSlotsByUser(userId, page, limit);
+    const result = await this._slotRepository.fetchSlotsByUser(userId, page, limit);
     return result
   }
 
   async createSlot(id: string, slotData: Slot): Promise<Slot> {
     try {
-      const isExist = await this.slotRepository.findExistingSlot(slotData.date, slotData.startTime);
+      const isExist = await this._slotRepository.findExistingSlot(slotData.date, slotData.startTime);
       if (isExist) {
         throw new Error("A slot already exists for the given date and time.");
       }
-      const advisor = await this.advisorRepository.findUserById(id);
+      const advisor = await this._advisorRepository.findUserById(id);
       if (!advisor) throw new Error('Advisor not found');
 
       const creatingSlot: Partial<Slot> = {
@@ -83,7 +83,7 @@ export default class SlotService implements ISlotService {
         description: slotData.description
       };
 
-      const slot = await this.slotRepository.createSlot(creatingSlot as Slot);
+      const slot = await this._slotRepository.createSlot(creatingSlot as Slot);
       return slot;
     } catch (err) {
       console.error('Error creating slot:', err);
@@ -95,7 +95,7 @@ export default class SlotService implements ISlotService {
   async fetchSlots(advisorId: string, page: number, limit: number): Promise<{ slots: Slot[] | Slot, totalPages: number }> {
     // eslint-disable-next-line no-useless-catch
     try {
-      const { slots, totalSlots } = await this.slotRepository.fetchSlots(advisorId, page, limit)
+      const { slots, totalSlots } = await this._slotRepository.fetchSlots(advisorId, page, limit)
       const totalPages = Math.ceil(totalSlots / limit)
       return { slots, totalPages }
     } catch (err) {
@@ -105,11 +105,11 @@ export default class SlotService implements ISlotService {
 
   async updateSlot(slotId: string, slot: Slot): Promise<Slot | null> {
     try {
-      const existingSlot = await this.slotRepository.findSlotById(slotId)
+      const existingSlot = await this._slotRepository.findSlotById(slotId)
       if (!existingSlot) {
         throw new Error('slot is not found')
       }
-      const updatedSlot = await this.slotRepository.updateSlot(slotId, slot)
+      const updatedSlot = await this._slotRepository.updateSlot(slotId, slot)
       return updatedSlot
     } catch (err) {
       console.error(err)
@@ -119,7 +119,7 @@ export default class SlotService implements ISlotService {
 
   async deleteSlot(slotId: string): Promise<boolean> {
     try {
-      const isDeleted = await this.slotRepository.deleteSlot(slotId)
+      const isDeleted = await this._slotRepository.deleteSlot(slotId)
       if (!isDeleted) {
         throw new Error('Cant found or delete the slot')
       }
@@ -132,7 +132,7 @@ export default class SlotService implements ISlotService {
 
   async getBookedSlotsForAdvisor(advisorId: string, page: number, limit: number): Promise<{ bookedSlots: Slot[] | Slot; totalPages: number }> {
     try {
-      const { bookedSlots, totalSlots } = await this.slotRepository.getBookedSlotsForAdvisor(advisorId, page, limit)
+      const { bookedSlots, totalSlots } = await this._slotRepository.getBookedSlotsForAdvisor(advisorId, page, limit)
       if (!bookedSlots) {
         throw new Error('No slots found')
       }
@@ -145,11 +145,11 @@ export default class SlotService implements ISlotService {
   }
 
   async cancelBookedSlot(slotId: string,advisorId:string,userId:string): Promise<Slot | null> {
-    const slot = await this.slotRepository.findSlotById(slotId);
+    const slot = await this._slotRepository.findSlotById(slotId);
     if (!slot) throw new Error("Slot not found");
     const slotAmount = slot.fee;
-    await this.walletRepository.updateWallet(userId, slotAmount);
-    await this.walletRepository.updateWallet(advisorId, -slotAmount);
-    return await this.slotRepository.updateSlotStatus(slotId);
+    await this._walletRepository.updateWallet(userId, slotAmount);
+    await this._walletRepository.updateWallet(advisorId, -slotAmount);
+    return await this._slotRepository.updateSlotStatus(slotId);
   }
 }

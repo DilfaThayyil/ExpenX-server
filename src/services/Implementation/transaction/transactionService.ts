@@ -6,17 +6,17 @@ import { ITransaction } from "../../../models/transactionSchema";
 
 @injectable()
 export default class TransactionService implements ITransactionService {
-    private transactionRepository: ITransactionRepository
+    private _transactionRepository: ITransactionRepository
 
     constructor(@inject('ITransactionRepository') transactionRepository: ITransactionRepository){
-        this.transactionRepository = transactionRepository
+        this._transactionRepository = transactionRepository
     }
 
     async createTransaction(transaction:ITransaction):Promise<ITransaction>{
-        return await this.transactionRepository.createTransaction(transaction)
+        return await this._transactionRepository.createTransaction(transaction)
     }
 
     async getTransactions(userId:string):Promise<ITransaction[]>{
-        return await this.transactionRepository.getTransactions(userId)
+        return await this._transactionRepository.getTransactions(userId)
     }
 }

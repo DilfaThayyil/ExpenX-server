@@ -7,14 +7,14 @@ import { messageConstants } from '../../../utils/messageConstants';
 
 @injectable()
 export default class CategoryController implements ICategoryController {
-  private categoryService: ICategoryService
+  private _categoryService: ICategoryService
   constructor(@inject('ICategoryService') categoryService: ICategoryService) {
-    this.categoryService = categoryService;
+    this._categoryService = categoryService;
   }
 
   async getCategories(req: Request, res: Response): Promise<Response> {
     try {
-      const categories = await this.categoryService.getCategories()
+      const categories = await this._categoryService.getCategories()
       return res.status(HttpStatusCode.OK).json(categories)
     } catch (err) {
       console.error(err)
@@ -26,7 +26,7 @@ export default class CategoryController implements ICategoryController {
     try {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
-      const { categories, totalPages } = await this.categoryService.fetchCategories(page, limit);
+      const { categories, totalPages } = await this._categoryService.fetchCategories(page, limit);
       return res.status(HttpStatusCode.OK).json({ success: true, data: { categories, totalPages } });
     } catch (error) {
       console.error(error)
@@ -37,7 +37,7 @@ export default class CategoryController implements ICategoryController {
   async addCategory(req: Request, res: Response): Promise<Response> {
     try {
         const { name } = req.body;
-        const category = await this.categoryService.addCategory(name);
+        const category = await this._categoryService.addCategory(name);
         return res.status(HttpStatusCode.CREATED).json({ success: true, data: { category } });
     } catch (err: any) {
         console.error(err);
@@ -52,7 +52,7 @@ export default class CategoryController implements ICategoryController {
     try{
       const {id} = req.params
       const {name} = req.body
-      const updatedCategory = await this.categoryService.updateCategory(id,name)
+      const updatedCategory = await this._categoryService.updateCategory(id,name)
       return res.status(HttpStatusCode.OK).json({success:true,data:{updatedCategory}})
     }catch(err){
       console.error(err)
@@ -63,7 +63,7 @@ export default class CategoryController implements ICategoryController {
   async deleteCategory(req:Request, res:Response):Promise<Response>{
     try{
       const {id} = req.params
-      const category = await this.categoryService.deleteCategory(id)
+      const category = await this._categoryService.deleteCategory(id)
       if(!category){
         return res.status(HttpStatusCode.NOT_FOUND).json({message:"category not found"})
       }

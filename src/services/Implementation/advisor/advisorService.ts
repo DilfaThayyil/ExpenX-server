@@ -15,10 +15,10 @@ import { IAppointment } from '../../../dto/advisorDTO';
 
 @injectable()
 export default class AdvisorService implements IAdvisorService {
-  private advisorRepository: IAdvisorRepository;
-  private advDashboardRepo: IAdvDashboardRepo;
-  private slotRepository: ISlotRepository;
-  private documentRepository: IDocumentRepository;
+  private _advisorRepository: IAdvisorRepository;
+  private _advDashboardRepo: IAdvDashboardRepo;
+  private _slotRepository: ISlotRepository;
+  private _documentRepository: IDocumentRepository;
 
   constructor(
     @inject('IAdvisorRepository') advisorRepository: IAdvisorRepository,
@@ -26,15 +26,15 @@ export default class AdvisorService implements IAdvisorService {
     @inject('ISlotRepository') slotRepository: ISlotRepository,
     @inject('IDocumentRepository') documentRepository: IDocumentRepository
   ) {
-    this.advisorRepository = advisorRepository;
-    this.advDashboardRepo = advDashboardRep;
-    this.slotRepository = slotRepository;
-    this.documentRepository = documentRepository;
+    this._advisorRepository = advisorRepository;
+    this._advDashboardRepo = advDashboardRep;
+    this._slotRepository = slotRepository;
+    this._documentRepository = documentRepository;
   }
 
   async updateUserProfile(userData: { profilePic: string; username: string; email: string; phone: string; country: string; language: string }) {
     try {
-      const updatedUser = await this.advisorRepository.updateUser(userData, userData.email);
+      const updatedUser = await this._advisorRepository.updateUser(userData, userData.email);
       console.log("updated user ; ", updatedUser)
       return updatedUser;
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -44,35 +44,35 @@ export default class AdvisorService implements IAdvisorService {
   }
 
   async fetchDashboard(advisorId: string): Promise<{ totalRevenue: number, activeClients: number, completedGoals: number, slotUtilization: number }> {
-    const dashboardData = await this.advDashboardRepo.getDashboardData(advisorId)
+    const dashboardData = await this._advDashboardRepo.getDashboardData(advisorId)
     return dashboardData
   }
 
   async fetchRevenue(advisorId: string, timeFrame: 'monthly' | 'quarterly' | 'yearly'): Promise<number> {
-    const revenue = await this.advDashboardRepo.fetchRevenue(advisorId, timeFrame)
+    const revenue = await this._advDashboardRepo.fetchRevenue(advisorId, timeFrame)
     return revenue
   }
 
   async getClientGoalProgress(advisorId: string): Promise<{ completed: number; inProgress: number; notStarted: number }> {
-    return await this.advDashboardRepo.getClientGoalProgress(advisorId);
+    return await this._advDashboardRepo.getClientGoalProgress(advisorId);
   }
 
   async getUpcomingAppointments(advisorId: string): Promise<IAppointment[]> {
-    return await this.advDashboardRepo.getUpcomingAppointments(advisorId)
+    return await this._advDashboardRepo.getUpcomingAppointments(advisorId)
   }
 
   async getRecentClients(advisorId: string): Promise<Slot[]> {
-    return await this.advDashboardRepo.getRecentClientActivities(advisorId)
+    return await this._advDashboardRepo.getRecentClientActivities(advisorId)
   }
 
   async getAdvisors(): Promise<IAdvisor[]> {
-    const advisors = await this.advisorRepository.getAdvisors()
+    const advisors = await this._advisorRepository.getAdvisors()
     return advisors
   }
 
   async fetchAdvisors(page: number, limit: number): Promise<{ users: IUser[]; totalPages: number }> {
     console.log("service....")
-    const { users, totalUsers } = await this.advisorRepository.fetchAdvisors(page, limit);
+    const { users, totalUsers } = await this._advisorRepository.fetchAdvisors(page, limit);
     const totalPages = Math.ceil(totalUsers / limit);
     console.log()
     return { users, totalPages };
@@ -82,7 +82,7 @@ export default class AdvisorService implements IAdvisorService {
   async updateAdvisorBlockStatus(action: string, email: string): Promise<{ message: string; error?: string }> {
     try {
       const isBlocked = action === 'block'
-      await this.advisorRepository.updateAdvisorStatus(email, isBlocked)
+      await this._advisorRepository.updateAdvisorStatus(email, isBlocked)
       return { message: `Advisor ${action}ed successfully` }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred";
@@ -92,7 +92,7 @@ export default class AdvisorService implements IAdvisorService {
 
   async getClientMeetings(clientId: string,advisorId:string): Promise<Slot[] | string> {
     try {
-      const getClientMeetings = await this.slotRepository.getClientMeetings(clientId,advisorId)
+      const getClientMeetings = await this._slotRepository.getClientMeetings(clientId,advisorId)
       return getClientMeetings
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : messageConstants.UNEXPECTED_ERROR
@@ -120,7 +120,7 @@ export default class AdvisorService implements IAdvisorService {
         url: file.path,
         uploadedAt: new Date()
       }
-      const document = await this.documentRepository.uploadDocument(doc)
+      const document = await this._documentRepository.uploadDocument(doc)
       console.log("docuemt-serice ; ", document)
       return document
     } catch (err) {
@@ -130,7 +130,7 @@ export default class AdvisorService implements IAdvisorService {
   }
 
   async getDocuments(clientId: string, advisorId: string): Promise<IDocument[]> {
-    const documents = await this.documentRepository.getDocuments(clientId, advisorId)
+    const documents = await this._documentRepository.getDocuments(clientId, advisorId)
     return documents
   }
 }

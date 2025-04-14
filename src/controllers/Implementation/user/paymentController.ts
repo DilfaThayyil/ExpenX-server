@@ -9,32 +9,32 @@ import { ITransactionService } from '../../../services/Interface/transaction/ITr
 
 @injectable()
 export default class PaymentController implements IPaymentController {
-  private paymentService: IPaymentService
-  private walletService: IWalletService
-  private transactionService: ITransactionService
+  private _paymentService: IPaymentService
+  private _walletService: IWalletService
+  private _transactionService: ITransactionService
 
   constructor(
     @inject('IPaymentService')paymentService: IPaymentService,
     @inject('IWalletService')walletService: IWalletService,
     @inject('ITransactionService')transactionService: ITransactionService
   ){
-    this.paymentService = paymentService
-    this.walletService = walletService
-    this.transactionService = transactionService
+    this._paymentService = paymentService
+    this._walletService = walletService
+    this._transactionService = transactionService
   }
   
   async initiatePayment(req: Request, res: Response): Promise<Response>{
     try {
       console.log("req.body : ",req.body)
       const { slotId, userId, advisorId, amount } = req.body;
-      const result = await this.paymentService.initiatePayment(
+      const result = await this._paymentService.initiatePayment(
         slotId,
         userId,
         advisorId,
         amount
       );
-      const wallet = await this.walletService.updateWallet(advisorId,amount)
-      await this.transactionService.createTransaction({
+      const wallet = await this._walletService.updateWallet(advisorId,amount)
+      await this._transactionService.createTransaction({
         userId: advisorId,
         walletId: wallet?._id as string,
         type: 'credit',
@@ -53,7 +53,7 @@ export default class PaymentController implements IPaymentController {
   async confirmPayment(req: Request, res: Response):Promise<Response>{
     try {
       const { paymentIntentId } = req.body;
-      const payment = await this.paymentService.confirmPayment(paymentIntentId);
+      const payment = await this._paymentService.confirmPayment(paymentIntentId);
       return res.status(HttpStatusCode.OK).json(payment);
     } catch (error) {
       return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: 'Failed to confirm payment' });

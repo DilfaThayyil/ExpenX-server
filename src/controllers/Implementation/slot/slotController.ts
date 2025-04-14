@@ -7,16 +7,16 @@ import { messageConstants } from '../../../utils/messageConstants';
 
 @injectable()
 export default class SlotController implements ISlotController {
-  private slotService: ISlotService
+  private _slotService: ISlotService
 
   constructor(@inject('ISlotService') slotService: ISlotService) {
-    this.slotService = slotService
+    this._slotService = slotService
   }
 
   async bookslot(req: Request, res: Response): Promise<void> {
     try {
       const { slotId, userId } = req.body
-      const bookedSlot = await this.slotService.bookslot(slotId, userId)
+      const bookedSlot = await this._slotService.bookslot(slotId, userId)
       res.status(HttpStatusCode.OK).json({ message: "slot booked successfully", slot: bookedSlot })
     } catch (err) {
       console.error(err)
@@ -33,7 +33,7 @@ export default class SlotController implements ISlotController {
       if (!userId) {
         return res.status(HttpStatusCode.BAD_REQUEST).json({ message: "User ID is required" });
       }
-      const data = await this.slotService.fetchSlotsByUser(userId, page, limit);
+      const data = await this._slotService.fetchSlotsByUser(userId, page, limit);
       return res.status(HttpStatusCode.OK).json({ success: true, data });
     } catch (error: any) {
       return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: error.message });
@@ -45,7 +45,7 @@ export default class SlotController implements ISlotController {
       if (req.body.slotData._id === '') {
         delete req.body.slotData._id
       }
-      const Slot = await this.slotService.createSlot(req.body.id, req.body.slotData)
+      const Slot = await this._slotService.createSlot(req.body.id, req.body.slotData)
       if (!Slot) {
         throw new Error('Slot is already exists')
       }
@@ -60,7 +60,7 @@ export default class SlotController implements ISlotController {
       const advisorId = req.params.advisorId
       const page = parseInt(req.query.page as string) || 1
       const limit = parseInt(req.query.limit as string) || 10
-      const { slots, totalPages } = await this.slotService.fetchSlots(advisorId, page, limit)
+      const { slots, totalPages } = await this._slotService.fetchSlots(advisorId, page, limit)
       return res.status(HttpStatusCode.OK).json({ success: true, data: { slots, totalPages } })
     } catch (err) {
       console.error(err)
@@ -72,7 +72,7 @@ export default class SlotController implements ISlotController {
     try {
       const { slotId } = req.params;
       const updatedSlotData = req.body;
-      const updatedSlot = await this.slotService.updateSlot(slotId, updatedSlotData);
+      const updatedSlot = await this._slotService.updateSlot(slotId, updatedSlotData);
       if (!updatedSlot) {
         res.status(HttpStatusCode.NOT_FOUND).json({ message: "Slot not found" });
       }
@@ -86,7 +86,7 @@ export default class SlotController implements ISlotController {
   async deleteSlot(req: Request, res: Response): Promise<void> {
     try {
       const { slotId } = req.params
-      const isDeleted = await this.slotService.deleteSlot(slotId)
+      const isDeleted = await this._slotService.deleteSlot(slotId)
       if (!isDeleted) {
         res.status(HttpStatusCode.NOT_FOUND).json({ message: "cant found or delete slot" })
       }
@@ -101,7 +101,7 @@ export default class SlotController implements ISlotController {
       const advisorId = req.params.advisorId
       const page = parseInt(req.query.page as string) || 1
       const limit = parseInt(req.query.limit as string) || 10
-      const { bookedSlots, totalPages } = await this.slotService.getBookedSlotsForAdvisor(advisorId, page, limit)
+      const { bookedSlots, totalPages } = await this._slotService.getBookedSlotsForAdvisor(advisorId, page, limit)
       return res.status(HttpStatusCode.OK).json({ success: true, data: { bookedSlots, totalPages } })
     } catch (error) {
       return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: "Error fetching booked slots" });
@@ -112,7 +112,7 @@ export default class SlotController implements ISlotController {
     try {
       const { slotId } = req.params;
       const {advisorId,userId} = req.body
-      const updatedSlot = await this.slotService.cancelBookedSlot(slotId,advisorId,userId);
+      const updatedSlot = await this._slotService.cancelBookedSlot(slotId,advisorId,userId);
       return res.status(200).json({ message: "Slot cancelled, amount refunded", updatedSlot });
     } catch (error: any) {
       return res.status(400).json({ message: error.message });

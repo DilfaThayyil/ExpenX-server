@@ -6,10 +6,10 @@ import { HttpStatusCode } from '../../../utils/httpStatusCode';
 
 @injectable()
 export default class GoalController implements IGoalController{
-    private goalService: IGoalService
+    private _goalService: IGoalService
 
     constructor(@inject('IGoalService') goalService: IGoalService){
-        this.goalService = goalService
+        this._goalService = goalService
     }
 
     async createGoal(req: Request, res: Response): Promise<Response> {
@@ -19,7 +19,7 @@ export default class GoalController implements IGoalController{
           if (!title || !target || !deadline) {
             return res.status(HttpStatusCode.BAD_REQUEST).json({ message: 'Missing required fields' });
           }
-          const goal = await this.goalService.createGoal(userId, { 
+          const goal = await this._goalService.createGoal(userId, { 
             title, 
             description, 
             target: Number(target), 
@@ -37,7 +37,7 @@ export default class GoalController implements IGoalController{
       async getGoalsById(req: Request, res: Response): Promise<Response> {
         try {
           const { userId } = req.params;
-          const goal = await this.goalService.getGoalsById(userId);  
+          const goal = await this._goalService.getGoalsById(userId);  
           if (!goal) {
             return res.status(HttpStatusCode.NOT_FOUND).json({ message: 'Goal not found' });
           }
@@ -52,11 +52,11 @@ export default class GoalController implements IGoalController{
         try {
           const { id } = req.params;
           const { title, description, target, current, deadline, category } = req.body;      
-          const existingGoal = await this.goalService.getGoalById(id);
+          const existingGoal = await this._goalService.getGoalById(id);
           if (!existingGoal) {
           return res.status(HttpStatusCode.NOT_FOUND).json({ message: 'Goal not found' });
           }
-          const updatedGoal = await this.goalService.updateGoal(id, {
+          const updatedGoal = await this._goalService.updateGoal(id, {
             title,
             description,
             target: target !== undefined ? Number(target) : undefined,
@@ -77,11 +77,11 @@ export default class GoalController implements IGoalController{
       async deleteGoal(req: Request, res: Response): Promise<Response> {
         try {
           const { id } = req.params;
-          const existingGoal = await this.goalService.getGoalById(id);
+          const existingGoal = await this._goalService.getGoalById(id);
           if (!existingGoal) {
             return res.status(HttpStatusCode.NOT_FOUND).json({ message: 'Goal not found' });
           }
-          const result = await this.goalService.deleteGoal(id);
+          const result = await this._goalService.deleteGoal(id);
           if (!result) {
             return res.status(HttpStatusCode.NOT_FOUND).json({ message: 'Goal not found' });
           }
@@ -99,11 +99,11 @@ export default class GoalController implements IGoalController{
           if (amount === undefined) {
             return res.status(HttpStatusCode.BAD_REQUEST).json({ message: 'Amount is required' });
           }
-          const existingGoal = await this.goalService.getGoalById(id);
+          const existingGoal = await this._goalService.getGoalById(id);
           if (!existingGoal) {
             return res.status(HttpStatusCode.NOT_FOUND).json({ message: 'Goal not found' });
           }
-          const updatedGoal = await this.goalService.updateGoalProgress(id, Number(amount));
+          const updatedGoal = await this._goalService.updateGoalProgress(id, Number(amount));
           if (!updatedGoal) {
             return res.status(HttpStatusCode.NOT_FOUND).json({ message: 'Goal not found' });
           }
