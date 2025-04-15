@@ -70,9 +70,9 @@ export default class AdvisorService implements IAdvisorService {
     return advisors
   }
 
-  async fetchAdvisors(page: number, limit: number): Promise<{ users: IUser[]; totalPages: number }> {
+  async fetchAdvisors(page: number, limit: number,search:string): Promise<{ users: IUser[]; totalPages: number }> {
     console.log("service....")
-    const { users, totalUsers } = await this._advisorRepository.fetchAdvisors(page, limit);
+    const { users, totalUsers } = await this._advisorRepository.fetchAdvisors(page, limit,search);
     const totalPages = Math.ceil(totalUsers / limit);
     console.log()
     return { users, totalPages };

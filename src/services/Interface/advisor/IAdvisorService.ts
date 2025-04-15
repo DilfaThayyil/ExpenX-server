@@ -12,7 +12,7 @@ export interface IAdvisorService {
     getUpcomingAppointments(advisorId:string):Promise<IAppointment[]>
     getRecentClients(advisorId:string):Promise<Slot[]>
     getAdvisors():Promise<IAdvisor[]>
-    fetchAdvisors(page: number, limit: number): Promise<{ users: IAdvisor[]; totalPages: number }>;
+    fetchAdvisors(page: number, limit: number,search:string): Promise<{ users: IAdvisor[]; totalPages: number }>;
     updateAdvisorBlockStatus(action:string,email:string):Promise<{ message: string; error?: string }>
     getClientMeetings(clientId:string,advisorId:string):Promise<Slot[] | string>
     uploadDocument(userId:string,advisorId:string,file:Express.Multer.File):Promise<IDocument>

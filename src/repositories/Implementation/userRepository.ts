@@ -25,31 +25,42 @@ export default class UserRepository extends BaseRepository<IUser> implements IUs
         return await userSchema.findOneAndUpdate({ email }, userData, { new: true });
     }
 
-    async fetchUsers(page: number, limit: number): Promise<{ users: IUser[]; totalUsers: number }> {
+    async fetchUsers(page: number, limit: number, search: string): Promise<{ users: IUser[]; totalUsers: number }> {
         const skip = (page - 1) * limit;
+        const query: any = { isAdmin: false };
+        if (search) {
+            const searchRegex = new RegExp(search, "i");
+            query.$or = [
+                { username: { $regex: searchRegex } },
+                { email: { $regex: searchRegex } },
+                { phone: { $regex: searchRegex } },
+                { country: { $regex: searchRegex } },
+            ];
+        }
         const [users, totalUsers] = await Promise.all([
-            userSchema.find({ isAdmin: false }).skip(skip).limit(limit),
-            userSchema.countDocuments({ isAdmin: false }),
+            userSchema.find(query).skip(skip).limit(limit),
+            userSchema.countDocuments(query),
         ]);
-
         return { users, totalUsers };
     }
+
     async findAdmin(): Promise<any> {
         return await userSchema.findOne({ isAdmin: true })
     }
+
+
     async updateAdmin(admin: any): Promise<any> {
         return await userSchema.findOneAndUpdate({ isAdmin: true }, admin, { new: true });
     }
+
     async updateUserStatus(email: string, isBlock: boolean): Promise<void> {
         await userSchema.updateOne({ email }, { $set: { isBlocked: isBlock } })
     }
-
 
     async findByEmail(email: string): Promise<IUser | null> {
         const user = await userSchema.findOne({ email });
         return user
     }
-
 
     async findUserById(userId: string): Promise<IUser | null> {
         return await userSchema.findById(userId)

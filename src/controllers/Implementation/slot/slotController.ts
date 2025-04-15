@@ -60,7 +60,8 @@ export default class SlotController implements ISlotController {
       const advisorId = req.params.advisorId
       const page = parseInt(req.query.page as string) || 1
       const limit = parseInt(req.query.limit as string) || 10
-      const { slots, totalPages } = await this._slotService.fetchSlots(advisorId, page, limit)
+      const search = req.query.search as string
+      const { slots, totalPages } = await this._slotService.fetchSlots(advisorId, page, limit, search)
       return res.status(HttpStatusCode.OK).json({ success: true, data: { slots, totalPages } })
     } catch (err) {
       console.error(err)
@@ -101,7 +102,8 @@ export default class SlotController implements ISlotController {
       const advisorId = req.params.advisorId
       const page = parseInt(req.query.page as string) || 1
       const limit = parseInt(req.query.limit as string) || 10
-      const { bookedSlots, totalPages } = await this._slotService.getBookedSlotsForAdvisor(advisorId, page, limit)
+      const search = req.query.search as string
+      const { bookedSlots, totalPages } = await this._slotService.getBookedSlotsForAdvisor(advisorId, page, limit, search)
       return res.status(HttpStatusCode.OK).json({ success: true, data: { bookedSlots, totalPages } })
     } catch (error) {
       return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: "Error fetching booked slots" });

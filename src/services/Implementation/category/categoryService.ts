@@ -14,9 +14,9 @@ export default class CategoryService implements ICategoryService {
         return this._categoryRepository.getAllCategories()
     }
 
-    async fetchCategories(page: number, limit: number): Promise<{ categories: ICategory[]; totalPages: number }> {
+    async fetchCategories(page: number, limit: number,search:string): Promise<{ categories: ICategory[]; totalPages: number }> {
         console.log("service-category..")
-        const { categories, totalCategories } = await this._categoryRepository.fetchCategories(page, limit);
+        const { categories, totalCategories } = await this._categoryRepository.fetchCategories(page, limit,search);
         const totalPages = Math.ceil(totalCategories / limit);
         return { categories, totalPages };
     }
