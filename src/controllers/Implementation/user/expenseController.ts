@@ -17,7 +17,9 @@ export default class ExpenseController implements IExpenseController {
       const { userId } = req.params;
       const page = Math.max(1, parseInt(req.query.currentPage as string) || 1);
       const limit = Math.max(1, parseInt(req.query.limit as string) || 4);
-      const {expenses,totalPages} = await this._expenseService.getExpensesByUserId(userId,page,limit);
+      const search = req.query.search as string
+      console.log("search - contrll : ",search)
+      const {expenses,totalPages} = await this._expenseService.getExpensesByUserId(userId,page,limit,search);
       res.status(HttpStatusCode.OK).json({success:true,data:{expenses,totalPages}});
     } catch (error) {
       console.error('Error fetching expenses:', error);

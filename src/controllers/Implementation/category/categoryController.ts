@@ -26,7 +26,8 @@ export default class CategoryController implements ICategoryController {
     try {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
-      const { categories, totalPages } = await this._categoryService.fetchCategories(page, limit);
+      const search = req.query.search as string
+      const { categories, totalPages } = await this._categoryService.fetchCategories(page, limit, search);
       return res.status(HttpStatusCode.OK).json({ success: true, data: { categories, totalPages } });
     } catch (error) {
       console.error(error)

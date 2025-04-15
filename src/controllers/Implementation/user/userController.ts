@@ -71,7 +71,8 @@ export default class UserController implements IUserController {
     try {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
-      const { users, totalPages } = await this._userService.fetchUsers(page, limit);
+      const search = req.query.search as string
+      const { users, totalPages } = await this._userService.fetchUsers(page, limit, search);
       return res.status(HttpStatusCode.OK).json({ success: true, data: { users, totalPages } });
     } catch (error) {
       console.error(error)

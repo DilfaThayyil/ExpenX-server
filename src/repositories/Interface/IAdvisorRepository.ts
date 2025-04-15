@@ -6,7 +6,7 @@ export interface IAdvisorRepository {
     findUserByEmail(email: string): Promise<any>;
     createUser(userData: any): Promise<any>;
     updateUser(userData: any, email: string): Promise<any>;
-    fetchAdvisors(page: number, limit: number): Promise<{ users: IAdvisor[]; totalUsers: number }>;
+    fetchAdvisors(page: number, limit: number,search:string): Promise<{ users: IAdvisor[]; totalUsers: number }>;
     updateRefreshToken(refreshToken: string, email: string): Promise<any>;
     removeRefreshToken(email: string): Promise<any>;
     updateAdvisorStatus(email:string, isBlock:boolean): Promise<void>

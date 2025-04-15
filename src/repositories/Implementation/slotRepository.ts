@@ -46,12 +46,27 @@ export default class SlotRepository extends BaseRepository<Slot> implements ISlo
         return !!result
     }
 
-    async fetchSlots(advisorId: string, page: number, limit: number): Promise<{ slots: Slot[] | Slot; totalSlots: number }> {
+    async fetchSlots(advisorId: string, page: number, limit: number, search: string): Promise<{ slots: Slot[] | Slot; totalSlots: number }> {
         const skip = (page - 1) * limit
+        const query: any = {
+            "advisorId._id": advisorId
+        };
+        if (search) {
+            const searchRegex = new RegExp(search, "i");
+
+            query.$or = [
+                { description: { $regex: searchRegex } },
+                { locationDetails: { $regex: searchRegex } },
+                { status: { $regex: searchRegex } }
+            ];
+        }
+
         const [slots, totalSlots] = await Promise.all([
-            slotSchema.find({ "advisorId._id": advisorId }).skip(skip).limit(limit),
-            slotSchema.countDocuments()
+            slotSchema.find(query).skip(skip).limit(limit),
+            slotSchema.countDocuments(query)
         ])
+        console.log("slots----------------------- : ", slots)
+        console.log("totalSlots------------------- : ", totalSlots)
         return { slots, totalSlots }
     }
 
@@ -68,23 +83,42 @@ export default class SlotRepository extends BaseRepository<Slot> implements ISlo
         return !!result;
     }
 
-    async getBookedSlotsForAdvisor(advisorId: string, page: number, limit: number): Promise<{ bookedSlots: Slot[] | Slot; totalSlots: number }> {
-        // eslint-disable-next-line no-useless-catch
+    async getBookedSlotsForAdvisor(
+        advisorId: string,
+        page: number,
+        limit: number,
+        search: string
+    ): Promise<{ bookedSlots: Slot[]; totalSlots: number }> {
         try {
-            const skip = (page - 1) * limit
+            const skip = (page - 1) * limit;
+
+            const query: any = {
+                'advisorId._id': advisorId,
+                status: 'Booked',
+            };
+
+            if (search) {
+                const searchRegex = new RegExp(search, 'i');
+                query.$or = [
+                    { 'bookedBy.username': { $regex: searchRegex } },
+                    { 'bookedBy.email': { $regex: searchRegex } }
+                ];
+            }
+
             const [bookedSlots, totalSlots] = await Promise.all([
                 slotSchema
-                    .find({ 'advisorId._id': advisorId, status: "Booked" })
+                    .find(query)
                     .skip(skip)
                     .limit(limit)
-                    .populate("bookedBy", "username email")
+                    .populate('bookedBy', 'username email profilePic')
                     .exec(),
 
-                slotSchema.countDocuments({ 'advisorId._id': advisorId, status: "Booked" })
+                slotSchema.countDocuments(query),
             ]);
+
             return { bookedSlots, totalSlots };
         } catch (err) {
-            throw err
+            throw err;
         }
     }
 
@@ -94,7 +128,7 @@ export default class SlotRepository extends BaseRepository<Slot> implements ISlo
                 "bookedBy._id": clientId,
                 "advisorId._id": advisorId
             }).exec();
-            console.log("meetings-repo : ",clientMeetings)
+            console.log("meetings-repo : ", clientMeetings)
             return clientMeetings;
         } catch (error) {
             console.error("Error fetching client meetings:", error);

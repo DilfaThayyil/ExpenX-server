@@ -92,10 +92,10 @@ export default class SlotService implements ISlotService {
   }
 
 
-  async fetchSlots(advisorId: string, page: number, limit: number): Promise<{ slots: Slot[] | Slot, totalPages: number }> {
+  async fetchSlots(advisorId: string, page: number, limit: number,search:string): Promise<{ slots: Slot[] | Slot, totalPages: number }> {
     // eslint-disable-next-line no-useless-catch
     try {
-      const { slots, totalSlots } = await this._slotRepository.fetchSlots(advisorId, page, limit)
+      const { slots, totalSlots } = await this._slotRepository.fetchSlots(advisorId, page, limit, search)
       const totalPages = Math.ceil(totalSlots / limit)
       return { slots, totalPages }
     } catch (err) {
@@ -130,9 +130,9 @@ export default class SlotService implements ISlotService {
     }
   }
 
-  async getBookedSlotsForAdvisor(advisorId: string, page: number, limit: number): Promise<{ bookedSlots: Slot[] | Slot; totalPages: number }> {
+  async getBookedSlotsForAdvisor(advisorId: string, page: number, limit: number,search:string): Promise<{ bookedSlots: Slot[] | Slot; totalPages: number }> {
     try {
-      const { bookedSlots, totalSlots } = await this._slotRepository.getBookedSlotsForAdvisor(advisorId, page, limit)
+      const { bookedSlots, totalSlots } = await this._slotRepository.getBookedSlotsForAdvisor(advisorId, page, limit,search)
       if (!bookedSlots) {
         throw new Error('No slots found')
       }

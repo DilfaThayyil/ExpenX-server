@@ -5,7 +5,7 @@ export interface IUserRepository {
   findUserByEmail(email: string): Promise<any>;
   createUser(userData: any): Promise<any>;
   updateUser(userData: any, email: string): Promise<any>;
-  fetchUsers(page: number, limit: number): Promise<{ users: IUser[]; totalUsers: number }>;
+  fetchUsers(page: number, limit: number,search:string): Promise<{ users: IUser[]; totalUsers: number }>;
   findAdmin():Promise<any>
   updateAdmin(admin:any):Promise<any>
   updateUserStatus(email:string, isBlock:boolean):Promise<void>

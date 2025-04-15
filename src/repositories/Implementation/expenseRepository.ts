@@ -9,14 +9,26 @@ export default class ExpenseRepository extends BaseRepository<IExpense> implemen
     super(expenseSchema)
   }
 
-  async findExpensesByUserId(userId: string, page: number, limit: number): Promise<{ expenses: IExpense[], totalExpenses: number }> {
-    const skip = (page - 1) * limit
+  async findExpensesByUserId(
+    userId: string,
+    page: number,
+    limit: number,
+    search?: string 
+  ): Promise<{ expenses: IExpense[], totalExpenses: number }> {
+    const skip = (page - 1) * limit;
+    const query: any = { userId };
+    if (search) {
+      query.description = { $regex: search, $options: 'i' };
+    }
     const [expenses, totalExpenses] = await Promise.all([
-      expenseSchema.find({ userId }).skip(skip).limit(limit),
-      expenseSchema.countDocuments({ userId })
-    ])
-    return { expenses, totalExpenses }
+      expenseSchema.find(query).skip(skip).limit(limit),
+      expenseSchema.countDocuments(query)
+    ]);
+    console.log("expenses-repo : ",expenses)
+    console.log("totalExpenses-repo : ",totalExpenses)
+    return { expenses, totalExpenses };
   }
+  
   async createExpense(expenseData: IExpense): Promise<IExpense> {
     return expenseSchema.create(expenseData);
   }

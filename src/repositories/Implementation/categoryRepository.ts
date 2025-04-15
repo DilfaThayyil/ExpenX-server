@@ -8,16 +8,21 @@ export default class CategoryRepository extends BaseRepository<ICategory> implem
         super(categorySchema)
     }
 
-    async fetchCategories(page: number, limit: number): Promise<{ categories: ICategory[]; totalCategories: number }> {
-        console.log("repo-category...")
+    async fetchCategories(page: number, limit: number, search: string): Promise<{ categories: ICategory[]; totalCategories: number }> {
+        console.log("repo-category...");
         const skip = (page - 1) * limit;
+        const query: any = {};
+        if (search) {
+          const searchRegex = new RegExp(search, "i"); 
+          query.name = { $regex: searchRegex };
+        }
         const [categories, totalCategories] = await Promise.all([
-            this.model.find().sort({ createdAt: -1 }).skip(skip).limit(limit),
-            this.model.countDocuments(),
+          this.model.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit),
+          this.model.countDocuments(query),
         ]);
-        console.log("skip :", skip)
         return { categories, totalCategories };
-    }
+      }
+      
 
     async addCategory(name: string): Promise<ICategory> {
         console.log("addCateg-repo...")
