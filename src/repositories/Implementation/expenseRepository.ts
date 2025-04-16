@@ -24,8 +24,6 @@ export default class ExpenseRepository extends BaseRepository<IExpense> implemen
       expenseSchema.find(query).skip(skip).limit(limit),
       expenseSchema.countDocuments(query)
     ]);
-    console.log("expenses-repo : ",expenses)
-    console.log("totalExpenses-repo : ",totalExpenses)
     return { expenses, totalExpenses };
   }
   

@@ -19,9 +19,9 @@ export default class SlotController implements ISlotController {
       const bookedSlot = await this._slotService.bookslot(slotId, userId)
       res.status(HttpStatusCode.OK).json({ message: "slot booked successfully", slot: bookedSlot })
     } catch (err) {
-      console.error(err)
-      const errorMessage = err instanceof Error ? err.message : messageConstants.UNEXPECTED_ERROR
-      res.status(HttpStatusCode.NOT_FOUND).json({ message: errorMessage })
+      console.error(err);
+      const errorMessage = err instanceof Error ? err.message : messageConstants.UNEXPECTED_ERROR;
+      res.status(HttpStatusCode.CONFLICT).json({message: errorMessage });
     }
   }
 
