@@ -7,16 +7,28 @@ export default class SlotRepository extends BaseRepository<Slot> implements ISlo
     constructor() {
         super(slotSchema)
     }
+
     async findSlot(slotId: string): Promise<Slot | null> {
         return await this.findById(slotId)
     }
+
     async bookSlot(slotId: string, slot: Slot): Promise<Slot | null> {
-        const bookedSlot = await slotSchema.findOneAndUpdate({ _id: slotId }, slot, { new: true })
-        return bookedSlot
+        return await slotSchema.findOneAndUpdate(
+            { _id: slotId, status: 'Available' },
+            {
+                $set: {
+                    ...slot,
+                    status: 'Booked'
+                }
+            },
+            { new: true }
+        );
     }
+
     async updateSlotStatus(slotId: string): Promise<Slot | null> {
         return await slotSchema.findOneAndUpdate({ _id: slotId }, { status: "Cancelled" }, { new: true })
     }
+    
     async fetchSlotsByUser(userId: string, page: number, limit: number): Promise<{ slots: Slot[], totalPages: number }> {
         try {
             const userObjectId = new Types.ObjectId(userId);

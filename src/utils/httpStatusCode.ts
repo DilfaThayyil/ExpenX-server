@@ -9,4 +9,5 @@ export enum HttpStatusCode {
     GONE = 410,
     INTERNAL_SERVER_ERROR = 500,
     SERVICE_UNAVAILABLE = 503,
+    CONFLICT = 409
   }

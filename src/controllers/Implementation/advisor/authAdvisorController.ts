@@ -96,7 +96,7 @@ export default class AuthAdvisorController implements IAuthAdvisorController {
         maxAge: 30 * 24 * 60 * 60 * 1000,
         sameSite: 'lax',
       })
-      res.status(HttpStatusCode.OK).json({ message: 'Login successfully', user2 });
+      res.status(HttpStatusCode.OK).json({ message: 'Login successfull', user2 });
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : messageConstants.UNEXPECTED_ERROR;
       res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: errorMessage });
