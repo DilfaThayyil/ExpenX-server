@@ -1,13 +1,5 @@
-import nodemailer from 'nodemailer';
-import { NODEMAILEREMAIL, NODEMAILERPASSWORD } from '../config/env';
-
-const transporter = nodemailer.createTransport({
-    service: 'Gmail',
-    auth: {
-        user: NODEMAILEREMAIL,
-        pass: NODEMAILERPASSWORD
-    }
-});
+import { NODEMAILEREMAIL } from "../../config/env";
+import transporter from "./emailTransporter";
 
 export const sendOtpEmail = async (email: string, otp: string) => {
     const htmlContent = `

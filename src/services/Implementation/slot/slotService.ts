@@ -6,6 +6,7 @@ import { IUserRepository } from "../../../repositories/Interface/IUserRepository
 import { Types } from "mongoose";
 import { IAdvisorRepository } from "../../../repositories/Interface/IAdvisorRepository";
 import { IWalletRepository } from "../../../repositories/Interface/IWalletRepository";
+import { sendBookingConfirmationEmail } from "../../../utils/email/slotBookingConfirmEmail";
 
 @injectable()
 export default class SlotService implements ISlotService {
@@ -26,30 +27,28 @@ export default class SlotService implements ISlotService {
     this._walletRepository = walletRepository
   }
 
-  async bookslot(slotId: string, userId: string): Promise<Slot | null> {
-    try {
-      const slot = await this._slotRepository.findSlot(slotId);
-      if (!slot) throw new Error("Slot not found");
-      if (slot.status === "Booked") throw new Error("Slot is already booked");
-
-      const user = await this._userRepository.findUserById(userId);
-      if (!user) throw new Error("User not found");
-
-      slot.status = "Booked";
-      slot.bookedBy = {
+  async bookslot(slotId: string, userId: string): Promise<Slot> {
+    const slot = await this._slotRepository.findSlot(slotId);
+    if (!slot) throw new Error("Slot not found");
+    const user = await this._userRepository.findUserById(userId);
+    if (!user) throw new Error("User not found");
+    const slotData: Partial<Slot> = {
+      bookedBy: {
         _id: user._id,
         username: user.username,
         email: user.email,
         profilePic: user.profilePic
-      };
-
-      const bookedSlot = await this._slotRepository.bookSlot(slotId, slot);
-      return bookedSlot;
-    } catch (err) {
-      console.error(err);
-      return null;
+      },
+      status: 'Booked'
+    };
+    const bookedSlot = await this._slotRepository.bookSlot(slotId, slotData as Slot);
+    if (!bookedSlot) {
+      throw new Error("This slot has already been booked by someone else.");
     }
+    await sendBookingConfirmationEmail(user.email, user.username, slot.date, slot.startTime);
+    return bookedSlot;
   }
+
   async fetchSlotsByUser(userId: string, page: number, limit: number): Promise<{ slots: Slot[], totalPages: number }> {
     const result = await this._slotRepository.fetchSlotsByUser(userId, page, limit);
     return result
@@ -92,7 +91,7 @@ export default class SlotService implements ISlotService {
   }
 
 
-  async fetchSlots(advisorId: string, page: number, limit: number,search:string): Promise<{ slots: Slot[] | Slot, totalPages: number }> {
+  async fetchSlots(advisorId: string, page: number, limit: number, search: string): Promise<{ slots: Slot[] | Slot, totalPages: number }> {
     // eslint-disable-next-line no-useless-catch
     try {
       const { slots, totalSlots } = await this._slotRepository.fetchSlots(advisorId, page, limit, search)
@@ -130,9 +129,9 @@ export default class SlotService implements ISlotService {
     }
   }
 
-  async getBookedSlotsForAdvisor(advisorId: string, page: number, limit: number,search:string): Promise<{ bookedSlots: Slot[] | Slot; totalPages: number }> {
+  async getBookedSlotsForAdvisor(advisorId: string, page: number, limit: number, search: string): Promise<{ bookedSlots: Slot[] | Slot; totalPages: number }> {
     try {
-      const { bookedSlots, totalSlots } = await this._slotRepository.getBookedSlotsForAdvisor(advisorId, page, limit,search)
+      const { bookedSlots, totalSlots } = await this._slotRepository.getBookedSlotsForAdvisor(advisorId, page, limit, search)
       if (!bookedSlots) {
         throw new Error('No slots found')
       }
@@ -144,7 +143,7 @@ export default class SlotService implements ISlotService {
     }
   }
 
-  async cancelBookedSlot(slotId: string,advisorId:string,userId:string): Promise<Slot | null> {
+  async cancelBookedSlot(slotId: string, advisorId: string, userId: string): Promise<Slot | null> {
     const slot = await this._slotRepository.findSlotById(slotId);
     if (!slot) throw new Error("Slot not found");
     const slotAmount = slot.fee;
