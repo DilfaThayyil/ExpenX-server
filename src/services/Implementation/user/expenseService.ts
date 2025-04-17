@@ -44,7 +44,7 @@ export default class ExpenseService implements IExpenseService {
       doc.moveDown();
 
       const total = expenses.reduce((sum: number, expense: IExpense) => sum + expense.amount, 0);
-      doc.fontSize(14).text(`Total Expenses: $${total.toFixed(2)}`, { align: 'left' });
+      doc.fontSize(14).text(`Total Expenses: ₹${total.toFixed(2)}`, { align: 'left' });
       doc.moveDown();
 
       const startX = 50;
@@ -56,7 +56,7 @@ export default class ExpenseService implements IExpenseService {
       doc.text('Date', startX, startY);
       doc.text('Description', startX + colWidths[0], startY);
       doc.text('Category', startX + colWidths[0] + colWidths[1], startY);
-      doc.text('Amount ($)', startX + colWidths[0] + colWidths[1] + colWidths[2], startY);
+      doc.text('Amount (₹)', startX + colWidths[0] + colWidths[1] + colWidths[2], startY);
       doc.font('Helvetica');
 
       startY += rowHeight;
@@ -112,7 +112,7 @@ export default class ExpenseService implements IExpenseService {
         { header: 'Date', key: 'date', width: 15 },
         { header: 'Description', key: 'description', width: 30 },
         { header: 'Category', key: 'category', width: 15 },
-        { header: 'Amount ($)', key: 'amount', width: 15 }
+        { header: 'Amount (₹)', key: 'amount', width: 15 }
       ];
       worksheet.getRow(1).font = { bold: true };
 
