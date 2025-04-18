@@ -20,7 +20,6 @@ export default class AdvDashboardRepo implements IAdvDashboardRepo {
                 this.getCompletedGoals(advisorId),
                 this.getSlotUtilization(advisorId),
             ]);
-        console.log("getDashBoardData - repo  : ", { totalRevenue, activeClients, completedGoals, slotUtilization })
         return { totalRevenue, activeClients, completedGoals, slotUtilization };
     }
 
@@ -89,7 +88,6 @@ export default class AdvDashboardRepo implements IAdvDashboardRepo {
                 }
             }
         ]);
-        console.log("fetchRevenue : ", totalRevenue.length > 0 ? totalRevenue[0].totalRevenue : 0);
         return totalRevenue.length > 0 ? totalRevenue[0].totalRevenue : 0;
     }
 
@@ -128,7 +126,6 @@ export default class AdvDashboardRepo implements IAdvDashboardRepo {
             goalStats.forEach((stat: { _id: "completed" | "inProgress" | "notStarted"; count: number }) => {
                 result[stat._id] = stat.count;
             });
-            console.log("Goal Progress:", result);
             return result;
         } catch (error) {
             console.error("Error fetching goal progress:", error);
@@ -191,7 +188,6 @@ export default class AdvDashboardRepo implements IAdvDashboardRepo {
                 .sort({ createdAt: -1 })
                 .limit(limit)
                 .lean();
-            console.log("recentClientActivities-repo : ",activities)
             return activities;
         } catch (error) {
             console.error("Error fetching recent client activities:", error);

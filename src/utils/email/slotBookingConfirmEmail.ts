@@ -25,7 +25,6 @@ export const sendBookingConfirmationEmail = async (
 
   try {
     await transporter.sendMail(mailOptions);
-    console.log('slot booking confirm email sent successfully');
   } catch (err) {
     console.error('Error sending email:', err);
     throw new Error('Error sending email');

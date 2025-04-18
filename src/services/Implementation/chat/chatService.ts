@@ -29,7 +29,6 @@ export default class ChatService implements IChatService {
   }
 
   async fetchMessages(senderId: string, receiverId: string): Promise<IMessage[]> {
-    console.log("fetchmsg-service : +++++++++++++++++++ ", senderId, receiverId)
     const messages = await this._chatRepository.fetchMessages(senderId, receiverId)
     return messages
   }
@@ -41,7 +40,6 @@ export default class ChatService implements IChatService {
 
   async fetchAdvisors(id: string): Promise<IAdvisor[]> {
     const advisors = await this._chatRepository.fetchAdvisors(id)
-    console.log("advisors : ", advisors)
     return advisors
   }
 

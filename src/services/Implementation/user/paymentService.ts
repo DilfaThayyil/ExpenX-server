@@ -19,7 +19,6 @@ export default class PaymentService implements IPaymentService {
     @inject('IPaymentRepository') paymentRepository: IPaymentRepository,
     @inject('IExpenseRepository') expenseRepository: IExpenseRepository
   ) {
-    console.log("Stripe Secret Key:", stripeSecretKey);
     this._stripe = new Stripe(stripeSecretKey, { apiVersion: undefined });
     this._paymentRepository = paymentRepository;
     this._expenseRepository = expenseRepository;

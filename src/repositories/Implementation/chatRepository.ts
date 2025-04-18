@@ -37,7 +37,6 @@ export default class ChatRepository extends BaseRepository<IMessage> implements 
     }
 
     async fetchUsers(id: string): Promise<IUser[]> {
-        console.log("senderId-repo : ", id)
         return await userSchema.find({ _id: id })
     }
 

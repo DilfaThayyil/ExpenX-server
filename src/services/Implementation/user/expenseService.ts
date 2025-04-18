@@ -29,7 +29,6 @@ export default class ExpenseService implements IExpenseService {
 
   async hasExpenses(userId: string, startDate?: string, endDate?: string): Promise<boolean> {
     const expenses = await this._expenseRepository.findByUserId(userId, startDate, endDate);
-    console.log("hasExpense-service : ", expenses)
     return expenses.length > 0;
   }
 
@@ -77,7 +76,6 @@ export default class ExpenseService implements IExpenseService {
       doc.end();
       return doc;
     } catch (err) {
-      console.log(err);
       throw err;
     }
   }
@@ -104,7 +102,6 @@ export default class ExpenseService implements IExpenseService {
   async exportExpensesAsExcel(userId: string, startDate?: string, endDate?: string): Promise<Buffer> {
     try {
       const expenses = await this._expenseRepository.findByUserId(userId, startDate, endDate); // Pass filters
-      console.log("Filtered Expenses for Excel:", expenses);
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet('Expenses');
 
@@ -155,7 +152,6 @@ export default class ExpenseService implements IExpenseService {
         endDate = new Date(customEndDate);
     }
     const expense = await this._expenseRepository.getExpenseByCategory(clientId, startDate, endDate);
-    console.log("expenses-serv : ", expense);
     return expense;
 }
 
