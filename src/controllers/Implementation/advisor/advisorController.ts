@@ -85,12 +85,10 @@ export default class AdvisorController implements IAdvisorController {
     try {
       const advisorId = req.params.advisorId
       const timeframe = req.query.timeFrame as "monthly" | "quarterly" | "yearly"
-      console.log("data-contrll : ", advisorId, ",", timeframe)
       if (!advisorId || !timeframe) {
         return res.status(HttpStatusCode.BAD_REQUEST).json({ message: "Missing required parameters" })
       }
       const revenue = await this._advisorService.fetchRevenue(advisorId, timeframe)
-      console.log("revenue-contrll : ", revenue)
       return res.status(HttpStatusCode.OK).json({ revenue })
     } catch (error) {
       console.error("Error fetching revenue:", error)
@@ -194,12 +192,10 @@ export default class AdvisorController implements IAdvisorController {
     try{
       const file = req.file
       const {userId,advisorId} = req.body
-      console.log("file-contrll #### : ",req.file)
       if (!file || !userId || !advisorId) {
         return res.status(HttpStatusCode.BAD_REQUEST).json({ error: 'Missing file or required fields' });
       }      
       const document = await this._advisorService.uploadDocument(userId,advisorId,file)
-      console.log("doc-contrlll : ",document)
       return res.status(HttpStatusCode.OK).json({message : 'File uploaded successfully',document})
     }catch(err){
       console.error(err)

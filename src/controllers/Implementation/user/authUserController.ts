@@ -34,7 +34,6 @@ export default class AuthUserController implements IAuthUserController {
 
   async generateOTP(req: Request, res: Response): Promise<void> {
     try {
-      // console.log('body in generateOTP ; ',req.body)
       const { email } = req.body
       await this._authUserService.generateOTP(email);
       res.json({ message: 'OTP sent successfully' });
@@ -46,7 +45,6 @@ export default class AuthUserController implements IAuthUserController {
   async resendOTP(req: Request, res: Response): Promise<Response> {
     try {
       const { email } = req.body;
-      // console.log('Resend OTP request for email:', email);
       await this._authUserService.resendOTP(email);
       return res.json({ message: 'OTP resent successfully' });
     } catch (err) {
@@ -103,16 +101,13 @@ export default class AuthUserController implements IAuthUserController {
 
   async setNewAccessToken(req: Request, res: Response): Promise<Response> {
     try {
-      console.log("starting... setNewAccessToken--------------------RETIU74")
       const refreshToken = req.cookies?.refreshToken;
-      console.log("refreshToken : ", refreshToken)
       const isBlacklisted = await redisClient.get(`bl:${refreshToken}`);
       if (isBlacklisted) {
         return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: "Refresh token is blacklisted." });
       }
       if (!refreshToken) return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: "No refresh token provided" });
       const result = await this._authUserService.setNewAccessToken(refreshToken);
-      console.log("-----result--- : ", result)
       if (!result.accessToken) return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: 'Failed to generate token' });
       // res.cookie('accessToken', result.accessToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production', maxAge: 60*60*1000, sameSite: 'strict' });
       res.cookie('accessToken', result.accessToken, {
@@ -185,9 +180,6 @@ export default class AuthUserController implements IAuthUserController {
       const profilePic = userCredential.picture
 
       const { existingUser, accessToken, refreshToken } = await this._authUserService.googleAuth(username, email, password, profilePic)
-      console.log("existingUser-googleAuth-contrll : ", existingUser)
-      console.log("accessToken-googleAuth : ", accessToken)
-      console.log("refreshToken-googleAuth : ", refreshToken)
       const user2 = mapUserProfile(existingUser)
       res.cookie('accessToken', accessToken, {
         httpOnly: true,
@@ -211,7 +203,6 @@ export default class AuthUserController implements IAuthUserController {
 
 
   async logout(req: Request, res: Response): Promise<Response> {
-    console.log('calling logout ..................6666666666555555')
     try {
       const refreshToken = req.cookies.refreshToken;
       if (refreshToken) {

@@ -25,7 +25,6 @@ export default class PaymentController implements IPaymentController {
   
   async initiatePayment(req: Request, res: Response): Promise<Response>{
     try {
-      console.log("req.body : ",req.body)
       const { slotId, userId, advisorId, amount } = req.body;
       const result = await this._paymentService.initiatePayment(
         slotId,
@@ -42,10 +41,8 @@ export default class PaymentController implements IPaymentController {
         status:'completed',
         description: 'Slot booking fee credited successfully!',
       })
-      console.log("result : ",result)
       return res.status(HttpStatusCode.OK).json(result);
     } catch (error) {
-      console.log("payment initiation error : ",error)
       return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: 'Failed to initiate payment' });
     }
   };

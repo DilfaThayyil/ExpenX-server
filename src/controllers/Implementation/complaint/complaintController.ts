@@ -27,7 +27,6 @@ export default class ComplaintController implements IComplaintController {
     try {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
-      console.log("page,limit-controll : ", page, ",", limit)
       const reports = await this._complaintService.fetchReports(page, limit)
       return res.status(HttpStatusCode.OK).json({ success: true, data: { reports } })
     } catch (err) {

@@ -18,7 +18,6 @@ export default class ExpenseController implements IExpenseController {
       const page = Math.max(1, parseInt(req.query.currentPage as string) || 1);
       const limit = Math.max(1, parseInt(req.query.limit as string) || 4);
       const search = req.query.search as string
-      console.log("search - contrll : ",search)
       const {expenses,totalPages} = await this._expenseService.getExpensesByUserId(userId,page,limit,search);
       res.status(HttpStatusCode.OK).json({success:true,data:{expenses,totalPages}});
     } catch (error) {
@@ -29,7 +28,6 @@ export default class ExpenseController implements IExpenseController {
 
   async createExpense(req: Request, res: Response): Promise<void> {
     try {
-      // console.log('dillll')
       const { userId } = req.params
       const { date, amount, category, description } = req.body;
       if (!date || !amount || !category || !description) {
@@ -43,7 +41,6 @@ export default class ExpenseController implements IExpenseController {
         category,
         description,
       });
-      // console.log("new expense: ",newExpense)
       res.status(HttpStatusCode.CREATED).json(newExpense);
     } catch (error) {
       console.error('Error creating expense:', error);
@@ -55,8 +52,6 @@ export default class ExpenseController implements IExpenseController {
   async exportExpense(req: Request, res: Response): Promise<Response | void> {
     try {
       const { userId, format, startDate, endDate } = req.query;
-      console.log(`Export request received for user ${userId} in ${format} format with date range: ${startDate} - ${endDate}`);
-
       const hasExpenses = await this._expenseService.hasExpenses(userId as string, startDate as string, endDate as string);
       if (!hasExpenses) {
         return res.status(HttpStatusCode.NOT_FOUND).json({ message: "No expenses found in the selected date range." });
@@ -64,7 +59,6 @@ export default class ExpenseController implements IExpenseController {
 
       switch (format) {
         case 'pdf':
-          console.log("Beginning PDF export");
           const pdfStream = await this._expenseService.exportExpensesAsPDF(userId as string, startDate as string, endDate as string);
           res.setHeader('Content-Type', 'application/pdf');
           res.setHeader('Content-Disposition', 'attachment; filename=expense-report.pdf');
@@ -76,14 +70,12 @@ export default class ExpenseController implements IExpenseController {
           });
           return;
         case 'csv':
-          console.log("Beginning CSV export");
           const csv = await this._expenseService.exportExpensesAsCSV(userId as string, startDate as string, endDate as string);
           res.setHeader('Content-Type', 'text/csv');
           res.setHeader('Content-Disposition', 'attachment; filename=expense-report.csv');
           return res.send(csv);
 
         case 'excel':
-          console.log("Beginning Excel export");
           const excelBuffer = await this._expenseService.exportExpensesAsExcel(userId as string, startDate as string, endDate as string);
           res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
           res.setHeader('Content-Disposition', 'attachment; filename=expense-report.xlsx');
@@ -105,7 +97,6 @@ export default class ExpenseController implements IExpenseController {
       const expenses = await this._expenseService.getExpenseByCategory(
         clientId as string,expenseTimeframe as string,
         customStartDate as string|undefined,customEndDate as string|undefined)
-      console.log("expenses-contrll : ",expenses)
       return res.status(HttpStatusCode.OK).json({success:true,expenses});
     }catch(err){
       console.error('Error fetching expenses:', err);
