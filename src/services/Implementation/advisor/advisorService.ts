@@ -35,7 +35,6 @@ export default class AdvisorService implements IAdvisorService {
   async updateUserProfile(userData: { profilePic: string; username: string; email: string; phone: string; country: string; language: string }) {
     try {
       const updatedUser = await this._advisorRepository.updateUser(userData, userData.email);
-      console.log("updated user ; ", updatedUser)
       return updatedUser;
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
@@ -71,10 +70,8 @@ export default class AdvisorService implements IAdvisorService {
   }
 
   async fetchAdvisors(page: number, limit: number,search:string): Promise<{ users: IUser[]; totalPages: number }> {
-    console.log("service....")
     const { users, totalUsers } = await this._advisorRepository.fetchAdvisors(page, limit,search);
     const totalPages = Math.ceil(totalUsers / limit);
-    console.log()
     return { users, totalPages };
   }
 
@@ -121,7 +118,6 @@ export default class AdvisorService implements IAdvisorService {
         uploadedAt: new Date()
       }
       const document = await this._documentRepository.uploadDocument(doc)
-      console.log("docuemt-serice ; ", document)
       return document
     } catch (err) {
       console.error("🚨 Upload Error:", err);

@@ -18,7 +18,6 @@ export default class UserService implements IUserService {
   async updateUserProfile(userData: { profilePic: string; username: string; email: string; phone: string; country: string; language: string }) {
     try {
       const updatedUser = await this._userRepository.updateUser(userData, userData.email);
-      console.log("updated user ; ", updatedUser)
       return updatedUser;
     } catch (error) {
       throw new Error('Error updating user in service');
@@ -26,10 +25,8 @@ export default class UserService implements IUserService {
   }
 
   async fetchUsers(page: number, limit: number,search:string): Promise<{ users: IUser[]; totalPages: number }> {
-    console.log("service....")
     const { users, totalUsers } = await this._userRepository.fetchUsers(page, limit,search);
     const totalPages = Math.ceil(totalUsers / limit);
-    console.log()
     return { users, totalPages };
   }
 

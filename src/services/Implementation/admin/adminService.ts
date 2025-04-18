@@ -71,9 +71,7 @@ export default class AdminService implements IAdminService {
     try {
       const hashedPassword = await bcrypt.hash(password, 10)
       const admin = { username: name, email, password: hashedPassword }
-      console.log("admin-service : ", admin)
       const updatedAdmin = await this._userRepository.updateAdmin(admin)
-      console.log('updatedAdmin-service : ', updatedAdmin)
       return updatedAdmin
     } catch (err) {
       console.error(err)

@@ -11,14 +11,11 @@ export class AdminAuthMiddleware {
   static async authorizeAdmin(req: AdminAuthRequest, res: Response, next: NextFunction) {
     try {
       const accessToken = req.cookies?.accessToken;
-      console.log("|||||||||accessToken-authMiddlewarrrrre : ", accessToken)
       if (!accessToken) {
         return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: "Access denied. No token provided." });
       }
       const decoded = jwt.verify(accessToken, ACCESSTOKEN_SECRET as string) as JwtPayload;
-      console.log("----------------decoded-authMiddleware : ", decoded)
       req.admin = { id: decoded.id, email: decoded.email, role: decoded.role, isAdmin: decoded.admin }
-      console.log("===============req.admin-authMiddleware : ", req.admin)
       if (decoded.role !== "admin") {
         return res.status(HttpStatusCode.FORBIDDEN).json({ message: "Forbidden: Admin access only." });
       }

@@ -39,8 +39,6 @@ export default class AdvisorRepository extends BaseRepository<IAdvisor> implemen
             this.model.find(query).skip(skip).limit(limit),
             this.model.countDocuments(query),
         ]);
-        console.log("users-repo1111111111111111",users)
-        console.log("totalUsers-repo222222222222222222",totalUsers)
         return { users, totalUsers };
     }
 

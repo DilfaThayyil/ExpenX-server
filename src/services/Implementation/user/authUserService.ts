@@ -54,7 +54,6 @@ export default class AuthUserService implements IAuthUserService {
 
   async verifyOTP(email: string, otp: string): Promise<void> {
     const otpRecord = await Otp.findOne({ email });
-    console.log("otp : ", otpRecord)
     if (!otpRecord) {
       throw new NotFoundError('OTP not found.');
     }

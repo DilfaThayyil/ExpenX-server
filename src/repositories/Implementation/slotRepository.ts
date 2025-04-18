@@ -77,8 +77,6 @@ export default class SlotRepository extends BaseRepository<Slot> implements ISlo
             slotSchema.find(query).skip(skip).limit(limit),
             slotSchema.countDocuments(query)
         ])
-        console.log("slots----------------------- : ", slots)
-        console.log("totalSlots------------------- : ", totalSlots)
         return { slots, totalSlots }
     }
 
@@ -140,7 +138,6 @@ export default class SlotRepository extends BaseRepository<Slot> implements ISlo
                 "bookedBy._id": clientId,
                 "advisorId._id": advisorId
             }).exec();
-            console.log("meetings-repo : ", clientMeetings)
             return clientMeetings;
         } catch (error) {
             console.error("Error fetching client meetings:", error);

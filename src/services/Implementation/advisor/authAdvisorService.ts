@@ -20,23 +20,17 @@ export default class AuthAdvisorService implements IAuthAdvisorService {
   }
 
   async register(username: string, email: string, password: string): Promise<void> {
-    console.log("  register-service -advisor ----------fksdj83457")
     const existingUser = await this._advisorRepository.findUserByEmail(email);
-    console.log("existing user : ",existingUser)
     if (existingUser) throw new Error('Email is already in use')
-      console.log("^^^ next is redisclient ^^^^^")
     await redisClient.setEx(`email:${email}`, 3600, JSON.stringify({ username, email, password }))    
   }
   
 
   async generateOTP(email: string): Promise<void> {
-    console.log("generte-otp-advisor : email: ",email)
     const user = await this._advisorRepository.findUserByEmail(email);
-    console.log("user ---> ",user)
     if (user) throw new Error('Email already verified');
 
     const otp = (Math.floor(Math.random() * 10000)).toString().padStart(4, '0');
-    console.log("otp ldsfksd  : ",otp)
     const expiresAt = new Date(Date.now() + 1 * 60 * 1000);
 
     await Otp.findOneAndUpdate(
@@ -62,7 +56,6 @@ export default class AuthAdvisorService implements IAuthAdvisorService {
 
  
   async verifyOTP(email: string, otp: string): Promise<void> {
-    console.log("verfiying otp-advisor-email : ",otp ," , ",email)
     const otpRecord = await Otp.findOne({ email });
     if (!otpRecord) {
       throw new NotFoundError('OTP not found.');
@@ -86,13 +79,10 @@ export default class AuthAdvisorService implements IAuthAdvisorService {
   async loginUser(email: string, password: string): Promise<any> {
     const user = await this._advisorRepository.findUserByEmail(email);
     if (!user) throw new Error('Invalid credentials');
-    console.log('loginUser : ',user)
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) throw new Error('Invalid credentials');
-    console.log("validPassword : ",validPassword)
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
-    console.log("access,refresh : ",accessToken,"  &&  ",refreshToken)
     user.accessToken = accessToken
     user.refreshToken = refreshToken
     return user
@@ -118,10 +108,8 @@ export default class AuthAdvisorService implements IAuthAdvisorService {
   async forgotPassword(email: string): Promise<void> {
     const user = await this._advisorRepository.findUserByEmail(email);
     if (!user) throw new Error('Email not found');
-    console.log("user in forgotPass : ",user)
     const otp = (Math.floor(Math.random() * 10000)).toString().padStart(4, '0');
     const expiresAt = new Date(Date.now() + 1 * 60 * 1000);
-    console.log("otp : ",otp)
     await Otp.findOneAndUpdate(
       { email },
       { otp, expiresAt },
@@ -145,14 +133,12 @@ export default class AuthAdvisorService implements IAuthAdvisorService {
   }
 
   async resetPassword(email: string, newPassword: string): Promise<void> {
-    console.log('Resetting password for email : ',email)
     const user = await this._advisorRepository.findUserByEmail(email);
     if(!user){
       console.error('User not found : ',email)
       throw new Error("User Not Found")
     }
     const hashedPassword = await bcrypt.hash(newPassword, 10);
-    console.log('Hashed password : ',hashedPassword)
     await this._advisorRepository.updateUser({ password: hashedPassword }, email);
   }
 

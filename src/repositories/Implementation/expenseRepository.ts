@@ -62,7 +62,6 @@ export default class ExpenseRepository extends BaseRepository<IExpense> implemen
 
   async createExpenses(expenses: IExpense[]): Promise<IExpense[]> {
     const createdExpenses = await expenseSchema.insertMany(expenses)
-    console.log("createdexp-repo : ", createdExpenses)
     return createdExpenses
   }
 
@@ -77,7 +76,6 @@ export default class ExpenseRepository extends BaseRepository<IExpense> implemen
       { $match: filter },{$group: {_id: "$category",totalAmount: { $sum: "$amount" }}},
       {$project: {category: "$_id",totalAmount: 1,_id: 0}}
     ]);
-    console.log("expense-repo:", expenses);
     return expenses;
   }
 

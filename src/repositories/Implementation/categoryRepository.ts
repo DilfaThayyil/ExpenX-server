@@ -9,7 +9,6 @@ export default class CategoryRepository extends BaseRepository<ICategory> implem
     }
 
     async fetchCategories(page: number, limit: number, search: string): Promise<{ categories: ICategory[]; totalCategories: number }> {
-        console.log("repo-category...");
         const skip = (page - 1) * limit;
         const query: any = {};
         if (search) {
@@ -25,22 +24,18 @@ export default class CategoryRepository extends BaseRepository<ICategory> implem
       
 
     async addCategory(name: string): Promise<ICategory> {
-        console.log("addCateg-repo...")
         return this.create({ name })
     }
 
     async updateCategory(id: string, name: string): Promise<ICategory | null> {
-        console.log("updateCategory-repo... ")
         return this.update(id, { name });
     }
 
     async deleteCategory(id: string): Promise<ICategory | null> {
-        console.log("deleteCategory-repo...")
         return this.model.findByIdAndDelete(id)
     }
 
     async findCategory(name: string): Promise<ICategory | null> {
-        console.log("findingCateg...")
         return this.model.findOne({ name: name })
     }
 

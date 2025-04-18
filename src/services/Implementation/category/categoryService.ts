@@ -15,7 +15,6 @@ export default class CategoryService implements ICategoryService {
     }
 
     async fetchCategories(page: number, limit: number,search:string): Promise<{ categories: ICategory[]; totalPages: number }> {
-        console.log("service-category..")
         const { categories, totalCategories } = await this._categoryRepository.fetchCategories(page, limit,search);
         const totalPages = Math.ceil(totalCategories / limit);
         return { categories, totalPages };
@@ -32,13 +31,11 @@ export default class CategoryService implements ICategoryService {
     
     async updateCategory(id: string, name: string): Promise<ICategory | null> {
         const updatedCategory = await this._categoryRepository.updateCategory(id, name)
-        console.log("updtCategry: ", updatedCategory)
         return updatedCategory
     }
 
     async deleteCategory(id: string): Promise<ICategory | null> {
         const deleteCategory = await this._categoryRepository.deleteCategory(id)
-        console.log("deleteCategory-serv : ", deleteCategory)
         return deleteCategory
     }
 }
