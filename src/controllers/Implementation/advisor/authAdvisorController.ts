@@ -21,12 +21,8 @@ export default class AuthAdvisorController implements IAuthAdvisorController {
 
   async register(req: Request, res: Response): Promise<void> {
     try {
-      console.log('register-contrll-advisor ----sdkjfksdjf')
       const { username, email, password } = req.body;
-      console.log("req.body : ", req.body)
       const regi = await this._authAdvisorService.register(username, email, password);
-      console.log("regi ===> , ", regi)
-      console.log(' ====> =====> ======> success register')
       res.status(HttpStatusCode.CREATED).json({ message: 'User registered successfully' });
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : messageConstants.UNEXPECTED_ERROR;
@@ -58,7 +54,6 @@ export default class AuthAdvisorController implements IAuthAdvisorController {
 
   async verifyOTP(req: Request, res: Response): Promise<Response> {
     try {
-      // console.log('req body in controllr : ',req.body)
       const { email, otp } = req.body;
       await this._authAdvisorService.verifyOTP(email, otp);
       return res.status(HttpStatusCode.OK).json({ success: true, message: 'User registered successfully' });
@@ -80,9 +75,7 @@ export default class AuthAdvisorController implements IAuthAdvisorController {
     try {
       const { email, password } = req.body;
       const user = await this._authAdvisorService.loginUser(email, password);
-      console.log("advisor-controller : ",user)
       const user2 = mapUserProfile(user)
-      console.log("user2 : ",user2)
       //set access token and refresh token in cookies
       res.cookie('accessToken', user.accessToken, {
         httpOnly: true,
@@ -105,16 +98,13 @@ export default class AuthAdvisorController implements IAuthAdvisorController {
 
   async setNewAccessToken(req: Request, res: Response): Promise<Response> {
     try {
-      console.log("starting... setNewAccessToken--------------------RETIU74")
       const refreshToken = req.cookies?.refreshToken;
-      console.log("refreshToken : ", refreshToken)
       const isBlacklisted = await redisClient.get(`bl:${refreshToken}`);
       if (isBlacklisted) {
         return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: "Refresh token is blacklisted." });
       }
       if (!refreshToken) return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: "No refresh token provided" });
       const result = await this._authAdvisorService.setNewAccessToken(refreshToken);
-      console.log("-----result--- : ", result)
       if (!result.accessToken) return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: 'Failed to generate token' });
       // res.cookie('accessToken', result.accessToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production', maxAge: 60*60*1000, sameSite: 'strict' });
       res.cookie('accessToken', result.accessToken, {
@@ -180,9 +170,6 @@ export default class AuthAdvisorController implements IAuthAdvisorController {
       const password = userCredential.sub
       const profilePic = userCredential.picture
       const {existingUser,accessToken,refreshToken} = await this._authAdvisorService.googleAuth(username, email,password, profilePic);
-      console.log("existingAdvisor-googleAuth : ",existingUser)
-      console.log("accessToken-googleAuth : ",accessToken)
-      console.log("refreshToken-googleAuth : ",refreshToken)
       const user2 = mapUserProfile(existingUser)
       res.cookie('accessToken', accessToken, {
         httpOnly: true,
@@ -204,7 +191,6 @@ export default class AuthAdvisorController implements IAuthAdvisorController {
   }
 
   async logout(req: Request, res: Response): Promise<Response> {
-    console.log("advisor logging out.....")
     try {
       const refreshToken = req.cookies.refreshToken;
       if (refreshToken) {

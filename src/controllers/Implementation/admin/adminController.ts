@@ -47,7 +47,6 @@ export default class AdminController implements IAdminController {
 
   async setNewAccessToken(req: Request, res: Response): Promise<Response> {
     try {
-      console.log("$$$$$$$$$$ admin accessToken refreshing started......")
       const refreshToken = req.cookies?.refreshToken
       const isBlacklisted = await redisClient.get(`bl:${refreshToken}`);
       if (isBlacklisted) {
@@ -55,7 +54,6 @@ export default class AdminController implements IAdminController {
       }
       if (!refreshToken) return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: messageConstants.REFRESH_TOKEN })
       const result = await this._adminService.setNewAccessToken(refreshToken)
-      console.log("$$$$$$$$$$$ result $$$$$$ : ", result)
       if (!result.accessToken) return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: messageConstants.TOKEN_FAILED })
       res.cookie('accessToken', result.accessToken, {
         httpOnly: true,

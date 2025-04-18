@@ -16,13 +16,11 @@ export default class GroupController implements IGroupController{
 
     async createGroup(req: Request, res: Response): Promise<Response> {
         try {
-          console.log('req.body : ', req.body)
           const { userId, name, members } = req.body;
           if (!userId || !name || !members) {
             return res.status(HttpStatusCode.BAD_REQUEST).json({ error: 'All fields are required!' })
           }
           const newGroup = await this._groupService.createGroup(userId, name, members)
-          console.log("newGroup in contrllr : ", newGroup)
           return res.status(HttpStatusCode.CREATED).json(newGroup);
         } catch (error) {
           console.error('Error creating group:', error);

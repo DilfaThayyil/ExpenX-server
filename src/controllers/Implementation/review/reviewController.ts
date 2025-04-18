@@ -29,7 +29,6 @@ export default class ReviewController implements IReviewController {
             const page = parseInt(req.query.page as string) || 1
             const limit = parseInt(req.query.limit as string) || 1
             const {reviews,totalPages} = await this._reviewService.fetchReviews(advisorId,page,limit);
-            console.log("reviews :::::::::  ",reviews)
             return res.status(HttpStatusCode.OK).json({ success: true, data: {reviews,totalPages} });
         } catch (error) {
             return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: 'Error fetching reviews' })
