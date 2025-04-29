@@ -7,7 +7,6 @@ import { IPaymentController } from '../../controllers/Interface/user/IPaymentCon
 import { AuthMiddleware } from '../../middleware/authMiddleware';
 import { IExpenseController } from '../../controllers/Interface/user/IExpenseController';
 import { ICategoryController } from '../../controllers/Interface/category/ICategoryController';
-import { IGroupController } from '../../controllers/Interface/group/IGroupController';
 import { ISlotController } from '../../controllers/Interface/slot/ISlotController';
 import { IGoalController } from '../../controllers/Interface/goal/IGoalController';
 import { IComplaintController } from '../../controllers/Interface/complaint/IComplaintController';
@@ -18,7 +17,6 @@ const chatController = container.resolve<IChatController>('IChatController')
 const paymentController = container.resolve<IPaymentController>('IPaymentController')
 const expenseController = container.resolve<IExpenseController>('IExpenseController')
 const categoryController = container.resolve<ICategoryController>('ICategoryController')
-const groupController = container.resolve<IGroupController>('IGroupController')
 const slotController = container.resolve<ISlotController>('ISlotController')
 const goalController = container.resolve<IGoalController>('IGoalController')
 const complaintController = container.resolve<IComplaintController>('IComplaintController')
@@ -30,10 +28,6 @@ router.patch('/editProfile',AuthMiddleware.authorizeUser, (req, res) =>userContr
 router.get('/getExpenses/:userId', AuthMiddleware.authorizeUser,(req,res)=>expenseController.getExpenses(req,res))
 router.post('/createExpense/:userId',AuthMiddleware.authorizeUser,(req,res)=>expenseController.createExpense(req,res))
 router.get('/getCategories',AuthMiddleware.authorizeUser,(req,res)=>categoryController.getCategories(req,res))
-router.post('/createGroup',AuthMiddleware.authorizeUser,(req,res)=>groupController.createGroup(req,res))
-router.get('/getUserGroups/:userId',AuthMiddleware.authorizeUser,(req,res)=>groupController.getUserGroups(req,res))
-router.post('/addMember/:groupId',AuthMiddleware.authorizeUser,(req,res)=>groupController.addMember(req,res))
-router.post('/addExpenseInGroup/:groupId',AuthMiddleware.authorizeUser,(req,res)=>groupController.addExpenseInGroup(req,res))
 router.patch('/bookslot',AuthMiddleware.authorizeUser,(req,res)=>slotController.bookslot(req,res))
 router.post('/sendMessage',AuthMiddleware.authorizeUser,(req,res)=>chatController.sendMessage(req,res))
 router.get('/fetchMessages/:senderId/:receiverId',AuthMiddleware.authorizeUser,(req,res)=>chatController.fetchMessages(req,res))

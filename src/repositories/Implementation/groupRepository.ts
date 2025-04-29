@@ -1,11 +1,11 @@
 import { Types } from "mongoose";
-import { GroupMember, IGroup, IGroupExpense } from "../../entities/groupEntities";
+import { GroupMember, IGroup, IGroupExpense, ISettlement } from "../../entities/groupEntities";
 import groupSchema from "../../models/groupSchema";
 import { IGroupRepository } from "../Interface/IGroupRepository";
 import { BaseRepository } from "./baseRepository";
 
-export default class GroupRepository extends BaseRepository<IGroup>implements IGroupRepository{
-    constructor(){
+export default class GroupRepository extends BaseRepository<IGroup> implements IGroupRepository {
+    constructor() {
         super(groupSchema)
     }
     async findById(groupId: string): Promise<IGroup | null> {
@@ -27,6 +27,7 @@ export default class GroupRepository extends BaseRepository<IGroup>implements IG
     }
     async getUserGroups(email: string): Promise<IGroup[]> {
         const groups = await groupSchema.find({ members: { $elemMatch: { email } } });
+        console.log("getUserGroups-repo : ",groups)
         return groups
     }
     async addExpenseInGroup(groupId: string, expense: IGroupExpense): Promise<IGroup> {
@@ -40,4 +41,20 @@ export default class GroupRepository extends BaseRepository<IGroup>implements IG
         }
         return updatedGroup
     }
+
+    // async removeMember(groupId: string, memberEmail: string): Promise<IGroup | null> {
+    //     return await groupSchema.findByIdAndUpdate(
+    //         groupId,
+    //         { $pull: { members: { email: memberEmail } } },
+    //         { new: true }
+    //     );
+    // }
+
+    // async addSettlement(groupId: string, settlement: ISettlement): Promise<IGroup | null> {
+    //     return await groupSchema.findByIdAndUpdate(
+    //         groupId,
+    //         { $push: { settlements: settlement } },
+    //         { new: true }
+    //     );
+    // }
 }
