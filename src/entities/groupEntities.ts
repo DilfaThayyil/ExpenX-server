@@ -25,9 +25,21 @@ export interface GroupMember {
     splits?: ISplit[]
   }
   
+  export interface ISettlement {
+    _id?: string;
+    from: string;
+    to: string; 
+    amount: number;
+    date: string;
+    createdAt?: Date;
+    updatedAt?: Date;
+  }
   export interface IGroup{
+    _id?:string;
     name: string;
     createdBy: string;
+    pendingInvites: GroupMember[]
     members: GroupMember[];
     expenses: IGroupExpense[]
+    settlements: ISettlement[]
   }

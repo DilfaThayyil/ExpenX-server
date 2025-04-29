@@ -2,9 +2,12 @@ import { inject, injectable } from "tsyringe";
 import { IGroupRepository } from "../../../repositories/Interface/IGroupRepository";
 import { IGroupService } from "../../Interface/group/IGroupService";
 import { Types } from "mongoose";
-import { GroupMember, IGroup, ISplit } from "../../../entities/groupEntities";
+import { GroupMember, IGroup, ISettlement, ISplit } from "../../../entities/groupEntities";
 import { IUserRepository } from "../../../repositories/Interface/IUserRepository";
 import { IExpenseRepository } from "../../../repositories/Interface/IExpenseRepository";
+import { sendGroupInviteEmail } from "../../../utils/email/sendGroupInviteEmail";
+import { BACKENDENDPOINT } from "../../../config/env";
+import IUser from "../../../entities/userEntities";
 
 @injectable()
 export default class GroupService implements IGroupService {
@@ -22,23 +25,40 @@ export default class GroupService implements IGroupService {
     this._expenseRepository = expenseRepository
   }
 
-  async createGroup(userId: string, name: string, members: string[]): Promise<IGroup> {
+  async createGroup(userId: string, name: string, members: string[],email:string): Promise<IGroup> {
     try {
-      const modifiedMembers = members.map((memberEmail: string) => ({
+      const creatorMember = {
+        id: email.replace('@', '_'),
+        name: email.split('@')[0],
+        email: email,
+        avatar: `https://ui-avatars.com/api/?name=${email.split('@')[0]}`,
+        paid: 0,
+        owed: 0,
+      };  
+      const invitedMembers = members.filter(email => email !== email);
+      const modifiedPendingInvites = invitedMembers.map((memberEmail: string) => ({
         id: memberEmail.replace('@', '_'),
         name: memberEmail.split('@')[0],
         email: memberEmail,
         avatar: `https://ui-avatars.com/api/?name=${memberEmail.split('@')[0]}`,
         paid: 0,
         owed: 0,
-      }))
+      }));
       const newGroup: IGroup = {
         name,
         createdBy: userId,
-        members: modifiedMembers,
+        pendingInvites: modifiedPendingInvites,
+        members: [creatorMember],
         expenses: [],
+        settlements: []
       }
-      return await this._groupRepository.createGroup(newGroup)
+      const createdGroup = await this._groupRepository.createGroup(newGroup);
+      for (const email of members) {
+        const existingUser = await this._userRepository.findByEmail(email);
+        const acceptLink = `${BACKENDENDPOINT}/user/group-invite/${createdGroup._id}?email=${encodeURIComponent(email)}`;
+        await sendGroupInviteEmail(email, name, acceptLink, !!existingUser);
+      }
+      return createdGroup
     } catch (err) {
       console.error(err)
       throw err
@@ -51,6 +71,7 @@ export default class GroupService implements IGroupService {
       throw new Error('User not found')
     }
     const groups = await this._groupRepository.getUserGroups(user?.email)
+    console.log("getUserGroups - serv : ",groups)
     return groups
   }
 
@@ -159,4 +180,126 @@ export default class GroupService implements IGroupService {
       throw err;
     }
   }
+
+
+  // async removeMember(groupId: string, memberEmail: string): Promise<{ success: boolean; message: string; group?: IGroup }> {
+  //   try {
+  //     const group = await this._groupRepository.findById(groupId);
+  //     if (!group) {
+  //       return { success: false, message: 'Group not found' };
+  //     }
+  //     if (!group.members.some(member => member.email === memberEmail)) {
+  //       return { success: false, message: 'Member not found in the group' };
+  //     }
+  //     const hasPendingTransactions = this.checkPendingTransactions(group, memberEmail);
+  //     if (hasPendingTransactions) {
+  //       return { success: false, message: 'Member has unsettled expenses. Please settle all expenses before removing.' };
+  //     }
+  //     const updatedGroup = await this._groupRepository.removeMember(groupId, memberEmail);
+  //     return {
+  //       success: true,
+  //       message: 'Member removed successfully',
+  //       group: updatedGroup as IGroup
+  //     };
+  //   } catch (error) {
+  //     console.error('Error removing member:', error);
+  //     return { success: false, message: 'Failed to remove member' };
+  //   }
+  // }
+
+
+  // private checkPendingTransactions(group: IGroup, memberEmail: string): boolean {
+  //   let memberBalance = 0;
+  //   group.expenses.forEach(expense => {
+  //     if (expense.paidBy === memberEmail) {
+  //       memberBalance += expense.totalAmount;
+  //     }
+  //   });
+  //   group.expenses.forEach(expense => {
+  //     const split = expense?.splits?.find(s => s.user === memberEmail);
+  //     if (split) {
+  //       memberBalance -= split.amountOwed;
+  //     }
+  //   });
+  //   group.settlements.forEach(settlement => {
+  //     if (settlement.from === memberEmail) {
+  //       memberBalance -= settlement.amount;
+  //     }
+  //     if (settlement.to === memberEmail) {
+  //       memberBalance += settlement.amount;
+  //     }
+  //   });
+  //   return Math.abs(memberBalance) > 0.01;
+  // }
+
+
+  // async leaveGroup(groupId: string, userEmail: string): Promise<{ success: boolean; message: string }> {
+  //   try {
+  //     const group = await this._groupRepository.findById(groupId);
+  //     if (!group) {
+  //       return { success: false, message: 'Group not found' };
+  //     }
+  //     if (group.createdBy === userEmail) {
+  //       return { success: false, message: 'Group owner cannot leave the group. Transfer ownership or delete the group.' };
+  //     }
+  //     const hasPendingTransactions = this.checkPendingTransactions(group, userEmail);
+  //     if (hasPendingTransactions) {
+  //       return { success: false, message: 'You have unsettled expenses. Please settle all expenses before leaving.' };
+  //     }
+  //     await this._groupRepository.removeMember(groupId, userEmail);
+  //     return { success: true, message: 'You have left the group successfully' };
+  //   } catch (error) {
+  //     console.error('Error leaving group:', error);
+  //     return { success: false, message: 'Failed to leave group' };
+  //   }
+  // }
+
+
+  // async settleDebt(groupId: string, settlement: ISettlement): Promise<{ success: boolean; message: string; group?: IGroup }> {
+  //   try {
+  //     const group = await this._groupRepository.findById(groupId);
+  //     if (!group) {
+  //       return { success: false, message: 'Group not found' };
+  //     }
+  //     const fromMemberExists = group.members.some(m => m.email === settlement.from);
+  //     const toMemberExists = group.members.some(m => m.email === settlement.to);
+  //     if (!fromMemberExists || !toMemberExists) {
+  //       return { success: false, message: 'One or both members not found in the group' };
+  //     }
+  //     const updatedGroup = await this._groupRepository.addSettlement(groupId, settlement);
+  //     return {
+  //       success: true,
+  //       message: 'Settlement recorded successfully',
+  //       group: updatedGroup as IGroup
+  //     };
+  //   } catch (error) {
+  //     console.error('Error settling debt:', error);
+  //     return { success: false, message: 'Failed to record settlement' };
+  //   }
+  // }
+
+
+  // async addUserToGroup(groupId: string, user: IUser): Promise<void> {
+  //   const group = await this._groupRepository.findById(groupId);
+  //   if (!group) throw new Error("Group not found");
+  
+  //   const alreadyMember = group.members.some(member => member.email === user.email);
+  //   if (alreadyMember) return;
+  
+  //   group.members.push({
+  //     id: user._id,
+  //     name: user.username,
+  //     email: user.email,
+  //     avatar: user.profilePic,
+  //     paid: 0,
+  //     owed: 0
+  //   });
+  
+  //   group.pendingInvites = group.pendingInvites.filter(inv => inv.email !== user.email);
+  
+  //   await this._groupRepository.updateGroup(groupId, group);
+  // }
+  
 }
+
+
