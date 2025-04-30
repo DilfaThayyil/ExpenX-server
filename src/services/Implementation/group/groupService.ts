@@ -6,8 +6,7 @@ import { GroupMember, IGroup, ISettlement, ISplit } from "../../../entities/grou
 import { IUserRepository } from "../../../repositories/Interface/IUserRepository";
 import { IExpenseRepository } from "../../../repositories/Interface/IExpenseRepository";
 import { sendGroupInviteEmail } from "../../../utils/email/sendGroupInviteEmail";
-import { BACKENDENDPOINT } from "../../../config/env";
-import IUser from "../../../entities/userEntities";
+import { CLIENTURL } from "../../../config/env";
 
 @injectable()
 export default class GroupService implements IGroupService {
@@ -25,17 +24,17 @@ export default class GroupService implements IGroupService {
     this._expenseRepository = expenseRepository
   }
 
-  async createGroup(userId: string, name: string, members: string[],email:string): Promise<IGroup> {
+  async createGroup(userId: string, name: string, members: string[], creatorEmail: string): Promise<IGroup> {
     try {
       const creatorMember = {
-        id: email.replace('@', '_'),
-        name: email.split('@')[0],
-        email: email,
-        avatar: `https://ui-avatars.com/api/?name=${email.split('@')[0]}`,
+        id: creatorEmail.replace('@', '_'),
+        name: creatorEmail.split('@')[0],
+        email: creatorEmail,
+        avatar: `https://ui-avatars.com/api/?name=${creatorEmail.split('@')[0]}`,
         paid: 0,
         owed: 0,
-      };  
-      const invitedMembers = members.filter(email => email !== email);
+      };
+      const invitedMembers = members.filter(memberEmail => memberEmail !== creatorEmail);
       const modifiedPendingInvites = invitedMembers.map((memberEmail: string) => ({
         id: memberEmail.replace('@', '_'),
         name: memberEmail.split('@')[0],
@@ -53,10 +52,13 @@ export default class GroupService implements IGroupService {
         settlements: []
       }
       const createdGroup = await this._groupRepository.createGroup(newGroup);
-      for (const email of members) {
-        const existingUser = await this._userRepository.findByEmail(email);
-        const acceptLink = `${BACKENDENDPOINT}/user/group-invite/${createdGroup._id}?email=${encodeURIComponent(email)}`;
-        await sendGroupInviteEmail(email, name, acceptLink, !!existingUser);
+      for (const memberEmail of invitedMembers) {
+        console.log("invitingMemberEmail : ",memberEmail)
+        const existingUser = await this._userRepository.findByEmail(memberEmail);
+        console.log("existingUser-service : ",existingUser)
+        const acceptLink = `/accept-invite?groupId=${createdGroup._id}&email=${encodeURIComponent(memberEmail)}`;
+        console.log("acceptLink - srvice : ",acceptLink)
+        await sendGroupInviteEmail(memberEmail, name, acceptLink, !!existingUser);
       }
       return createdGroup
     } catch (err) {
@@ -71,7 +73,6 @@ export default class GroupService implements IGroupService {
       throw new Error('User not found')
     }
     const groups = await this._groupRepository.getUserGroups(user?.email)
-    console.log("getUserGroups - serv : ",groups)
     return groups
   }
 
@@ -160,7 +161,7 @@ export default class GroupService implements IGroupService {
           amount: split.amountOwed,
           category: "Group Expense",
           description: expenseData.title,
-          userId: userId, 
+          userId: userId,
         };
       });
       const expense = {
@@ -279,27 +280,46 @@ export default class GroupService implements IGroupService {
   // }
 
 
-  // async addUserToGroup(groupId: string, user: IUser): Promise<void> {
-  //   const group = await this._groupRepository.findById(groupId);
-  //   if (!group) throw new Error("Group not found");
+  async groupInvite(groupId: string, email: string): Promise<void> {
+    console.log("📨 groupInvite called with:", { groupId, email });
   
-  //   const alreadyMember = group.members.some(member => member.email === user.email);
-  //   if (alreadyMember) return;
+    const group = await this._groupRepository.findById(groupId);
+    console.log("📦 Retrieved group:", group);
   
-  //   group.members.push({
-  //     id: user._id,
-  //     name: user.username,
-  //     email: user.email,
-  //     avatar: user.profilePic,
-  //     paid: 0,
-  //     owed: 0
-  //   });
+    if (!group) {
+      console.error("❌ Group not found for ID:", groupId);
+      throw new Error("Group not found");
+    }
   
-  //   group.pendingInvites = group.pendingInvites.filter(inv => inv.email !== user.email);
+    const alreadyMember = group.members.some(member => member.email === email);
+    console.log("👥 Is user already a member?", alreadyMember);
   
-  //   await this._groupRepository.updateGroup(groupId, group);
-  // }
+    if (alreadyMember) {
+      console.log("ℹ️ User is already a member. Skipping invite.");
+      return;
+    }
   
+    const newMember = {
+      id: email.replace('@', '_'),
+      name: email.split('@')[0],
+      email: email,
+      avatar: `https://ui-avatars.com/api/?name=${email.split('@')[0]}`,
+      paid: 0,
+      owed: 0
+    };
+  
+    console.log("➕ New member to add:", newMember);
+  
+    console.log("🧹 Removing previous invite or member (if any)...");
+    await this._groupRepository.removeMember(groupId, email);
+  
+    console.log("✅ Adding new member to group...");
+    await this._groupRepository.addMember(groupId, newMember);
+  
+    console.log("🎉 Member successfully invited and added to group:", groupId);
+  }
+  
+
 }
 
 

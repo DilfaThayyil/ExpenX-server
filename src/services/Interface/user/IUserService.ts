@@ -9,4 +9,5 @@ export interface IUserService {
     fetchUsers(page: number, limit: number, search:string): Promise<{ users: IUser[]; totalPages: number }>;
     updateUserBlockStatus(action:string,email:string):Promise<{ message: string; error?: string }>
     fetchUser(userId:string):Promise<IUser | null>
+    findByEmail(email:string):Promise<IUser | null>
 }
