@@ -5,13 +5,23 @@ import { IGroupController } from "../../Interface/group/IGroupController";
 import { HttpStatusCode } from '../../../utils/httpStatusCode';
 import { messageConstants } from '../../../utils/messageConstants';
 import { IGroupExpense } from '../../../entities/groupEntities';
+import { IUserService } from '../../../services/Interface/user/IUserService';
+import { ACCESSTOKEN_SECRET, BACKENDENDPOINT, CLIENTURL } from '../../../config/env';
+import jwt, { JwtPayload } from "jsonwebtoken";
 
+
+const BASEURL = `${BACKENDENDPOINT}/user`
 @injectable()
 export default class GroupController implements IGroupController {
   private _groupService: IGroupService
+  private _userService: IUserService
 
-  constructor(@inject('IGroupService') groupService: IGroupService) {
+  constructor(
+    @inject('IGroupService') groupService: IGroupService,
+    @inject('IUserService') userService: IUserService
+  ) {
     this._groupService = groupService
+    this._userService = userService
   }
 
   async createGroup(req: Request, res: Response): Promise<Response> {
@@ -141,31 +151,68 @@ export default class GroupController implements IGroupController {
   // }
 
 
-  // async groupInvite(req: Request, res: Response): Promise<Response> {
-  //   const { groupId } = req.params;
-  //   const { email } = req.query;
-  //   if (!email || typeof email !== "string") {
-  //     return res.status(HttpStatusCode.BAD_REQUEST).json("Email is required");
-  //   }
-  //   try {
-  //     const user = await this._userService.findByEmail(email); 
-  //     const encodedRedirectUrl = encodeURIComponent(`/group/${groupId}`);
-  //     if (!user) {
-  //       res.redirect(`/register?email=${encodeURIComponent(email)}&redirect=${encodedRedirectUrl}`);
-  //     }
-  //     const isAuthenticated = req.cookies?.accessToken; 
-  //     if (!isAuthenticated) {
-  //       res.redirect(`/login?email=${encodeURIComponent(email)}&redirect=${encodedRedirectUrl}`);
-  //     }
-  //     await this._groupService.addUserToGroup(groupId, user); 
+  async groupInvite(req: Request, res: Response): Promise<Response> {
+    const { groupId } = req.params;
+    const { email } = req.query;
   
-  //     res.redirect(`/group/${groupId}`);
-  //   } catch (err) {
-  //     console.error(err);
-  //     return res.status(500).json("Something went wrong");
-  //   }
-  // }
+    console.log("➡️ Received invite request:", { groupId, email });
   
-
+    if (!email || typeof email !== "string") {
+      console.warn("⚠️ Missing or invalid email in query:", email);
+      return res.status(HttpStatusCode.BAD_REQUEST).json("Email is required");
+    }
+  
+    try {
+      const user = await this._userService.findByEmail(email);
+      console.log("🔍 User lookup result:", user);
+  
+      if (!user) {
+        const redirectAfterRegister = encodeURIComponent(`/accept-invite?groupId=${groupId}&email=${email}`);
+        const registerRedirect = `${CLIENTURL}/register?redirect=${redirectAfterRegister}`;
+        console.log("👤 User not found, redirecting to register:", registerRedirect);
+        return res.status(HttpStatusCode.OK).json({
+          status: 'redirect',
+          redirectTo: registerRedirect,
+        });
+      }
+  
+      const accessToken = req.cookies?.accessToken;
+      console.log("🍪 Access token:", accessToken);
+  
+      let isAuthenticated = false;
+  
+      if (accessToken) {
+        try {
+          const decoded = jwt.verify(accessToken, ACCESSTOKEN_SECRET as string) as JwtPayload;
+          console.log("🔑 Decoded JWT:", decoded);
+          isAuthenticated = decoded?.email === email;
+        } catch (err) {
+          console.error("❌ Token verification failed:", err);
+          isAuthenticated = false;
+        }
+      }
+  
+      if (!isAuthenticated) {
+        const redirectAfterLogin = encodeURIComponent(`/accept-invite?groupId=${groupId}&email=${email}`);
+        const loginRedirect = `${CLIENTURL}/login?redirect=${redirectAfterLogin}`;
+        console.log("🔒 User not authenticated, redirecting to login:", loginRedirect);
+        return res.status(HttpStatusCode.OK).json({
+          status: 'redirect',
+          redirectTo: loginRedirect,
+        });
+      }
+  
+      console.log("✅ User authenticated, proceeding to send invite");
+      await this._groupService.groupInvite(groupId, email);
+      return res.status(HttpStatusCode.OK).json({
+        status: 'success'
+      });
+  
+    } catch (err) {
+      console.error("💥 Error in groupInvite handler:", err);
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json("Something went wrong");
+    }
+  }
+  
 
 }

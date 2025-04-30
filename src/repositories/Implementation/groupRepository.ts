@@ -25,9 +25,17 @@ export default class GroupRepository extends BaseRepository<IGroup> implements I
         }
         return group
     }
+    async removeMember(groupId: string, email: string): Promise<IGroup | null> {
+        const updatedGroup = await groupSchema.findByIdAndUpdate(
+          groupId,
+          { $pull: { pendingInvites: { email: email } } },
+          { new: true } 
+        );
+        return updatedGroup;
+      }
+      
     async getUserGroups(email: string): Promise<IGroup[]> {
         const groups = await groupSchema.find({ members: { $elemMatch: { email } } });
-        console.log("getUserGroups-repo : ",groups)
         return groups
     }
     async addExpenseInGroup(groupId: string, expense: IGroupExpense): Promise<IGroup> {
