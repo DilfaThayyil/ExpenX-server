@@ -94,23 +94,23 @@ export default class GroupController implements IGroupController {
   }
 
 
-  // async removeMember(req: Request, res: Response): Promise<Response> {
-  //   try {
-  //     const { groupId } = req.params;
-  //     const { memberEmail } = req.body
-  //     if (!groupId || !memberEmail) {
-  //       return res.status(HttpStatusCode.BAD_REQUEST).json({ success: false, message: 'Group ID and member email are required' });
-  //     }
-  //     const result = await this._groupService.removeMember(groupId, memberEmail);
-  //     if (result.success) {
-  //       return res.status(HttpStatusCode.OK).json(result);
-  //     } else {
-  //       return res.status(HttpStatusCode.BAD_REQUEST).json(result);
-  //     }
-  //   } catch (error) {
-  //     return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Failed to remove member' });
-  //   }
-  // }
+  async removeMember(req: Request, res: Response): Promise<Response> {
+    try {
+      const { groupId } = req.params;
+      const { memberEmail } = req.body
+      if (!groupId || !memberEmail) {
+        return res.status(HttpStatusCode.BAD_REQUEST).json({ success: false, message: 'Group ID and member email are required' });
+      }
+      const result = await this._groupService.removeMember(groupId, memberEmail);
+      if (result.success) {
+        return res.status(HttpStatusCode.OK).json(result);
+      } else {
+        return res.status(HttpStatusCode.BAD_REQUEST).json(result);
+      }
+    } catch (error) {
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Failed to remove member' });
+    }
+  }
 
 
   async leaveGroup(req: Request, res: Response): Promise<Response> {
