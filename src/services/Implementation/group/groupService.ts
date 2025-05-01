@@ -58,7 +58,7 @@ export default class GroupService implements IGroupService {
         console.log("existingUser-service : ",existingUser)
         const acceptLink = `/accept-invite?groupId=${createdGroup._id}&email=${encodeURIComponent(memberEmail)}`;
         console.log("acceptLink - srvice : ",acceptLink)
-        await sendGroupInviteEmail(memberEmail, name, acceptLink, !!existingUser);
+        await sendGroupInviteEmail(memberEmail, name, acceptLink, !!existingUser,creatorEmail);
       }
       return createdGroup
     } catch (err) {
@@ -209,51 +209,51 @@ export default class GroupService implements IGroupService {
   // }
 
 
-  // private checkPendingTransactions(group: IGroup, memberEmail: string): boolean {
-  //   let memberBalance = 0;
-  //   group.expenses.forEach(expense => {
-  //     if (expense.paidBy === memberEmail) {
-  //       memberBalance += expense.totalAmount;
-  //     }
-  //   });
-  //   group.expenses.forEach(expense => {
-  //     const split = expense?.splits?.find(s => s.user === memberEmail);
-  //     if (split) {
-  //       memberBalance -= split.amountOwed;
-  //     }
-  //   });
-  //   group.settlements.forEach(settlement => {
-  //     if (settlement.from === memberEmail) {
-  //       memberBalance -= settlement.amount;
-  //     }
-  //     if (settlement.to === memberEmail) {
-  //       memberBalance += settlement.amount;
-  //     }
-  //   });
-  //   return Math.abs(memberBalance) > 0.01;
-  // }
+  private checkPendingTransactions(group: IGroup, memberEmail: string): boolean {
+    let memberBalance = 0;
+    group.expenses.forEach(expense => {
+      if (expense.paidBy === memberEmail) {
+        memberBalance += expense.totalAmount;
+      }
+    });
+    group.expenses.forEach(expense => {
+      const split = expense?.splits?.find(s => s.user === memberEmail);
+      if (split) {
+        memberBalance -= split.amountOwed;
+      }
+    });
+    group.settlements.forEach(settlement => {
+      if (settlement.from === memberEmail) {
+        memberBalance -= settlement.amount;
+      }
+      if (settlement.to === memberEmail) {
+        memberBalance += settlement.amount;
+      }
+    });
+    return Math.abs(memberBalance) > 0.01;
+  }
 
 
-  // async leaveGroup(groupId: string, userEmail: string): Promise<{ success: boolean; message: string }> {
-  //   try {
-  //     const group = await this._groupRepository.findById(groupId);
-  //     if (!group) {
-  //       return { success: false, message: 'Group not found' };
-  //     }
-  //     if (group.createdBy === userEmail) {
-  //       return { success: false, message: 'Group owner cannot leave the group. Transfer ownership or delete the group.' };
-  //     }
-  //     const hasPendingTransactions = this.checkPendingTransactions(group, userEmail);
-  //     if (hasPendingTransactions) {
-  //       return { success: false, message: 'You have unsettled expenses. Please settle all expenses before leaving.' };
-  //     }
-  //     await this._groupRepository.removeMember(groupId, userEmail);
-  //     return { success: true, message: 'You have left the group successfully' };
-  //   } catch (error) {
-  //     console.error('Error leaving group:', error);
-  //     return { success: false, message: 'Failed to leave group' };
-  //   }
-  // }
+  async leaveGroup(groupId: string, userEmail: string,userId:string): Promise<{ success: boolean; message: string }> {
+    try {
+      const group = await this._groupRepository.findById(groupId);
+      if (!group) {
+        return { success: false, message: 'Group not found' };
+      }
+      if (group.createdBy === userId) {
+        return { success: false, message: 'Group owner cannot leave the group. Transfer ownership or delete the group.' };
+      }
+      const hasPendingTransactions = this.checkPendingTransactions(group, userEmail);
+      if (hasPendingTransactions) {
+        return { success: false, message: 'You have unsettled expenses. Please settle all expenses before leaving.' };
+      }
+      await this._groupRepository.removeMember(groupId, userEmail);
+      return { success: true, message: 'You have left the group successfully' };
+    } catch (error) {
+      console.error('Error leaving group:', error);
+      return { success: false, message: 'Failed to leave group' };
+    }
+  }
 
 
   // async settleDebt(groupId: string, settlement: ISettlement): Promise<{ success: boolean; message: string; group?: IGroup }> {

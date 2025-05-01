@@ -5,13 +5,14 @@ export const sendGroupInviteEmail = async (
     email: string,
     groupName: string,
     acceptLink: string,
-    existingUser: boolean
+    existingUser: boolean,
+    creatorEmail: string
 ) => {
     const htmlContent = `
     <div style="font-family: Arial, sans-serif; color: #333;">
       <h1>Hello "${email}",<h1>
       <h2>You're Invited to Join a Group on ExpenX</h2>
-      <p>You've been invited to join the group <strong>${groupName}</strong> from the ExpenX app.</p>
+      <p>You've been invited by ${creatorEmail} to join the group <strong>${groupName}</strong> from the ExpenX app.</p>
       ${existingUser
             ? `<p>Click below to accept the invitation and join the group:</p>
              <a href="${CLIENTURL}${acceptLink}" style="display: inline-block; padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 4px;">Accept Invitation</a>`
