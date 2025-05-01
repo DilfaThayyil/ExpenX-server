@@ -183,30 +183,30 @@ export default class GroupService implements IGroupService {
   }
 
 
-  // async removeMember(groupId: string, memberEmail: string): Promise<{ success: boolean; message: string; group?: IGroup }> {
-  //   try {
-  //     const group = await this._groupRepository.findById(groupId);
-  //     if (!group) {
-  //       return { success: false, message: 'Group not found' };
-  //     }
-  //     if (!group.members.some(member => member.email === memberEmail)) {
-  //       return { success: false, message: 'Member not found in the group' };
-  //     }
-  //     const hasPendingTransactions = this.checkPendingTransactions(group, memberEmail);
-  //     if (hasPendingTransactions) {
-  //       return { success: false, message: 'Member has unsettled expenses. Please settle all expenses before removing.' };
-  //     }
-  //     const updatedGroup = await this._groupRepository.removeMember(groupId, memberEmail);
-  //     return {
-  //       success: true,
-  //       message: 'Member removed successfully',
-  //       group: updatedGroup as IGroup
-  //     };
-  //   } catch (error) {
-  //     console.error('Error removing member:', error);
-  //     return { success: false, message: 'Failed to remove member' };
-  //   }
-  // }
+  async removeMember(groupId: string, memberEmail: string): Promise<{ success: boolean; message: string; group?: IGroup }> {
+    try {
+      const group = await this._groupRepository.findById(groupId);
+      if (!group) {
+        return { success: false, message: 'Group not found' };
+      }
+      if (!group.members.some(member => member.email === memberEmail)) {
+        return { success: false, message: 'Member not found in the group' };
+      }
+      const hasPendingTransactions = this.checkPendingTransactions(group, memberEmail);
+      if (hasPendingTransactions) {
+        return { success: false, message: 'Member has unsettled expenses. Please settle all expenses before removing.' };
+      }
+      const updatedGroup = await this._groupRepository.removeMember(groupId, memberEmail);
+      return {
+        success: true,
+        message: 'Member removed successfully',
+        group: updatedGroup as IGroup
+      };
+    } catch (error) {
+      console.error('Error removing member:', error);
+      return { success: false, message: 'Failed to remove member' };
+    }
+  }
 
 
   private checkPendingTransactions(group: IGroup, memberEmail: string): boolean {
