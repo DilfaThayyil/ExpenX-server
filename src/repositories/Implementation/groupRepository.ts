@@ -27,13 +27,18 @@ export default class GroupRepository extends BaseRepository<IGroup> implements I
     }
     async removeMember(groupId: string, email: string): Promise<IGroup | null> {
         const updatedGroup = await groupSchema.findByIdAndUpdate(
-          groupId,
-          { $pull: { pendingInvites: { email: email } } },
-          { new: true } 
+            groupId,
+            {
+                $pull: {
+                    pendingInvites: { email: email },
+                    members: { email: email }
+                }
+            },
+            { new: true }
         );
         return updatedGroup;
-      }
-      
+    }
+
     async getUserGroups(email: string): Promise<IGroup[]> {
         const groups = await groupSchema.find({ members: { $elemMatch: { email } } });
         return groups
@@ -49,14 +54,6 @@ export default class GroupRepository extends BaseRepository<IGroup> implements I
         }
         return updatedGroup
     }
-
-    // async removeMember(groupId: string, memberEmail: string): Promise<IGroup | null> {
-    //     return await groupSchema.findByIdAndUpdate(
-    //         groupId,
-    //         { $pull: { members: { email: memberEmail } } },
-    //         { new: true }
-    //     );
-    // }
 
     // async addSettlement(groupId: string, settlement: ISettlement): Promise<IGroup | null> {
     //     return await groupSchema.findByIdAndUpdate(

@@ -47,7 +47,7 @@ export default class GroupController implements IGroupController {
       }
       const groups = await this._groupService.getUserGroups(userId);
       if (groups.length === 0) {
-        return res.status(HttpStatusCode.NOT_FOUND).json({ message: 'No groups found for this _user' });
+        return res.status(HttpStatusCode.NOT_FOUND).json({ message: 'No groups found for this user' });
       }
       return res.status(HttpStatusCode.OK).json({ groups });
     } catch (error) {
@@ -113,23 +113,23 @@ export default class GroupController implements IGroupController {
   // }
 
 
-  // async leaveGroup(req: Request, res: Response): Promise<Response> {
-  //   try {
-  //     const { groupId } = req.params;
-  //     const { userEmail } = req.body;
-  //     if (!groupId || !userEmail) {
-  //       return res.status(HttpStatusCode.BAD_REQUEST).json({ success: false, message: 'Group ID and user email are required' });
-  //     }
-  //     const result = await this._groupService.leaveGroup(groupId, userEmail);
-  //     if (result.success) {
-  //       return res.status(HttpStatusCode.OK).json(result);
-  //     } else {
-  //       return res.status(HttpStatusCode.BAD_REQUEST).json(result);
-  //     }
-  //   } catch (error) {
-  //     return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Failed to leave group' });
-  //   }
-  // }
+  async leaveGroup(req: Request, res: Response): Promise<Response> {
+    try {
+      const { groupId } = req.params;
+      const { userEmail,userId } = req.body;
+      if (!groupId || !userEmail) {
+        return res.status(HttpStatusCode.BAD_REQUEST).json({ success: false, message: 'Group ID and user email are required' });
+      }
+      const result = await this._groupService.leaveGroup(groupId, userEmail,userId);
+      if (result.success) {
+        return res.status(HttpStatusCode.OK).json(result);
+      } else {
+        return res.status(HttpStatusCode.BAD_REQUEST).json(result);
+      }
+    } catch (error) {
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Failed to leave group' });
+    }
+  }
 
 
   // async settleDebt(req: Request, res: Response): Promise<Response> {
