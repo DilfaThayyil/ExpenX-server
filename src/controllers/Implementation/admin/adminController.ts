@@ -3,12 +3,10 @@ import { inject, injectable } from "tsyringe";
 import { IAdminController } from "../../Interface/admin/IAdminController";
 import { IAdminService } from "../../../services/Interface/admin/IAdminService";
 import { HttpStatusCode } from "../../../utils/httpStatusCode";
-import { ACCESSTOKEN_SECRET } from "../../../config/env";
+import { NODE_ENV } from "../../../config/env";
 import jwt from "jsonwebtoken";
 import { messageConstants } from "../../../utils/messageConstants";
 import redisClient from "../../../utils/redisClient";
-
-
 
 
 @injectable()
@@ -26,14 +24,14 @@ export default class AdminController implements IAdminController {
       const { admin, accessToken, refreshToken } = await this._adminService.adminLogin(email, password);
       res.cookie('accessToken', accessToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 60 * 60 * 1000, //1 hour
+        secure: NODE_ENV === 'production',
+        maxAge: 60 * 60 * 1000,
         sameSite: 'strict',
       })
       res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 30 * 24 * 60 * 60 * 1000, //30 days
+        secure: NODE_ENV === 'production',
+        maxAge: 30 * 24 * 60 * 60 * 1000,
         sameSite: 'strict',
       })
       return res.status(HttpStatusCode.OK).json({ message: messageConstants.LOGIN_SUCCESS, accessToken });
@@ -57,7 +55,7 @@ export default class AdminController implements IAdminController {
       if (!result.accessToken) return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: messageConstants.TOKEN_FAILED })
       res.cookie('accessToken', result.accessToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: NODE_ENV === 'production',
         maxAge: 60 * 60 * 1000,
         sameSite: 'strict',
       })
@@ -136,7 +134,7 @@ export default class AdminController implements IAdminController {
           const ttl = expiry - currentTime;
 
           await redisClient.set(`bl:${refreshToken}`, "1", {
-            EX: ttl, // expire same time as token
+            EX: ttl,
           });
         }
       }

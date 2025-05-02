@@ -156,7 +156,6 @@ export default class GroupController implements IGroupController {
     const { groupId } = req.params;
     const { email } = req.query;
   
-    console.log("➡️ Received invite request:", { groupId, email });
   
     if (!email || typeof email !== "string") {
       console.warn("⚠️ Missing or invalid email in query:", email);
@@ -164,28 +163,22 @@ export default class GroupController implements IGroupController {
     }
   
     try {
-      const user = await this._userService.findByEmail(email);
-      console.log("🔍 User lookup result:", user);
-  
+      const user = await this._userService.findByEmail(email);  
       if (!user) {
         const redirectAfterRegister = encodeURIComponent(`/accept-invite?groupId=${groupId}&email=${email}`);
         const registerRedirect = `${CLIENTURL}/register?redirect=${redirectAfterRegister}`;
-        console.log("👤 User not found, redirecting to register:", registerRedirect);
         return res.status(HttpStatusCode.OK).json({
           status: 'redirect',
           redirectTo: registerRedirect,
         });
       }
   
-      const accessToken = req.cookies?.accessToken;
-      console.log("🍪 Access token:", accessToken);
-  
+      const accessToken = req.cookies?.accessToken;  
       let isAuthenticated = false;
   
       if (accessToken) {
         try {
           const decoded = jwt.verify(accessToken, ACCESSTOKEN_SECRET as string) as JwtPayload;
-          console.log("🔑 Decoded JWT:", decoded);
           isAuthenticated = decoded?.email === email;
         } catch (err) {
           console.error("❌ Token verification failed:", err);
@@ -196,14 +189,11 @@ export default class GroupController implements IGroupController {
       if (!isAuthenticated) {
         const redirectAfterLogin = encodeURIComponent(`/accept-invite?groupId=${groupId}&email=${email}`);
         const loginRedirect = `${CLIENTURL}/login?redirect=${redirectAfterLogin}`;
-        console.log("🔒 User not authenticated, redirecting to login:", loginRedirect);
         return res.status(HttpStatusCode.OK).json({
           status: 'redirect',
           redirectTo: loginRedirect,
         });
       }
-  
-      console.log("✅ User authenticated, proceeding to send invite");
       await this._groupService.groupInvite(groupId, email);
       return res.status(HttpStatusCode.OK).json({
         status: 'success'

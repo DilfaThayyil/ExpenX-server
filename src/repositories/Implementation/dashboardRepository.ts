@@ -4,7 +4,7 @@ import Payment from "../../models/paymentSchema";
 import goalsSchema from '../../models/goalsSchema';
 import SlotModel from "../../models/slotSchema";
 import slotSchema, { Slot } from '../../models/slotSchema';
-import { IAppointment } from "../../dto/advisorDTO";
+import { IAppointment, PopulatedSlot } from "../../dto/advisorDTO";
 
 export default class AdvDashboardRepo implements IAdvDashboardRepo {
     async getDashboardData(advisorId: string): Promise<{
@@ -137,17 +137,19 @@ export default class AdvDashboardRepo implements IAdvDashboardRepo {
         const currentDate = new Date().toISOString().split("T")[0];
 
         const slots = await SlotModel.find({
-            "advisorId._id": new Types.ObjectId(advisorId), // Ensure ObjectId is used
+            advisorId: new Types.ObjectId(advisorId),
             date: { $gte: currentDate },
             status: "Booked",
         })
             .sort({ date: 1, startTime: 1 })
-            .lean();
+            .populate('advisorId', 'username email profilePic') 
+            .populate('bookedBy', 'username email profilePic')
+            .lean<PopulatedSlot[]>();
 
         return slots.map(slot => ({
-            _id: slot._id.toString(), // Convert ObjectId to string
+            _id: slot._id.toString(), 
             advisorId:
-                slot.advisorId && "_id" in slot.advisorId // Type guard to check if it's not an empty object
+                slot.advisorId && "_id" in slot.advisorId 
                     ? {
                         _id: slot.advisorId._id.toString(),
                         username: slot.advisorId.username,

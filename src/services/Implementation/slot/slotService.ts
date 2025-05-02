@@ -33,12 +33,7 @@ export default class SlotService implements ISlotService {
     const user = await this._userRepository.findUserById(userId);
     if (!user) throw new Error("User not found");
     const slotData: Partial<Slot> = {
-      bookedBy: {
-        _id: user._id,
-        username: user.username,
-        email: user.email,
-        profilePic: user.profilePic
-      },
+      bookedBy: new Types.ObjectId(user._id),
       status: 'Booked'
     };
     const bookedSlot = await this._slotRepository.bookSlot(slotId, slotData as Slot);
@@ -62,32 +57,26 @@ export default class SlotService implements ISlotService {
       }
       const advisor = await this._advisorRepository.findUserById(id);
       if (!advisor) throw new Error('Advisor not found');
-
+      
       const creatingSlot: Partial<Slot> = {
-        advisorId: {
-          _id: new Types.ObjectId(advisor._id),
-          username: advisor.username,
-          email: advisor.email,
-          profilePic: advisor.profilePic
-        },
+        advisorId: new Types.ObjectId(advisor._id),
         date: slotData.date,
         startTime: slotData.startTime,
         fee: slotData.fee,
         duration: slotData.duration,
         maxBookings: slotData.maxBookings,
         status: slotData.status,
-        bookedBy: {}, // Empty object by default
+        bookedBy: null,
         location: slotData.location,
         locationDetails: slotData.locationDetails,
         description: slotData.description
       };
-
       const slot = await this._slotRepository.createSlot(creatingSlot as Slot);
       return slot;
     } catch (err) {
       console.error('Error creating slot:', err);
-      throw new Error('Error creating slot');
-    }
+      throw err;
+    }    
   }
 
 

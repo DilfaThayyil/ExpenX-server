@@ -20,29 +20,22 @@ const initializeSocket = (server: HttpServer) => {
   });
 
   io.on("connection", (socket: Socket) => {
-    console.log(`User connected: ${socket.id}`);
-
     socket.on("addUser", (userId: string) => {
       users = users.filter((user) => user.userId !== userId);
       users.push({ userId, socketId: socket.id });
-      console.log(`User ${userId} added with socket ${socket.id}`);
-      console.log("Current users:", users);
     });
 
     socket.on("joinRoom", (roomId: string) => {
       socket.join(roomId);
-      console.log(`Socket ${socket.id} joined room: ${roomId}`);
     });
 
     socket.on("leaveRoom", (roomId: string) => {
       socket.leave(roomId);
-      console.log(`Socket ${socket.id} left room: ${roomId}`);
     });
 
     socket.on("send_message", async (messageData) => { 
       io.to(messageData.roomId).emit("receive_message", messageData);
       try {
-        console.log("Message received:", messageData);
         const newMessage = new messageSchema({
           senderId: messageData.senderId,
           receiverId: messageData.receiverId,
@@ -54,8 +47,6 @@ const initializeSocket = (server: HttpServer) => {
           status: "sent",
         });
         const savedMessage = await newMessage.save();
-        console.log("savedMessage : ", savedMessage)
-
         const newNotification = new notificationSchema({
           senderId: messageData.senderId,
           receiverId: messageData.receiverId,
@@ -66,7 +57,6 @@ const initializeSocket = (server: HttpServer) => {
         });
 
         const savedNotification = await newNotification.save();
-        console.log("Notification saved-socket-utils:", savedNotification);
         io.to(messageData.receiverId).emit("new_notification", savedNotification);
       } catch (error) {
         console.error("Error saving message or notification:", error);
@@ -82,9 +72,7 @@ const initializeSocket = (server: HttpServer) => {
     });
 
     socket.on("disconnect", () => {
-      console.log(`User disconnected: ${socket.id}`);
       users = users.filter((user) => user.socketId !== socket.id);
-      console.log("Remaining users:", users);
     });
   });
 

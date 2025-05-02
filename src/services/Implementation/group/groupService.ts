@@ -53,11 +53,8 @@ export default class GroupService implements IGroupService {
       }
       const createdGroup = await this._groupRepository.createGroup(newGroup);
       for (const memberEmail of invitedMembers) {
-        console.log("invitingMemberEmail : ",memberEmail)
         const existingUser = await this._userRepository.findByEmail(memberEmail);
-        console.log("existingUser-service : ",existingUser)
         const acceptLink = `/accept-invite?groupId=${createdGroup._id}&email=${encodeURIComponent(memberEmail)}`;
-        console.log("acceptLink - srvice : ",acceptLink)
         await sendGroupInviteEmail(memberEmail, name, acceptLink, !!existingUser,creatorEmail);
       }
       return createdGroup
@@ -281,24 +278,15 @@ export default class GroupService implements IGroupService {
 
 
   async groupInvite(groupId: string, email: string): Promise<void> {
-    console.log("📨 groupInvite called with:", { groupId, email });
-  
     const group = await this._groupRepository.findById(groupId);
-    console.log("📦 Retrieved group:", group);
-  
     if (!group) {
       console.error("❌ Group not found for ID:", groupId);
       throw new Error("Group not found");
     }
-  
     const alreadyMember = group.members.some(member => member.email === email);
-    console.log("👥 Is user already a member?", alreadyMember);
-  
     if (alreadyMember) {
-      console.log("ℹ️ User is already a member. Skipping invite.");
       return;
     }
-  
     const newMember = {
       id: email.replace('@', '_'),
       name: email.split('@')[0],
@@ -307,16 +295,8 @@ export default class GroupService implements IGroupService {
       paid: 0,
       owed: 0
     };
-  
-    console.log("➕ New member to add:", newMember);
-  
-    console.log("🧹 Removing previous invite or member (if any)...");
     await this._groupRepository.removeMember(groupId, email);
-  
-    console.log("✅ Adding new member to group...");
     await this._groupRepository.addMember(groupId, newMember);
-  
-    console.log("🎉 Member successfully invited and added to group:", groupId);
   }
   
 
