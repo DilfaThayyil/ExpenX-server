@@ -1,5 +1,6 @@
-import morgan from 'morgan';
 import { createStream } from 'rotating-file-stream';
+import { LOG_INTERVAL } from '../config/env';
+import morgan from 'morgan';
 import path from 'path';
 import fs from 'fs';
 
@@ -9,7 +10,7 @@ if (!fs.existsSync(logDirectory)) {
 }
 
 const accessLogStream = createStream('access.log', {
-  interval: process.env.LOG_INTERVAL || '1d', 
+  interval: LOG_INTERVAL || '1d', 
   path: logDirectory,
 });
 

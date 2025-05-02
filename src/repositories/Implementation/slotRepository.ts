@@ -28,12 +28,12 @@ export default class SlotRepository extends BaseRepository<Slot> implements ISlo
     async updateSlotStatus(slotId: string): Promise<Slot | null> {
         return await slotSchema.findOneAndUpdate({ _id: slotId }, { status: "Cancelled" }, { new: true })
     }
-    
+
     async fetchSlotsByUser(userId: string, page: number, limit: number): Promise<{ slots: Slot[], totalPages: number }> {
         try {
             const userObjectId = new Types.ObjectId(userId);
             const filter = {
-                $or: [{ "bookedBy._id": userObjectId }, { status: "Available" }],
+                $or: [{ "bookedBy": userObjectId }, { status: "Available" }],
             };
             const totalSlots = await slotSchema.countDocuments(filter);
             const totalPages = Math.ceil(totalSlots / limit);
@@ -61,18 +61,16 @@ export default class SlotRepository extends BaseRepository<Slot> implements ISlo
     async fetchSlots(advisorId: string, page: number, limit: number, search: string): Promise<{ slots: Slot[] | Slot; totalSlots: number }> {
         const skip = (page - 1) * limit
         const query: any = {
-            "advisorId._id": advisorId
+            "advisorId": new Types.ObjectId(advisorId)
         };
         if (search) {
             const searchRegex = new RegExp(search, "i");
-
             query.$or = [
                 { description: { $regex: searchRegex } },
                 { locationDetails: { $regex: searchRegex } },
                 { status: { $regex: searchRegex } }
             ];
         }
-
         const [slots, totalSlots] = await Promise.all([
             slotSchema.find(query).skip(skip).limit(limit),
             slotSchema.countDocuments(query)
@@ -98,39 +96,83 @@ export default class SlotRepository extends BaseRepository<Slot> implements ISlo
         page: number,
         limit: number,
         search: string
-    ): Promise<{ bookedSlots: Slot[]; totalSlots: number }> {
+    ): Promise<{ bookedSlots: any[]; totalSlots: number }> {
         try {
             const skip = (page - 1) * limit;
-
-            const query: any = {
-                'advisorId._id': advisorId,
+            const matchStage: any = {
+                advisorId: new Types.ObjectId(advisorId),
                 status: 'Booked',
             };
+            const searchRegex = new RegExp(search, 'i');
+
+            const pipeline: any[] = [
+                { $match: matchStage },
+                {
+                    $lookup: {
+                        from: 'users',
+                        localField: 'bookedBy',
+                        foreignField: '_id',
+                        as: 'bookedBy'
+                    }
+                },
+                { $unwind: '$bookedBy' },
+            ];
 
             if (search) {
-                const searchRegex = new RegExp(search, 'i');
-                query.$or = [
-                    { 'bookedBy.username': { $regex: searchRegex } },
-                    { 'bookedBy.email': { $regex: searchRegex } }
-                ];
+                pipeline.push({
+                    $match: {
+                        $or: [
+                            { 'bookedBy.username': { $regex: searchRegex } },
+                            { 'bookedBy.email': { $regex: searchRegex } }
+                        ]
+                    }
+                });
             }
 
-            const [bookedSlots, totalSlots] = await Promise.all([
-                slotSchema
-                    .find(query)
-                    .skip(skip)
-                    .limit(limit)
-                    .populate('bookedBy', 'username email profilePic')
-                    .exec(),
+            pipeline.push({
+                $facet: {
+                    paginatedResults: [
+                        { $skip: skip },
+                        { $limit: limit },
+                        {
+                            $project: {
+                                _id: 1,
+                                advisorId: 1,
+                                date: 1,
+                                startTime: 1,
+                                fee: 1,
+                                duration: 1,
+                                location: 1,
+                                locationDetails: 1,
+                                description: 1,
+                                status: 1,
+                                createdAt: 1,
+                                updatedAt: 1,
+                                bookedBy: {
+                                    _id:1,
+                                    username: 1,
+                                    email: 1,
+                                    profilePic: 1
+                                }
+                            }
+                        }
+                    ],
+                    totalCount: [
+                        { $count: 'count' }
+                    ]
+                }
+            });
 
-                slotSchema.countDocuments(query),
-            ]);
-
+            const result = await slotSchema.aggregate(pipeline);
+            const bookedSlots = result[0]?.paginatedResults || [];
+            const totalSlots = result[0]?.totalCount[0]?.count || 0;
             return { bookedSlots, totalSlots };
         } catch (err) {
+            console.error('Error in getBookedSlotsForAdvisor:', err);
             throw err;
         }
     }
+
 
     async getClientMeetings(clientId: string, advisorId: string): Promise<Slot[]> {
         try {

@@ -8,6 +8,7 @@ import { mapUserProfile } from '../../Interface/mappers/userMapper';
 import { messageConstants } from '../../../utils/messageConstants';
 import redisClient from '../../../utils/redisClient';
 import jwt from "jsonwebtoken";
+import { NODE_ENV } from '../../../config/env';
 
 
 
@@ -76,18 +77,17 @@ export default class AuthAdvisorController implements IAuthAdvisorController {
       const { email, password } = req.body;
       const user = await this._authAdvisorService.loginUser(email, password);
       const user2 = mapUserProfile(user)
-      //set access token and refresh token in cookies
       res.cookie('accessToken', user.accessToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 15 * 60 * 1000,
-        sameSite: 'lax',
+        secure: NODE_ENV==='production',
+        maxAge: 60 * 60 * 1000,
+        sameSite: 'strict',
       })
       res.cookie('refreshToken', user.refreshToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: NODE_ENV === 'production',
         maxAge: 30 * 24 * 60 * 60 * 1000,
-        sameSite: 'lax',
+        sameSite: 'strict',
       })
       res.status(HttpStatusCode.OK).json({ message: 'Login successfull', user2 });
     } catch (err) {
@@ -106,10 +106,9 @@ export default class AuthAdvisorController implements IAuthAdvisorController {
       if (!refreshToken) return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: "No refresh token provided" });
       const result = await this._authAdvisorService.setNewAccessToken(refreshToken);
       if (!result.accessToken) return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: 'Failed to generate token' });
-      // res.cookie('accessToken', result.accessToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production', maxAge: 60*60*1000, sameSite: 'strict' });
       res.cookie('accessToken', result.accessToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: NODE_ENV === 'production',
         maxAge: 60 * 60 * 1000,
         sameSite: 'strict',
       })
@@ -173,13 +172,13 @@ export default class AuthAdvisorController implements IAuthAdvisorController {
       const user2 = mapUserProfile(existingUser)
       res.cookie('accessToken', accessToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: NODE_ENV === 'production',
         maxAge: 60 * 60 * 1000,
         sameSite: 'strict',
       })
       res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: NODE_ENV === 'production',
         maxAge: 30 * 24 * 60 * 60 * 1000,
         sameSite: 'strict',
       })

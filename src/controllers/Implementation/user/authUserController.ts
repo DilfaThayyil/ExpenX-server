@@ -8,6 +8,7 @@ import { mapUserProfile } from '../../Interface/mappers/userMapper';
 import { messageConstants } from '../../../utils/messageConstants';
 import jwt from "jsonwebtoken";
 import redisClient from "../../../utils/redisClient";
+import { NODE_ENV } from '../../../config/env';
 
 
 
@@ -80,13 +81,13 @@ export default class AuthUserController implements IAuthUserController {
       const user2 = mapUserProfile(userData)
       res.cookie('accessToken', accessToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: NODE_ENV === 'production',
         maxAge: 60 * 60 * 1000,
         sameSite: 'strict',
       })
       res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: NODE_ENV === 'production',
         maxAge: 30 * 24 * 60 * 60 * 1000,
         sameSite: 'strict',
       })
@@ -109,10 +110,9 @@ export default class AuthUserController implements IAuthUserController {
       if (!refreshToken) return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: "No refresh token provided" });
       const result = await this._authUserService.setNewAccessToken(refreshToken);
       if (!result.accessToken) return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: 'Failed to generate token' });
-      // res.cookie('accessToken', result.accessToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production', maxAge: 60*60*1000, sameSite: 'strict' });
       res.cookie('accessToken', result.accessToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: NODE_ENV === 'production',
         maxAge: 60 * 60 * 1000,
         sameSite: 'strict',
       })
@@ -183,13 +183,13 @@ export default class AuthUserController implements IAuthUserController {
       const user2 = mapUserProfile(existingUser)
       res.cookie('accessToken', accessToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: NODE_ENV === 'production',
         maxAge: 60 * 60 * 1000,
         sameSite: 'strict',
       })
       res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: NODE_ENV === 'production',
         maxAge: 30 * 24 * 60 * 60 * 1000,
         sameSite: 'strict',
       })

@@ -21,7 +21,7 @@ export default class SlotController implements ISlotController {
     } catch (err) {
       console.error(err);
       const errorMessage = err instanceof Error ? err.message : messageConstants.UNEXPECTED_ERROR;
-      res.status(HttpStatusCode.CONFLICT).json({message: errorMessage });
+      res.status(HttpStatusCode.CONFLICT).json({ message: errorMessage });
     }
   }
 
@@ -40,20 +40,26 @@ export default class SlotController implements ISlotController {
     }
   }
 
-  async createSlot(req: Request, res: Response): Promise<void> {
+  async createSlot(req: Request, res: Response): Promise<Response> {
     try {
       if (req.body.slotData._id === '') {
-        delete req.body.slotData._id
+        delete req.body.slotData._id;
       }
-      const Slot = await this._slotService.createSlot(req.body.id, req.body.slotData)
-      if (!Slot) {
-        throw new Error('Slot is already exists')
+      const Slot = await this._slotService.createSlot(req.body.id, req.body.slotData);
+      return res.status(HttpStatusCode.CREATED).json({ message: 'Slot created successfully', Slot });
+    } catch (err: any) {
+      console.error(err.message);
+      switch (err.message) {
+        case 'A slot already exists for the given date and time.':
+          return res.status(HttpStatusCode.CONFLICT).json({ message: err.message });
+        case 'Advisor not found':
+          return res.status(HttpStatusCode.NOT_FOUND).json({ message: err.message });
+        default:
+          return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: 'Failed to create slot' });
       }
-      res.status(HttpStatusCode.CREATED).json({ message: 'Slot created successfully', Slot })
-    } catch (err) {
-      console.error(err)
     }
   }
+  
 
   async fetchSlots(req: Request, res: Response): Promise<Response> {
     try {
@@ -110,11 +116,11 @@ export default class SlotController implements ISlotController {
     }
   }
 
-  async cancelBookedSlot(req: Request, res: Response): Promise<Response>{
+  async cancelBookedSlot(req: Request, res: Response): Promise<Response> {
     try {
       const { slotId } = req.params;
-      const {advisorId,userId} = req.body
-      const updatedSlot = await this._slotService.cancelBookedSlot(slotId,advisorId,userId);
+      const { advisorId, userId } = req.body
+      const updatedSlot = await this._slotService.cancelBookedSlot(slotId, advisorId, userId);
       return res.status(200).json({ message: "Slot cancelled, amount refunded", updatedSlot });
     } catch (error: any) {
       return res.status(400).json({ message: error.message });
