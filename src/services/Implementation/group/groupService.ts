@@ -108,14 +108,14 @@ export default class GroupService implements IGroupService {
       if (!group) {
         throw new Error('Group not found');
       }
-      const { splitMethod, shares, totalAmount } = expenseData;
+      const { splitMethod, share, totalAmount } = expenseData;
       let splits: ISplit[] = [];
       if (splitMethod === "percentage") {
-        const totalPercentage = Object.values(shares).reduce((sum: number, percent) => sum + Number(percent), 0);
+        const totalPercentage = Object.values(share).reduce((sum: number, percent) => sum + Number(percent), 0);
         if (totalPercentage !== 100) {
           throw new Error('Total percentage must equal 100%');
         }
-        splits = Object.entries(shares).map(([email, percentage]) => ({
+        splits = Object.entries(share).map(([email, percentage]) => ({
           user: email,
           amountOwed: (Number(percentage) / 100) * totalAmount,
           percentage: Number(percentage),
@@ -124,11 +124,11 @@ export default class GroupService implements IGroupService {
         }));
       }
       else if (splitMethod === "custom") {
-        const totalCustomAmount = Object.values(shares).reduce((sum: number, amount) => sum + Number(amount), 0);
+        const totalCustomAmount = Object.values(share).reduce((sum: number, amount) => sum + Number(amount), 0);
         if (totalCustomAmount !== totalAmount) {
           throw new Error('Total custom amounts must equal total expense amount');
         }
-        splits = Object.entries(shares).map(([email, customAmount]) => ({
+        splits = Object.entries(share).map(([email, customAmount]) => ({
           user: email,
           amountOwed: Number(customAmount),
           percentage: undefined,
@@ -137,10 +137,10 @@ export default class GroupService implements IGroupService {
         }));
       }
       else {
-        const memberCount = Object.keys(shares).length;
+        const memberCount = Object.keys(share).length;
         const equalAmount = totalAmount / memberCount;
 
-        splits = Object.entries(shares).map(([email]) => ({
+        splits = Object.entries(share).map(([email]) => ({
           user: email,
           amountOwed: equalAmount,
           percentage: undefined,
@@ -148,7 +148,7 @@ export default class GroupService implements IGroupService {
           status: 'pending',
         }));
       }
-      const userEmails = Object.keys(shares);
+      const userEmails = Object.keys(share);
       const users = await this._userRepository.findUsersByEmails(userEmails);
       const userMap = new Map(users.map(user => [user.email, user._id]));
       const individualExpenses = splits.map(split => {
@@ -177,7 +177,7 @@ export default class GroupService implements IGroupService {
       await this._expenseRepository.createExpenses(individualExpenses);
       return updatedGroup
     } catch (err) {
-      console.error(err);
+      console.error("failed adding expense - service : ",err);
       throw err;
     }
   }
@@ -256,28 +256,28 @@ export default class GroupService implements IGroupService {
   }
 
 
-  // async settleDebt(groupId: string, settlement: ISettlement): Promise<{ success: boolean; message: string; group?: IGroup }> {
-  //   try {
-  //     const group = await this._groupRepository.findById(groupId);
-  //     if (!group) {
-  //       return { success: false, message: 'Group not found' };
-  //     }
-  //     const fromMemberExists = group.members.some(m => m.email === settlement.from);
-  //     const toMemberExists = group.members.some(m => m.email === settlement.to);
-  //     if (!fromMemberExists || !toMemberExists) {
-  //       return { success: false, message: 'One or both members not found in the group' };
-  //     }
-  //     const updatedGroup = await this._groupRepository.addSettlement(groupId, settlement);
-  //     return {
-  //       success: true,
-  //       message: 'Settlement recorded successfully',
-  //       group: updatedGroup as IGroup
-  //     };
-  //   } catch (error) {
-  //     console.error('Error settling debt:', error);
-  //     return { success: false, message: 'Failed to record settlement' };
-  //   }
-  // }
+  async settleDebt(groupId: string, settlement: ISettlement): Promise<{ success: boolean; message: string; group?: IGroup }> {
+    try {
+      const group = await this._groupRepository.findById(groupId);
+      if (!group) {
+        return { success: false, message: 'Group not found' };
+      }
+      const fromMemberExists = group.members.some(m => m.email === settlement.from);
+      const toMemberExists = group.members.some(m => m.email === settlement.to);
+      if (!fromMemberExists || !toMemberExists) {
+        return { success: false, message: 'One or both members not found in the group' };
+      }
+      const updatedGroup = await this._groupRepository.addSettlement(groupId, settlement);
+      return {
+        success: true,
+        message: 'Settlement recorded successfully',
+        group: updatedGroup as IGroup
+      };
+    } catch (error) {
+      console.error('Error settling debt:', error);
+      return { success: false, message: 'Failed to record settlement' };
+    }
+  }
 
 
   async groupInvite(groupId: string, email: string): Promise<void> {
