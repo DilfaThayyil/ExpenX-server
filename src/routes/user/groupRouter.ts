@@ -12,7 +12,7 @@ router.post('/addMember/:groupId',AuthMiddleware.authorizeUser,(req,res)=>groupC
 router.post('/addExpenseInGroup/:groupId',AuthMiddleware.authorizeUser,(req,res)=>groupController.addExpenseInGroup(req,res))
 router.post('/removeMember/:groupId',AuthMiddleware.authorizeUser,(req,res)=>groupController.removeMember(req,res))
 router.post('/leaveGroup/:groupId',AuthMiddleware.authorizeUser,(req,res)=>groupController.leaveGroup(req,res))
-// router.post('/settleDebt/:groupId',AuthMiddleware.authorizeUser,(req,res)=>groupController.settleDebt(req,res))
+router.post('/settleDebt/:groupId',AuthMiddleware.authorizeUser,(req,res)=>groupController.settleDebt(req,res))
 router.get('/acceptInvite/:groupId',(req,res)=>groupController.groupInvite(req,res))
 
 export default router

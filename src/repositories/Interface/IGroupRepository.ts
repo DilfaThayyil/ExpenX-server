@@ -7,6 +7,5 @@ export interface IGroupRepository{
     removeMember(groupId:string,email:string):Promise<IGroup|null>
     getUserGroups(email:string):Promise<IGroup[]>
     addExpenseInGroup(groupId:string,expense:IGroupExpense):Promise<IGroup>
-    // removeMember(groupId:string,memberEmail:string):Promise<IGroup | null>
-    // addSettlement(groupId:string,settlement:ISettlement):Promise<IGroup | null>
+    addSettlement(groupId:string,settlement:ISettlement):Promise<IGroup | null>
 }

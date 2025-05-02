@@ -80,7 +80,7 @@ export default class GroupController implements IGroupController {
       const { groupId } = req.params;
       const expenseData: IGroupExpense = req.body;
       if (!expenseData.title || !expenseData.totalAmount || !expenseData.paidBy) {
-        return res.status(HttpStatusCode.BAD_REQUEST).json({ success: false, error: 'Missing required fields' });
+        return res.status(HttpStatusCode.BAD_REQUEST).json({ success: false, message: 'Missing required fields' });
       }
       const updatedGroup = await this._groupService.addExpenseInGroup(groupId, expenseData);
       return res.status(HttpStatusCode.OK).json({
@@ -88,8 +88,9 @@ export default class GroupController implements IGroupController {
         message: 'Expense added successfully',
         groups: updatedGroup,
       });
-    } catch (err) {
-      return res.status(HttpStatusCode.BAD_REQUEST).json({ success: false, error: 'Failed to update group' });
+    } catch (err:any) {
+      console.error('error adding expense in group - contrller : ',err.message)
+      return res.status(HttpStatusCode.BAD_REQUEST).json({ success: false, message: err.message||'Failed to update group' });
     }
   }
 
@@ -132,23 +133,23 @@ export default class GroupController implements IGroupController {
   }
 
 
-  // async settleDebt(req: Request, res: Response): Promise<Response> {
-  //   try {
-  //     const { groupId } = req.params;
-  //     const { settlementData } = req.body;
-  //     if (!groupId || !settlementData) {
-  //       return res.status(HttpStatusCode.BAD_REQUEST).json({ success: false, message: 'Group ID and settlement details are required' });
-  //     }
-  //     const result = await this._groupService.settleDebt(groupId, settlementData);
-  //     if (result.success) {
-  //       return res.status(HttpStatusCode.OK).json(result);
-  //     } else {
-  //       return res.status(HttpStatusCode.BAD_REQUEST).json(result);
-  //     }
-  //   } catch (error) {
-  //     return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Failed to settle debt' });
-  //   }
-  // }
+  async settleDebt(req: Request, res: Response): Promise<Response> {
+    try {
+      const { groupId } = req.params;
+      const { settlementData } = req.body;
+      if (!groupId || !settlementData) {
+        return res.status(HttpStatusCode.BAD_REQUEST).json({ success: false, message: 'Group ID and settlement details are required' });
+      }
+      const result = await this._groupService.settleDebt(groupId, settlementData);
+      if (result.success) {
+        return res.status(HttpStatusCode.OK).json(result);
+      } else {
+        return res.status(HttpStatusCode.BAD_REQUEST).json(result);
+      }
+    } catch (error) {
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Failed to settle debt' });
+    }
+  }
 
 
   async groupInvite(req: Request, res: Response): Promise<Response> {

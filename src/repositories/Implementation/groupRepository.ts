@@ -55,11 +55,11 @@ export default class GroupRepository extends BaseRepository<IGroup> implements I
         return updatedGroup
     }
 
-    // async addSettlement(groupId: string, settlement: ISettlement): Promise<IGroup | null> {
-    //     return await groupSchema.findByIdAndUpdate(
-    //         groupId,
-    //         { $push: { settlements: settlement } },
-    //         { new: true }
-    //     );
-    // }
+    async addSettlement(groupId: string, settlement: ISettlement): Promise<IGroup | null> {
+        return await groupSchema.findByIdAndUpdate(
+            groupId,
+            { $push: { settlements: settlement } },
+            { new: true }
+        );
+    }
 }
