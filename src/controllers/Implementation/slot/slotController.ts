@@ -30,10 +30,11 @@ export default class SlotController implements ISlotController {
       const { userId } = req.params;
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
+      const search = req.query.search as string
       if (!userId) {
         return res.status(HttpStatusCode.BAD_REQUEST).json({ message: "User ID is required" });
       }
-      const data = await this._slotService.fetchSlotsByUser(userId, page, limit);
+      const data = await this._slotService.fetchSlotsByUser(userId, page, limit, search);
       return res.status(HttpStatusCode.OK).json({ success: true, data });
     } catch (error: any) {
       return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: error.message });

@@ -29,24 +29,111 @@ export default class SlotRepository extends BaseRepository<Slot> implements ISlo
         return await slotSchema.findOneAndUpdate({ _id: slotId }, { status: "Cancelled" }, { new: true })
     }
 
-    async fetchSlotsByUser(userId: string, page: number, limit: number): Promise<{ slots: Slot[], totalPages: number }> {
+    async fetchSlotsByUser(
+        userId: string, 
+        page: number, 
+        limit: number, 
+        search: string, 
+        status?: string,
+        location?: string,
+        startDate?: string,
+        endDate?: string
+    ): Promise<{ slots: Slot[], totalPages: number }> {
         try {
-            const userObjectId = new Types.ObjectId(userId);
-            const filter = {
-                $or: [{ "bookedBy": userObjectId }, { status: "Available" }],
-            };
-            const totalSlots = await slotSchema.countDocuments(filter);
-            const totalPages = Math.ceil(totalSlots / limit);
-            const slots = await slotSchema.find(filter)
-                .skip((page - 1) * limit)
-                .limit(limit)
-                .sort({ date: 1 })
-                .lean();
+            const userObjectId = new Types.ObjectId(userId);            
+            const baseMatch: any = {
+                $or: [
+                    { bookedBy: userObjectId },
+                    { status: "Available" }
+                ]
+            };    
+            if (status && status !== "All") {
+                baseMatch.status = status;
+            }
+            if (location && location !== "All") {
+                baseMatch.location = location;
+            }
+            if (startDate && startDate.trim() !== '') {
+                if (!baseMatch.date) baseMatch.date = {};
+                baseMatch.date.$gte = startDate;
+            }
+            if (endDate && endDate.trim() !== '') {
+                if (!baseMatch.date) baseMatch.date = {};
+                baseMatch.date.$lte = endDate;
+            }    
+            const searchRegex = search && search.trim() !== '' ? new RegExp(search, "i") : null;            
+            const searchMatch = searchRegex
+                ? {
+                    $or: [
+                        { description: { $regex: searchRegex } },
+                        { locationDetails: { $regex: searchRegex } },
+                        { status: { $regex: searchRegex } },
+                        { "advisorId.username": { $regex: searchRegex } },
+                        { date: { $regex: searchRegex } },
+                        { startTime: { $regex: searchRegex } }
+                    ]
+                }
+                : {};    
+            const pipeline: any[] = [
+                { $match: baseMatch },
+                {
+                    $lookup: {
+                        from: 'advisors',
+                        localField: 'advisorId',
+                        foreignField: '_id',
+                        as: 'advisorId'
+                    }
+                },
+                { $unwind: "$advisorId" },
+                {
+                    $project: {
+                        advisorId: {
+                            _id: 1,
+                            username: 1,
+                            email: 1,
+                            profilePic: 1
+                        },
+                        date: 1,
+                        startTime: 1,
+                        endTime: 1,
+                        duration: 1,
+                        maxBookings: 1,
+                        status: 1,
+                        location: 1,
+                        locationDetails: 1,
+                        description: 1,
+                        createdAt: 1,
+                        updatedAt: 1,
+                        fee: 1,
+                        bookedBy: 1
+                    }
+                }
+            ];            
+            if (search && search.trim() !== '') {
+                pipeline.push({ $match: searchMatch });
+            }            
+            pipeline.push({
+                $facet: {
+                    data: [
+                        { $sort: { date: 1 } },
+                        { $skip: (page - 1) * limit },
+                        { $limit: limit }
+                    ],
+                    totalCount: [
+                        { $count: "count" }
+                    ]
+                }
+            });    
+            const result = await slotSchema.aggregate(pipeline);
+            const slots = result[0]?.data || [];
+            const total = result[0]?.totalCount[0]?.count || 0;
+            const totalPages = Math.ceil(total / limit);
             return { slots, totalPages };
         } catch (error: any) {
             throw new Error(`Error fetching slots: ${error.message}`);
         }
     }
+
 
     async createSlot(slot: Slot): Promise<Slot> {
         const result = await this.create(slot)
@@ -72,9 +159,18 @@ export default class SlotRepository extends BaseRepository<Slot> implements ISlo
             ];
         }
         const [slots, totalSlots] = await Promise.all([
-            slotSchema.find(query).skip(skip).limit(limit),
+            slotSchema.find(query)
+                .skip(skip)
+                .limit(limit)
+                .sort({ date: -1 })
+                .populate({
+                    path: 'bookedBy',
+                    select: '_id username email'
+                })
+                .lean(),
             slotSchema.countDocuments(query)
-        ])
+        ]);
+        console.log("slots-fetchSlots-advisor : ", slots)
         return { slots, totalSlots }
     }
 
@@ -130,38 +226,52 @@ export default class SlotRepository extends BaseRepository<Slot> implements ISlo
             }
 
             pipeline.push({
-                $facet: {
-                    paginatedResults: [
-                        { $skip: skip },
-                        { $limit: limit },
-                        {
-                            $project: {
-                                _id: 1,
-                                advisorId: 1,
-                                date: 1,
-                                startTime: 1,
-                                fee: 1,
-                                duration: 1,
-                                location: 1,
-                                locationDetails: 1,
-                                description: 1,
-                                status: 1,
-                                createdAt: 1,
-                                updatedAt: 1,
-                                bookedBy: {
-                                    _id:1,
-                                    username: 1,
-                                    email: 1,
-                                    profilePic: 1
-                                }
-                            }
-                        }
-                    ],
-                    totalCount: [
-                        { $count: 'count' }
-                    ]
-                }
-            });
+                $group: {
+                    _id: '$bookedBy._id',
+                    slotId: { $first: '$_id' },
+                    advisorId: { $first: '$advisorId' },
+                    date: { $first: '$date' },
+                    startTime: { $first: '$startTime' },
+                    fee: { $first: '$fee' },
+                    duration: { $first: '$duration' },
+                    location: { $first: '$location' },
+                    locationDetails: { $first: '$locationDetails' },
+                    description: { $first: '$description' },
+                    status: { $first: '$status' },
+                    createdAt: { $first: '$createdAt' },
+                    updatedAt: { $first: '$updatedAt' },
+                    bookedBy: { $first: '$bookedBy' },
+                },
+            },
+                {
+                    $project: {
+                        _id: '$slotId',
+                        advisorId: 1,
+                        date: 1,
+                        startTime: 1,
+                        fee: 1,
+                        duration: 1,
+                        location: 1,
+                        locationDetails: 1,
+                        description: 1,
+                        status: 1,
+                        createdAt: 1,
+                        updatedAt: 1,
+                        bookedBy: {
+                            _id: '$bookedBy._id',
+                            username: '$bookedBy.username',
+                            email: '$bookedBy.email',
+                            profilePic: '$bookedBy.profilePic',
+                        },
+                    },
+                },
+                { $sort: { date: -1 } },
+                {
+                    $facet: {
+                        paginatedResults: [{ $skip: skip }, { $limit: limit }],
+                        totalCount: [{ $count: 'count' }],
+                    },
+                });
 
             const result = await slotSchema.aggregate(pipeline);
             const bookedSlots = result[0]?.paginatedResults || [];
@@ -177,9 +287,10 @@ export default class SlotRepository extends BaseRepository<Slot> implements ISlo
     async getClientMeetings(clientId: string, advisorId: string): Promise<Slot[]> {
         try {
             const clientMeetings = await this.model.find({
-                "bookedBy._id": clientId,
-                "advisorId._id": advisorId
+                "bookedBy": clientId,
+                "advisorId": advisorId
             }).exec();
+            console.log("clientMeetings0-repo : ", clientMeetings)
             return clientMeetings;
         } catch (error) {
             console.error("Error fetching client meetings:", error);
