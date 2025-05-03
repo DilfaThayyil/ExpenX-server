@@ -81,13 +81,13 @@ export default class AuthAdvisorController implements IAuthAdvisorController {
         httpOnly: true,
         secure: NODE_ENV==='production',
         maxAge: 60 * 60 * 1000,
-        sameSite: 'strict',
+        sameSite: 'none',
       })
       res.cookie('refreshToken', user.refreshToken, {
         httpOnly: true,
         secure: NODE_ENV === 'production',
         maxAge: 30 * 24 * 60 * 60 * 1000,
-        sameSite: 'strict',
+        sameSite: 'none'
       })
       res.status(HttpStatusCode.OK).json({ message: 'Login successfull', user2 });
     } catch (err) {
@@ -110,7 +110,7 @@ export default class AuthAdvisorController implements IAuthAdvisorController {
         httpOnly: true,
         secure: NODE_ENV === 'production',
         maxAge: 60 * 60 * 1000,
-        sameSite: 'strict',
+        sameSite: 'none'
       })
       return res.status(HttpStatusCode.OK).json({ message: "Token set successfully", accessToken: result.accessToken, success: result.success });
     } catch (error) {
@@ -174,13 +174,13 @@ export default class AuthAdvisorController implements IAuthAdvisorController {
         httpOnly: true,
         secure: NODE_ENV === 'production',
         maxAge: 60 * 60 * 1000,
-        sameSite: 'strict',
+        sameSite: 'none'
       })
       res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
         secure: NODE_ENV === 'production',
         maxAge: 30 * 24 * 60 * 60 * 1000,
-        sameSite: 'strict',
+        sameSite: 'none'
       })
       res.status(HttpStatusCode.OK).json({ message: messageConstants.LOGIN_SUCCESS, user2 });
     } catch (err) {

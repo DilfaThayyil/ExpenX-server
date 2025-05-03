@@ -11,7 +11,6 @@ import redisClient from "../../../utils/redisClient";
 import { NODE_ENV } from '../../../config/env';
 
 
-
 @injectable()
 export default class AuthUserController implements IAuthUserController {
   private _authUserService: IAuthUserService;
@@ -83,13 +82,13 @@ export default class AuthUserController implements IAuthUserController {
         httpOnly: true,
         secure: NODE_ENV === 'production',
         maxAge: 60 * 60 * 1000,
-        sameSite: 'strict',
+        sameSite: 'none',
       })
       res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
         secure: NODE_ENV === 'production',
         maxAge: 30 * 24 * 60 * 60 * 1000,
-        sameSite: 'strict',
+        sameSite: 'none'
       })
       res.status(HttpStatusCode.OK).json({ message: messageConstants.LOGIN_SUCCESS, user2 });
     } catch (err) {
@@ -114,11 +113,10 @@ export default class AuthUserController implements IAuthUserController {
         httpOnly: true,
         secure: NODE_ENV === 'production',
         maxAge: 60 * 60 * 1000,
-        sameSite: 'strict',
+        sameSite: 'none',
       })
       return res.status(HttpStatusCode.OK).json({ message: "Token set successfully", accessToken: result.accessToken, success: result.success });
     } catch (error) {
-      console.error(error);
       return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: messageConstants.INTERNAL_ERROR });
     }
   }
@@ -163,7 +161,6 @@ export default class AuthUserController implements IAuthUserController {
       await this._authUserService.resetPassword(email, password);
       res.status(HttpStatusCode.OK).json({ message: 'Password changed successfully' });
     } catch (err) {
-      console.error('Error resetting password : ', err)
       const errorMessage = err instanceof Error ? err.message : messageConstants.UNEXPECTED_ERROR;
       res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: errorMessage });
     }
@@ -185,13 +182,13 @@ export default class AuthUserController implements IAuthUserController {
         httpOnly: true,
         secure: NODE_ENV === 'production',
         maxAge: 60 * 60 * 1000,
-        sameSite: 'strict',
+        sameSite: 'none',
       })
       res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
         secure: NODE_ENV === 'production',
         maxAge: 30 * 24 * 60 * 60 * 1000,
-        sameSite: 'strict',
+        sameSite: 'none',
       })
       res.status(HttpStatusCode.OK).json({ message: messageConstants.LOGIN_SUCCESS, user2 })
     } catch (err) {

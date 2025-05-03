@@ -92,10 +92,20 @@ export default class AuthUserService implements IAuthUserService {
 
   async setNewAccessToken(refreshToken: string): Promise<any> {
     try {
+    console.log("🔄 [Service] setNewAccessToken called with token:", refreshToken);
       const isBlacklisted = await redisClient.get(`bl:${refreshToken}`);
-      if (isBlacklisted) throw new Error("Refresh token expired or blacklisted");
+    console.log("🧾 [Redis] Is refresh token blacklisted?", isBlacklisted);
+
+      if (isBlacklisted) {
+      console.warn("🚫 [Service] Refresh token is blacklisted or expired.");
+	throw new Error("Refresh token expired or blacklisted")
+	}
       const decoded = verifyRefreshToken(refreshToken);
+    console.log("🔓 [JWT] Refresh token verified. Decoded payload:", decoded);
+
       const accessToken = generateAccessToken(decoded);
+    console.log("🔐 [JWT] New access token generated:", accessToken);
+
       return {
         accessToken,
         message: "Access token set successfully from service ",
@@ -103,6 +113,7 @@ export default class AuthUserService implements IAuthUserService {
         user: decoded
       }
     } catch (error: any) {
+    console.error("❌ [Service] Error in setNewAccessToken:", error.message);
       throw new Error("Error generating new access token: " + error.message);
     }
   }
