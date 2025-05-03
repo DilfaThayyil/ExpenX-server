@@ -5,7 +5,7 @@ import { createServer } from "http";
 import { connectDB } from "./config/connectDB";
 import cors from "cors";
 import dotenv from "dotenv";
-import { BACKENDENDPOINT, CLIENTURL, PORT } from "./config/env";
+import { CLIENTURL, PORT, BACKENDENDPOINT } from "./config/env";
 import router from "./routes";
 import initializeSocket from "./utils/socket";
 import cookieParser from "cookie-parser";
@@ -17,7 +17,7 @@ const app: Application = express();
 const server = createServer(app);  
 
 app.use(cors({
-  origin: CLIENTURL,
+  origin: ["https://expenx.vercel.app","https://expenx.dilfa.site"],
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
