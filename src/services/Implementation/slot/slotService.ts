@@ -44,8 +44,8 @@ export default class SlotService implements ISlotService {
     return bookedSlot;
   }
 
-  async fetchSlotsByUser(userId: string, page: number, limit: number): Promise<{ slots: Slot[], totalPages: number }> {
-    const result = await this._slotRepository.fetchSlotsByUser(userId, page, limit);
+  async fetchSlotsByUser(userId: string, page: number, limit: number,search:string): Promise<{ slots: Slot[], totalPages: number }> {
+    const result = await this._slotRepository.fetchSlotsByUser(userId, page, limit,search);
     return result
   }
 
