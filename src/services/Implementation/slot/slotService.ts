@@ -51,13 +51,26 @@ export default class SlotService implements ISlotService {
 
   async createSlot(id: string, slotData: Slot): Promise<Slot> {
     try {
-      const isExist = await this._slotRepository.findExistingSlot(slotData.date, slotData.startTime);
-      if (isExist) {
-        throw new Error("A slot already exists for the given date and time.");
+      const slotStart = new Date(`${slotData.date}T${slotData.startTime}`);
+      const slotEnd = new Date(slotStart.getTime() + slotData.duration * 60000);
+      const now = new Date();
+      if (slotStart <= now) {
+        throw new Error("Slot cannot be created in the past.");
       }
       const advisor = await this._advisorRepository.findUserById(id);
       if (!advisor) throw new Error('Advisor not found');
-      
+      const isExist = await this._slotRepository.findExistingSlot(advisor._id, slotData.date, slotData.startTime);
+      if (isExist) {
+        throw new Error("A slot already exists for the given date and time.");
+      }
+      const isOverlapping = await this._slotRepository.findOverlappingSlot(
+        advisor._id,
+        slotStart,
+        slotEnd
+      );
+      if (isOverlapping) {
+        throw new Error("An overlapping slot already exists for the given time interval.");
+      }
       const creatingSlot: Partial<Slot> = {
         advisorId: new Types.ObjectId(advisor._id),
         date: slotData.date,
@@ -69,16 +82,20 @@ export default class SlotService implements ISlotService {
         bookedBy: null,
         location: slotData.location,
         locationDetails: slotData.locationDetails,
-        description: slotData.description
+        description: slotData.description,
+        startDateTime: slotStart,
+        endDateTime: slotEnd
       };
       const slot = await this._slotRepository.createSlot(creatingSlot as Slot);
       return slot;
     } catch (err) {
-      console.error('Error creating slot:', err);
-      throw err;
-    }    
+      console.error("Error creating slot:", err);
+      if (err instanceof Error) {
+        throw new Error(err.message);
+      }
+      throw new Error("Unknown error occurred while creating slot");
+    }
   }
-
 
   async fetchSlots(advisorId: string, page: number, limit: number, search: string): Promise<{ slots: Slot[] | Slot, totalPages: number }> {
     // eslint-disable-next-line no-useless-catch

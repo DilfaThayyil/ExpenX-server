@@ -6,11 +6,12 @@ export interface ISlotRepository{
     updateSlotStatus(slotId:string):Promise<Slot | null>
     fetchSlotsByUser(userId: string, page: number, limit: number,search:string): Promise<{ slots: Slot[], totalPages: number }> 
     createSlot(slotData:Slot):Promise<Slot>
-    findExistingSlot(date:string,startTime:string):Promise<boolean>
+    findExistingSlot(advisorId:string,date:string,startTime:string):Promise<boolean>
     fetchSlots(advisorId:string,page:number,limit:number,search:string):Promise<{slots:Slot[] | Slot; totalSlots:number}>
     findSlotById(slotId:string):Promise<Slot | null>
     updateSlot(slotId:string,slot:Slot):Promise<Slot | null>
     deleteSlot(slotId:string):Promise<boolean>
     getBookedSlotsForAdvisor(advisorid:string,page:number,limit:number,search:string):Promise<{bookedSlots:Slot[] | Slot; totalSlots:number}>
     getClientMeetings(clientId:string,advisorId:string):Promise<Slot[]>
+    findOverlappingSlot(advisorId:string,newStart:Date,newEnd:Date):Promise<Slot | null>
 }

@@ -17,7 +17,7 @@ const app: Application = express();
 const server = createServer(app);  
 
 app.use(cors({
-  origin: ["https://expenx.vercel.app","https://expenx.dilfa.site"],
+  origin: CLIENTURL,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,

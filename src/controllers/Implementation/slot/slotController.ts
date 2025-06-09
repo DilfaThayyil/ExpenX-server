@@ -46,18 +46,14 @@ export default class SlotController implements ISlotController {
       if (req.body.slotData._id === '') {
         delete req.body.slotData._id;
       }
-      const Slot = await this._slotService.createSlot(req.body.id, req.body.slotData);
-      return res.status(HttpStatusCode.CREATED).json({ message: 'Slot created successfully', Slot });
-    } catch (err: any) {
-      console.error(err.message);
-      switch (err.message) {
-        case 'A slot already exists for the given date and time.':
-          return res.status(HttpStatusCode.CONFLICT).json({ message: err.message });
-        case 'Advisor not found':
-          return res.status(HttpStatusCode.NOT_FOUND).json({ message: err.message });
-        default:
-          return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: 'Failed to create slot' });
+      const Slot = await this._slotService.createSlot(req.body.id, req.body.slotData)
+      if (!Slot) {
+        throw new Error('Slot is already exists')
       }
+      return res.status(HttpStatusCode.CREATED).json({ message: 'Slot created successfully', Slot })
+    } catch (err:any) {
+      console.error("Error in createSlot controller : ",err)
+      return res.status(HttpStatusCode.BAD_REQUEST).json({ message: err.message || 'Internal Server Error' });
     }
   }
   
