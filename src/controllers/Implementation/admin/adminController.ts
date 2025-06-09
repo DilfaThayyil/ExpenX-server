@@ -7,6 +7,7 @@ import { NODE_ENV } from "../../../config/env";
 import jwt from "jsonwebtoken";
 import { messageConstants } from "../../../utils/messageConstants";
 import redisClient from "../../../utils/redisClient";
+import { setAccessTokenCookie, setRefreshTokenCookie } from "../../../utils/setCookies";
 
 
 @injectable()
@@ -22,18 +23,8 @@ export default class AdminController implements IAdminController {
     try {
       const { email, password } = req.body;
       const { admin, accessToken, refreshToken } = await this._adminService.adminLogin(email, password);
-      res.cookie('accessToken', accessToken, {
-        httpOnly: true,
-        secure: NODE_ENV === 'production',
-        maxAge: 60 * 60 * 1000,
-        sameSite: 'none',
-      })
-      res.cookie('refreshToken', refreshToken, {
-        httpOnly: true,
-        secure: NODE_ENV === 'production',
-        maxAge: 30 * 24 * 60 * 60 * 1000,
-        sameSite: 'none',
-      })
+      setAccessTokenCookie(res, accessToken);
+      setRefreshTokenCookie(res, refreshToken)
       return res.status(HttpStatusCode.OK).json({ message: messageConstants.LOGIN_SUCCESS, accessToken });
     } catch (error) {
       return res.status(HttpStatusCode.UNAUTHORIZED).json({
@@ -53,12 +44,7 @@ export default class AdminController implements IAdminController {
       if (!refreshToken) return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: messageConstants.REFRESH_TOKEN })
       const result = await this._adminService.setNewAccessToken(refreshToken)
       if (!result.accessToken) return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: messageConstants.TOKEN_FAILED })
-      res.cookie('accessToken', result.accessToken, {
-        httpOnly: true,
-        secure: NODE_ENV === 'production',
-        maxAge: 60 * 60 * 1000,
-        sameSite: 'none',
-      })
+      setAccessTokenCookie(res, result.accessToken);
       return res.status(HttpStatusCode.OK).json({ message: messageConstants.TOKEN_SUCCESS, accessToken: result.accessToken, success: result.success });
     } catch (err) {
       console.error(err);
@@ -78,7 +64,7 @@ export default class AdminController implements IAdminController {
     } catch (err) {
       console.error(err)
     }
-  }  
+  }
 
   async getMonthlyTrends(req: Request, res: Response): Promise<Response> {
     try {
