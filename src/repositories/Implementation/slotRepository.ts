@@ -30,23 +30,23 @@ export default class SlotRepository extends BaseRepository<Slot> implements ISlo
     }
 
     async fetchSlotsByUser(
-        userId: string, 
-        page: number, 
-        limit: number, 
-        search: string, 
+        userId: string,
+        page: number,
+        limit: number,
+        search: string,
         status?: string,
         location?: string,
         startDate?: string,
         endDate?: string
     ): Promise<{ slots: Slot[], totalPages: number }> {
         try {
-            const userObjectId = new Types.ObjectId(userId);            
+            const userObjectId = new Types.ObjectId(userId);
             const baseMatch: any = {
                 $or: [
                     { bookedBy: userObjectId },
                     { status: "Available" }
                 ]
-            };    
+            };
             if (status && status !== "All") {
                 baseMatch.status = status;
             }
@@ -60,8 +60,8 @@ export default class SlotRepository extends BaseRepository<Slot> implements ISlo
             if (endDate && endDate.trim() !== '') {
                 if (!baseMatch.date) baseMatch.date = {};
                 baseMatch.date.$lte = endDate;
-            }    
-            const searchRegex = search && search.trim() !== '' ? new RegExp(search, "i") : null;            
+            }
+            const searchRegex = search && search.trim() !== '' ? new RegExp(search, "i") : null;
             const searchMatch = searchRegex
                 ? {
                     $or: [
@@ -73,7 +73,7 @@ export default class SlotRepository extends BaseRepository<Slot> implements ISlo
                         { startTime: { $regex: searchRegex } }
                     ]
                 }
-                : {};    
+                : {};
             const pipeline: any[] = [
                 { $match: baseMatch },
                 {
@@ -108,10 +108,10 @@ export default class SlotRepository extends BaseRepository<Slot> implements ISlo
                         bookedBy: 1
                     }
                 }
-            ];            
+            ];
             if (search && search.trim() !== '') {
                 pipeline.push({ $match: searchMatch });
-            }            
+            }
             pipeline.push({
                 $facet: {
                     data: [
@@ -123,7 +123,7 @@ export default class SlotRepository extends BaseRepository<Slot> implements ISlo
                         { $count: "count" }
                     ]
                 }
-            });    
+            });
             const result = await slotSchema.aggregate(pipeline);
             const slots = result[0]?.data || [];
             const total = result[0]?.totalCount[0]?.count || 0;
@@ -140,8 +140,8 @@ export default class SlotRepository extends BaseRepository<Slot> implements ISlo
         return result
     }
 
-    async findExistingSlot(date: string, startTime: string): Promise<boolean> {
-        const result = await slotSchema.findOne({ date, startTime })
+    async findExistingSlot(advisorId: string, date: string, startTime: string): Promise<boolean> {
+        const result = await slotSchema.findOne({ advisorId: new Types.ObjectId(advisorId), date, startTime })
         return !!result
     }
 
@@ -170,7 +170,6 @@ export default class SlotRepository extends BaseRepository<Slot> implements ISlo
                 .lean(),
             slotSchema.countDocuments(query)
         ]);
-        console.log("slots-fetchSlots-advisor : ", slots)
         return { slots, totalSlots }
     }
 
@@ -290,12 +289,24 @@ export default class SlotRepository extends BaseRepository<Slot> implements ISlo
                 "bookedBy": clientId,
                 "advisorId": advisorId
             }).exec();
-            console.log("clientMeetings0-repo : ", clientMeetings)
             return clientMeetings;
         } catch (error) {
             console.error("Error fetching client meetings:", error);
             throw error;
         }
+    }
+
+    async findOverlappingSlot(
+        advisorId: string,
+        newStart: Date,
+        newEnd: Date
+    ): Promise<Slot | null> {
+        return await slotSchema.findOne({
+            advisorId: new Types.ObjectId(advisorId),
+            status: { $ne: "Cancelled" },
+            startDateTime: { $lt: newEnd },
+            endDateTime: { $gt: newStart }
+        });
     }
 
 }

@@ -8,8 +8,7 @@ import { mapUserProfile } from '../../Interface/mappers/userMapper';
 import { messageConstants } from '../../../utils/messageConstants';
 import jwt from "jsonwebtoken";
 import redisClient from "../../../utils/redisClient";
-import { NODE_ENV } from '../../../config/env';
-
+import { setAccessTokenCookie, setRefreshTokenCookie } from '../../../utils/setCookies';
 
 @injectable()
 export default class AuthUserController implements IAuthUserController {
@@ -78,18 +77,8 @@ export default class AuthUserController implements IAuthUserController {
       const { email, password } = req.body;
       const { userData, accessToken, refreshToken } = await this._authUserService.loginUser(email, password);
       const user2 = mapUserProfile(userData)
-      res.cookie('accessToken', accessToken, {
-        httpOnly: true,
-        secure: NODE_ENV === 'production',
-        maxAge: 60 * 60 * 1000,
-        sameSite: 'none',
-      })
-      res.cookie('refreshToken', refreshToken, {
-        httpOnly: true,
-        secure: NODE_ENV === 'production',
-        maxAge: 30 * 24 * 60 * 60 * 1000,
-        sameSite: 'none'
-      })
+      setAccessTokenCookie(res, accessToken);
+      setRefreshTokenCookie(res, refreshToken);
       res.status(HttpStatusCode.OK).json({ message: messageConstants.LOGIN_SUCCESS, user2 });
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : messageConstants.UNEXPECTED_ERROR;
@@ -109,12 +98,7 @@ export default class AuthUserController implements IAuthUserController {
       if (!refreshToken) return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: "No refresh token provided" });
       const result = await this._authUserService.setNewAccessToken(refreshToken);
       if (!result.accessToken) return res.status(HttpStatusCode.UNAUTHORIZED).json({ message: 'Failed to generate token' });
-      res.cookie('accessToken', result.accessToken, {
-        httpOnly: true,
-        secure: NODE_ENV === 'production',
-        maxAge: 60 * 60 * 1000,
-        sameSite: 'none',
-      })
+      setAccessTokenCookie(res, result.accessToken);
       return res.status(HttpStatusCode.OK).json({ message: "Token set successfully", accessToken: result.accessToken, success: result.success });
     } catch (error) {
       return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: messageConstants.INTERNAL_ERROR });
@@ -175,21 +159,10 @@ export default class AuthUserController implements IAuthUserController {
       const email = userCredential.email
       const password = userCredential.sub
       const profilePic = userCredential.picture
-
       const { existingUser, accessToken, refreshToken } = await this._authUserService.googleAuth(username, email, password, profilePic)
       const user2 = mapUserProfile(existingUser)
-      res.cookie('accessToken', accessToken, {
-        httpOnly: true,
-        secure: NODE_ENV === 'production',
-        maxAge: 60 * 60 * 1000,
-        sameSite: 'none',
-      })
-      res.cookie('refreshToken', refreshToken, {
-        httpOnly: true,
-        secure: NODE_ENV === 'production',
-        maxAge: 30 * 24 * 60 * 60 * 1000,
-        sameSite: 'none',
-      })
+      setAccessTokenCookie(res, accessToken);
+      setRefreshTokenCookie(res, refreshToken);
       res.status(HttpStatusCode.OK).json({ message: messageConstants.LOGIN_SUCCESS, user2 })
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : messageConstants.UNEXPECTED_ERROR
@@ -211,7 +184,7 @@ export default class AuthUserController implements IAuthUserController {
           const ttl = expiry - currentTime;
 
           await redisClient.set(`bl:${refreshToken}`, "1", {
-            EX: ttl, // expire same time as token
+            EX: ttl,
           });
         }
       }
